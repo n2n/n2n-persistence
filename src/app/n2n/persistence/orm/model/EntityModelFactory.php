@@ -29,7 +29,7 @@ use n2n\persistence\orm\property\SetupProcess;
 use n2n\persistence\orm\model\UnknownEntityPropertyException;
 use n2n\persistence\orm\OrmConfigurationException;
 use n2n\persistence\orm\property\BasicEntityProperty;
-use n2n\dispatch\model\ModelInitializationException;
+use n2n\web\dispatch\model\ModelInitializationException;
 use n2n\persistence\orm\property\PropertyInitializationException;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\property\ClassSetup;

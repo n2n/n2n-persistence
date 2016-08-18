@@ -27,7 +27,7 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\reflection\ReflectionContext;
 use n2n\persistence\orm\OrmErrorException;
 use n2n\reflection\ReflectionUtils;
-use n2n\dispatch\model\ModelInitializationException;
+use n2n\web\dispatch\model\ModelInitializationException;
 use n2n\persistence\orm\annotation\AnnoMappedSuperclass;
 // @todo create ReflectionClass later because fatal error if class has errors
 class EntityModelManager {

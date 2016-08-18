@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm\annotation;
 
-use n2n\N2N;
+use n2n\core\N2N;
 
 class AnnoManyToOne extends OrmRelationAnnotation {
 	public function __construct(\ReflectionClass $targetEntityClass, int $cascadeType = null, 

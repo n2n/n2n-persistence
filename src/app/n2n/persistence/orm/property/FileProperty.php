@@ -30,7 +30,7 @@ use n2n\persistence\orm\store\MappingJob;
 use n2n\reflection\property\TypeConstraint;
 use n2n\io\fs\ClonedFile;
 use n2n\persistence\orm\store\RemoveAction;
-use n2n\N2N;
+use n2n\core\N2N;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\annotation\File as FileAnnotation;
 

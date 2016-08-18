@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\N2N;
+use n2n\core\N2N;
 
 use n2n\io\OutputStream;
 

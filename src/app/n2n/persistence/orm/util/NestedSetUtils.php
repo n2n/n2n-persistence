@@ -24,7 +24,7 @@ namespace n2n\persistence\orm\util;
 use n2n\persistence\meta\data\OrderDirection;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\persistence\orm\criteria\item\CriteriaFunction;
-use n2n\N2N;
+use n2n\core\N2N;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\criteria\Criteria;
 use n2n\persistence\orm\criteria\JoinType;

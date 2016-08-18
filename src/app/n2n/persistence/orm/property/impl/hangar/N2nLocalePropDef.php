@@ -24,7 +24,7 @@ namespace n2n\persistence\orm\property\impl\hangar;
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
 use n2n\util\config\Attributes;
-use n2n\dispatch\mag\MagCollection;
+use n2n\web\dispatch\mag\MagCollection;
 use hangar\entity\model\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;

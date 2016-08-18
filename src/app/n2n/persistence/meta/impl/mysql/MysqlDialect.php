@@ -29,7 +29,7 @@ use n2n\persistence\meta\data\common\CommonSelectStatementBuilder;
 use n2n\persistence\meta\structure\InvalidColumnAttributesException;
 use n2n\persistence\meta\structure\IntegerColumn;
 use n2n\persistence\meta\structure\Column;
-use n2n\N2N;
+use n2n\core\N2N;
 use n2n\persistence\Pdo;
 use n2n\persistence\meta\impl\DialectAdapter;
 use n2n\core\SysTextUtils;

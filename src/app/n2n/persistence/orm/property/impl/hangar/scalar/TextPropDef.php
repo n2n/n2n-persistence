@@ -22,11 +22,11 @@
 namespace n2n\persistence\orm\property\impl\hangar\scalar;
 
 use hangar\entity\model\PropSourceDef;
-use n2n\dispatch\mag\MagCollection;
+use n2n\web\dispatch\mag\MagCollection;
 use n2n\util\config\Attributes;
 use hangar\entity\model\DbInfo;
-use n2n\dispatch\mag\impl\model\NumericMag;
-use n2n\dispatch\mag\impl\model\StringMag;
+use n2n\web\dispatch\mag\impl\model\NumericMag;
+use n2n\web\dispatch\mag\impl\model\StringMag;
 use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\ArgUtils;
