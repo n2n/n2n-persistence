@@ -1,0 +1,28 @@
+{
+    "name": "n2n/n2n-persistence",
+    "type": "library",
+    "description": "Persitence library for n2n. Includes ORM and Meta API.",
+    "keywords": ["n2n","persistence","orm","db meta api"],
+    "homepage": "http://n2n.rocks/",
+    "license": "GNU LGPL",
+    "authors": [
+        {
+            "name": "Andreas von Burg",
+            "email": "a@von-burg.net",
+            "homepage": "http://www.von-burg.net",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "n2n/n2n-io": "master-dev",
+        "n2n/n2n-l10n": "master-dev",
+        "n2n/n2n-reflection": "master-dev",
+        "n2n/n2n-util": "master-dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "n2n\\core\\": "src/app/n2n/core"
+        }
+    }
+}
