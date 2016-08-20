@@ -23,7 +23,7 @@ namespace n2n\persistence\orm\model;
 
 use n2n\reflection\property\PropertiesAnalyzer;
 use n2n\reflection\ReflectionContext;
-use n2n\persistence\orm\property\impl\ScalarEntityProperty;
+use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\persistence\orm\property\ClassSetup;
 
 class EntityPropertyAnalyzer {

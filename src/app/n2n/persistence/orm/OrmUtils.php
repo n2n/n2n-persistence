@@ -29,7 +29,7 @@ use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\criteria\item\CriteriaProperty;
 use n2n\persistence\orm\model\UnknownEntityPropertyException;
 use n2n\persistence\orm\proxy\EntityProxy;
-use n2n\persistence\orm\property\impl\relation\selection\ArrayObjectProxy;
+use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 
 class OrmUtils {	
 // 	public static function extractId($entity, EntityModel $entityModel = null) {

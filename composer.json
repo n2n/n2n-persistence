@@ -16,13 +16,12 @@
     "require": {
         "php": ">=7.0",
         "n2n/n2n-io": "master-dev",
-        "n2n/n2n-l10n": "master-dev",
         "n2n/n2n-reflection": "master-dev",
         "n2n/n2n-util": "master-dev"
     },
     "autoload": {
         "psr-4": {
-            "n2n\\core\\": "src/app/n2n/core"
+            "n2n\\persistence\\": "src/app/n2n/persistence"
         }
     }
 }

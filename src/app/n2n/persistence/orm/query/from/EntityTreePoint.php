@@ -25,7 +25,7 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\query\select\EntitySelection;
-use n2n\persistence\orm\property\impl\relation\compare\IdColumnComparableDecorator;
+use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
 
 abstract class EntityTreePoint extends ExtendableTreePoint {
 	protected $entityModel;
