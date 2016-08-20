@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "n2n\\core\\": "src/app/n2n/persistence"
+            "n2n\\persistence\\": "src/app/n2n/persistence"
         }
     }
 }
