@@ -29,7 +29,7 @@ use n2n\persistence\orm\query\from\meta\TablePerClassTreePointMeta;
 use n2n\persistence\orm\query\from\meta\SingleTableTreePointMeta;
 use n2n\persistence\orm\query\from\meta\JoinedTreePointMeta;
 use n2n\persistence\orm\query\from\meta\SimpleTreePointMeta;
-use n2n\persistence\orm\property\impl\IdProperty;
+use n2n\impl\persistence\orm\property\IdProperty;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\query\QueryState;
 use n2n\util\ex\IllegalStateException;
