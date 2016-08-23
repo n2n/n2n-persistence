@@ -9,8 +9,7 @@
         {
             "name": "Andreas von Burg",
             "email": "a@von-burg.net",
-            "homepage": "http://www.von-burg.net",
-            "role": "Developer"
+            "homepage": "http://www.von-burg.net"
         }
     ],
     "require": {
