@@ -22,4 +22,9 @@
 namespace n2n\persistence\orm\annotation;
 
 class AnnoManyToMany extends MappableOrmRelationAnnotation {
+	public function __construct(\ReflectionClass $targetEntityClass, string $mappedBy = null,
+			int $cascadeType = null, string $fetchType = null) {
+		
+		parent::__construct($targetEntityClass, $mappedBy, $cascadeType, $fetchType);
+	}
 }
