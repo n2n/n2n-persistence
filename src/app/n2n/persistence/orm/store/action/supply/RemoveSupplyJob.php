@@ -25,11 +25,12 @@ use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\property\CascadableEntityProperty;
+use n2n\persistence\orm\store\ValuesHash;
 
 class RemoveSupplyJob extends SupplyJobAdapter {
 
-	public function __construct(RemoveAction $removeAction, array $oldValueHashes) {
-		parent::__construct($removeAction, $oldValueHashes);
+	public function __construct(RemoveAction $removeAction, ValuesHash $oldValuesHash) {
+		parent::__construct($removeAction, $oldValuesHash);
 	}
 
 	public function getPersistAction() {
@@ -62,8 +63,8 @@ class RemoveSupplyJob extends SupplyJobAdapter {
 				as $propertyName => $entityProperty) {
 			if (!($entityProperty instanceof CascadableEntityProperty)) continue;
 
-			$entityProperty->prepareSupplyJob($this->getValue($propertyName), 
-					$this->getOldValueHash($propertyName), $this);
+			$entityProperty->prepareSupplyJob($this, $this->getValue($propertyName), 
+					$this->getOldValueHash($propertyName));
 		}
 	}
 
@@ -86,8 +87,8 @@ class RemoveSupplyJob extends SupplyJobAdapter {
 		$entityModel = $this->entityAction->getEntityModel();
 		
 		foreach ($entityModel->getEntityProperties() as $propertyName => $entityProperty) {
-			$entityProperty->supplyRemoveAction($this->getValue($propertyName), 
-					$this->getOldValueHash($propertyName), $this->entityAction);
+			$entityProperty->supplyRemoveAction($this->entityAction, $this->getValue($propertyName), 
+					$this->getOldValueHash($propertyName));
 		}
 		
 		foreach ($entityModel->getActionDependencies() as $actionDependency) {

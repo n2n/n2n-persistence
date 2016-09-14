@@ -29,6 +29,7 @@ use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\model\EntityPropertyCollection;
+use n2n\persistence\orm\store\ValueHash;
 
 interface EntityProperty {
 	/**
@@ -89,19 +90,19 @@ interface EntityProperty {
 	 * @param mixed $mappedValue
 	 * @param PersistAction $persistingJob
 	 */
-	public function supplyPersistAction($value, $valueHash, PersistAction $persistingJob);
+	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $oldValueHash = null);
 	
 	/**
 	 * @param mixed $mappedValue
 	 * @param RemoveAction $removingJob
 	 */
-	public function supplyRemoveAction($value, $valueHash, RemoveAction $removeAction);
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash);
 	
 	/**
 	 * @param unknown $value
 	 * @return mixed
 	 */
-	public function buildValueHash($value, EntityManager $em);
+	public function createValueHash($value, EntityManager $em): ValueHash;
 	
 	/**
 	 * @param mixed $mappedValue

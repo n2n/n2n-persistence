@@ -301,17 +301,17 @@ class PersistActionPool {
 		$hasher = new ValueHashesFactory($entityModel, $persistAction->getActionQueue()->getEntityManager());
 	
 		$values = array();
-		$valueHashes = $hasher->create($entity, $values);
-		$oldValueHashes = $this->actionQueue->getEntityManager()->getPersistenceContext()
-				->getValueHashesByEntity($entity);
+		$valuesHash = $hasher->create($entity, $values);
+		$oldValuesHash = $this->actionQueue->getEntityManager()->getPersistenceContext()
+				->getValuesHashByEntity($entity);
 		
-		if ($valueHashes === $oldValueHashes) {
+		if ($valuesHash->matches($oldValuesHash)) {
 			return null;
 		}
 		
-		$supplyJob = new PersistSupplyJob($persistAction, $oldValueHashes);
+		$supplyJob = new PersistSupplyJob($persistAction, $oldValuesHash);
 		$supplyJob->setValues($values);
-		$supplyJob->setValueHashes($valueHashes);
+		$supplyJob->setValueHashes($valuesHash);
 		
 		$supplyJob->prepare();
 		return $supplyJob;

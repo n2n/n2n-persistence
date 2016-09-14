@@ -25,12 +25,13 @@ use n2n\persistence\orm\store\action\PersistAction;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\property\CascadableEntityProperty;
+use n2n\persistence\orm\store\ValuesHash;
 
 class PersistSupplyJob extends SupplyJobAdapter {
 	private $valueHashes = array();
 	private $prepared = false;
 
-	public function __construct(PersistAction $persistAction, array $oldValueHashes = null) {
+	public function __construct(PersistAction $persistAction, ValuesHash $oldValueHashes = null) {
 		parent::__construct($persistAction, $oldValueHashes);
 	}
 
@@ -50,8 +51,8 @@ class PersistSupplyJob extends SupplyJobAdapter {
 		return false;
 	}
 
-	public function setValueHashes(array $valueHashes) {
-		$this->valueHashes = $valueHashes;
+	public function setValueHashes(ValuesHash $valuesHash) {
+		$this->valueHashes = $valuesHash->getValueHashes();
 	}
 
 	public function getValueHashes() {
@@ -77,10 +78,10 @@ class PersistSupplyJob extends SupplyJobAdapter {
 			$oldValueHash = null;
 			if (!$new) {
 				$oldValueHash = $this->getOldValueHash($propertyName);
-				if ($oldValueHash === $this->getValueHash($propertyName)) continue;
+				if ($oldValueHash->matches($this->getValueHash($propertyName))) continue;
 			}
 			
-			$entityProperty->prepareSupplyJob($this->values[$propertyName], $oldValueHash, $this);
+			$entityProperty->prepareSupplyJob($this, $this->values[$propertyName], $oldValueHash);
 		}
 	}
 
@@ -114,11 +115,10 @@ class PersistSupplyJob extends SupplyJobAdapter {
 			$oldValueHash = null;
 			if (!$this->entityAction->isNew()) {
 				$oldValueHash = $this->getOldValueHash($propertyName);
-				if ($oldValueHash === $this->getValueHash($propertyName)) continue;
+				if ($oldValueHash->matches($this->getValueHash($propertyName))) continue;
 			}
 			
-			$property->supplyPersistAction($this->getValue($propertyName), $oldValueHash, 
-					$this->entityAction);
+			$property->supplyPersistAction($this->entityAction, $this->getValue($propertyName), $oldValueHash);
 		}
 
 		foreach ($entityModel->getActionDependencies() as $actionDependency) {
