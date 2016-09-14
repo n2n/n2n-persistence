@@ -32,7 +32,7 @@ class AnnoManagedFile implements PropertyAnnotation {
 	
 	private $fileManagerlookupId;
 	private $fileLocator;
-	private $cascadeDelete = false;
+	private $cascadeDelete = true;
 	/**
 	 * @param string $fileManagerlookupId
 	 * @param FileLocator $fileLocator
