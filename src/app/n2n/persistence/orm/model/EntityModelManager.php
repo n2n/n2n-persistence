@@ -93,7 +93,7 @@ class EntityModelManager {
 		}
 	}
 		
-	public function getEntityModelByEntity($entity) {		
+	public function getEntityModelByEntityObj($entity) {		
 		$class = new \ReflectionClass($entity);
 		if ($entity instanceof EntityProxy) {
 			$class = $class->getParentClass();

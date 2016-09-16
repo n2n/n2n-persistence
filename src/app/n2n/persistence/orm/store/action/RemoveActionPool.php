@@ -110,14 +110,14 @@ class RemoveActionPool {
 		}
 
 		$persistenceContext = $em->getPersistenceContext();
-		$oldValuesHash = $persistenceContext->getValuesHashByEntity($entity);
+		$oldValuesHash = $persistenceContext->getValuesHashByEntityObj($entity);
 		IllegalStateException::assertTrue($oldValuesHash !== null);
 
 		$actionMeta = $entityModel->createActionMeta();
 		$actionMeta->setIdRawValue($entityModel->getIdDef()->getEntityProperty()
 				->buildRaw($entityInfo->getId(), $this->actionQueue->getEntityManager()->getPdo()));
 		
-		$persistenceContext->removeEntity($entity);
+		$persistenceContext->removeEntityObj($entity);
 		return new RemoveActionImpl($this->actionQueue, $entityModel, $id, $entity,
 				$actionMeta, $oldValuesHash);		
 	}
@@ -175,7 +175,7 @@ class RemoveActionPool {
 		$entity = $removeAction->getEntityObj();
 
 		$oldValuesHash = $this->actionQueue->getEntityManager()->getPersistenceContext()
-				->getValuesHashByEntity($entity);
+				->getValuesHashByEntityObj($entity);
 		$values = array();
 		foreach ($entityModel->getEntityProperties() as $propertyName => $entityProperty) {
 			$values[$propertyName] = $entityProperty->readValue($entity);

@@ -41,8 +41,8 @@ use n2n\persistence\orm\proxy\EntityProxy;
 class PersistenceContext {
 	private $entityProxyManager;
 	
-	private $managedEntities = array();
-	private $removedEntities = array();
+	private $managedEntityObjs = array();
+	private $removedEntityObjs = array();
 	
 	private $entityValuesHash = array();
 	private $entityIdReps = array();
@@ -62,20 +62,20 @@ class PersistenceContext {
 	 * 
 	 */
 	public function clear() {
-		$this->managedEntities = array();
+		$this->managedEntityObjs = array();
 		$this->entityValuesHash = array();
 		
-		$this->removedEntities = array();
+		$this->removedEntityObjs = array();
 		
 		$this->entityIdReps = array();
 		$this->entityIdentifiers = array();
 		$this->entityModels = array();
 	}
 	
-	public function getIdByEntity($entity) {
-		ArgUtils::assertTrue(is_object($entity));
+	public function getIdByEntityObj($entityObj) {
+		ArgUtils::assertTrue(is_object($entityObj));
 		
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_hash($entityObj);
 		if (isset($this->entityIdReps[$objHash])) {
 			return $this->entityIdReps[$objHash];
 		}
@@ -112,8 +112,8 @@ class PersistenceContext {
 		if (!isset($this->entityIdentifiers[$className][$idRep])) return null;
 		
 		$objHash = spl_object_hash($this->entityIdentifiers[$className][$idRep]);
-		if (isset($this->removedEntities[$objHash])) {
-			return $this->removedEntities[$objHash];
+		if (isset($this->removedEntityObjs[$objHash])) {
+			return $this->removedEntityObjs[$objHash];
 		}
 		
 		return null;
@@ -123,10 +123,10 @@ class PersistenceContext {
 	 * @param $entity
 	 * @return \n2n\persistence\orm\store\EntityInfo
 	 */
-	public function getEntityInfo($entity, EntityModelManager $entityModelManager) {
-		ArgUtils::assertTrue(is_object($entity));
+	public function getEntityInfo($entityObj, EntityModelManager $entityModelManager) {
+		ArgUtils::assertTrue(is_object($entityObj));
 		
-		$objectHash = spl_object_hash($entity);
+		$objectHash = spl_object_hash($entityObj);
 		$entityModel = null;
 		$id = null;
 		if (isset($this->entityIdReps[$objectHash])) {
@@ -134,17 +134,17 @@ class PersistenceContext {
 					$this->entityIdReps[$objectHash]);	
 		}
 		
-		if (isset($this->managedEntities[$objectHash])) {
+		if (isset($this->managedEntityObjs[$objectHash])) {
 			return new EntityInfo(EntityInfo::STATE_MANAGED, $this->entityModels[$objectHash], $id);
 		}
 			
-		if (isset($this->removedEntities[$objectHash])) {
+		if (isset($this->removedEntityObjs[$objectHash])) {
 			return new EntityInfo(EntityInfo::STATE_REMOVED, $this->entityModels[$objectHash], $id);
 		}
 		
-		$entityModel = $entityModelManager->getEntityModelByEntity($entity);
+		$entityModel = $entityModelManager->getEntityModelByEntityObj($entityObj);
 		$idDef = $entityModel->getIdDef();
-		$id = $idDef->getEntityProperty()->readValue($entity);
+		$id = $idDef->getEntityProperty()->readValue($entityObj);
 	
 		if ($idDef->isGenerated()) {
 			return new EntityInfo(($id === null ? EntityInfo::STATE_NEW : EntityInfo::STATE_DETACHED), 
@@ -154,35 +154,39 @@ class PersistenceContext {
 		return new EntityInfo(EntityInfo::STATE_NEW, $entityModel, $id);
 	}
 	
-	public function getManagedEntities() {
-		return $this->managedEntities;
+	public function getManagedEntityObjs() {
+		return $this->managedEntityObjs;
 	}
 	
-	public function getManagedEntityByIdRep(EntityModel $entityModel, $idRep) {
+	public function getRemovedEntityObjs() {
+		return $this->removedEntityObjs;
+	}
+	
+	public function getManagedEntityObjByIdRep(EntityModel $entityModel, $idRep) {
 		$className = $entityModel->getClass()->getName();
 		
 		if (isset($this->entityIdentifiers[$className][$idRep])
-				&& $this->containsManagedEntity($this->entityIdentifiers[$className][$idRep])) {
+				&& $this->containsManagedEntityObj($this->entityIdentifiers[$className][$idRep])) {
 			return $this->entityIdentifiers[$className][$idRep];
 		}
 		
 		return null;
 	}
 	
-	public function getManagedEntity(EntityModel $entityModel, $id) {
+	public function getManagedEntityObj(EntityModel $entityModel, $id) {
 		if ($id === null) return null;
 		
 		$idRep = $entityModel->getIdDef()->getEntityProperty()->valueToRep($id);
 		
-		return $this->getManagedEntityByIdRep($entityModel, $idRep);
+		return $this->getManagedEntityObjByIdRep($entityModel, $idRep);
 	}
 	
 	public function getOrCreateManagedEntity(EntityModel $entityModel, $id) {
-		if (null !== ($entity = $this->getManagedEntity($entityModel, $id))) {
+		if (null !== ($entity = $this->getManagedEntityObj($entityModel, $id))) {
 			return $entity;
 		}
 		
-		return $this->createManagedEntity($entityModel, $id);
+		return $this->createManagedEntityObj($entityModel, $id);
 	}
 	
 	/**
@@ -191,7 +195,7 @@ class PersistenceContext {
 	 * @throws EntityCreationFailedException
 	 * @return object
 	 */
-	public function createManagedEntity(EntityModel $entityModel, $id) {
+	public function createManagedEntityObj(EntityModel $entityModel, $id) {
 		$entityObj = null;
 		try {
 			$entityObj = ReflectionUtils::createObject($entityModel->getClass(), true);
@@ -199,8 +203,8 @@ class PersistenceContext {
 			throw new EntityCreationFailedException('Could not create entity object for ' 
 					. EntityInfo::buildEntityString($entityModel, $id), 0, $e);
 		}
-		$this->manageEntity($entityObj, $entityModel);
-		$this->identifyManagedEntity($entityObj, $id);
+		$this->manageEntityObj($entityObj, $entityModel);
+		$this->identifyManagedEntityObj($entityObj, $id);
 		return $entityObj;
 	}
 
@@ -235,8 +239,8 @@ class PersistenceContext {
 		
 		$entityModel->getIdDef()->getEntityProperty()->writeValue($entity, $id);
 		
-		$this->manageEntity($entity, $entityModel);
-		$this->identifyManagedEntity($entity, $id);
+		$this->manageEntityObj($entity, $entityModel);
+		$this->identifyManagedEntityObj($entity, $id);
 	
 		return $entity;
 	}
@@ -245,11 +249,11 @@ class PersistenceContext {
 	 * @param object $entity
 	 * @param EntityModel $entityModel
 	 */
-	public function manageEntity($entity, EntityModel $entityModel) {
+	public function manageEntityObj($entity, EntityModel $entityModel) {
 		$objHash = spl_object_hash($entity);
-		unset($this->removedEntities[$objHash]);
+		unset($this->removedEntityObjs[$objHash]);
 		
-		$this->managedEntities[$objHash] = $entity;
+		$this->managedEntityObjs[$objHash] = $entity;
 		$this->entityModels[$objHash] = $entityModel;
 	}
 	
@@ -257,27 +261,27 @@ class PersistenceContext {
 	 * @param object $entity
 	 * @return bool
 	 */
-	public function containsManagedEntity($entity) {
+	public function containsManagedEntityObj($entity) {
 		ArgUtils::assertTrue(is_object($entity));
-		return isset($this->managedEntities[spl_object_hash($entity)]);
+		return isset($this->managedEntityObjs[spl_object_hash($entity)]);
 	}
 	
 	/**
 	 * @param object $entity
 	 */
-	public function removeEntity($entity) {
-		$this->validateEntityManaged($entity);
+	public function removeEntityObj($entity) {
+		$this->validateEntityObjManaged($entity);
 		
 		$objHash = spl_object_hash($entity);
-		unset($this->managedEntities[$objHash]);
-		$this->removedEntities[$objHash] = $entity;
+		unset($this->managedEntityObjs[$objHash]);
+		$this->removedEntityObjs[$objHash] = $entity;
 	}
 	
 	/**
 	 * @param EntityModel $entityModel
 	 * @param string $idRep
 	 */
-	private function removeEntityIdentifiction(EntityModel $entityModel, string $idRep) {
+	private function removeEntityObjIdentifiction(EntityModel $entityModel, string $idRep) {
 		do {
 			unset($this->entityIdentifiers[$entityModel->getClass()->getName()][$idRep]);
 		} while (null !== ($entityModel = $entityModel->getSuperEntityModel()));
@@ -286,7 +290,7 @@ class PersistenceContext {
 	/**
 	 * @param object $entity
 	 */
-	public function detachEntity($entity) {
+	public function detachEntityObj($entity) {
 		$objHash = spl_object_hash($entity);
 		
 		if (isset($this->entityModels[$objHash])) {
@@ -294,24 +298,24 @@ class PersistenceContext {
 			unset($this->entityModels[$objHash]);
 			
 			if (isset($this->entityIdReps[$objHash])) {
-				$this->removeEntityIdentifiction($entityModel, $this->entityIdReps[$objHash]);
+				$this->removeEntityObjIdentifiction($entityModel, $this->entityIdReps[$objHash]);
 				unset($this->entityIdReps[$objHash]);
 			}
 		}
 		
 		unset($this->entityIdReps[$objHash]);
-		unset($this->managedEntities[$objHash]);
+		unset($this->managedEntityObjs[$objHash]);
 		unset($this->entityValuesHash[$objHash]);
-		unset($this->removedEntities[$objHash]);
+		unset($this->removedEntityObjs[$objHash]);
 // 		$this->detachedEntities[$objHash] = $entity;
 	}
 	                
 	/**
 	 * 
 	 */
-	public function detachNotManagedEntities() {
-		foreach ($this->removedEntities as $entity) {
-			$this->detachEntity($entity);
+	public function detachNotManagedEntityObjs() {
+		foreach ($this->removedEntityObjs as $entity) {
+			$this->detachEntityObj($entity);
 // 			unset($this->entityIdReps[$objHash]);
 // 			unset($this->managedEntities[$objHash]);
 // 			unset($this->entityValueHashes[$objHash]);
@@ -323,8 +327,8 @@ class PersistenceContext {
 	 * @param object $entity
 	 * @throws \InvalidArgumentException
 	 */
-	private function validateEntityManaged($entity) {
-		if ($this->containsManagedEntity($entity)) return;
+	private function validateEntityObjManaged($entityObj) {
+		if ($this->containsManagedEntityObj($entityObj)) return;
 		
 		throw new \InvalidArgumentException('Passed entity not managed');
 	}
@@ -334,12 +338,12 @@ class PersistenceContext {
 	 * @param mixed $id
 	 * @throws IllegalStateException
 	 */
-	public function identifyManagedEntity($entity, $id) {
-		ArgUtils::assertTrue(is_object($entity));
+	public function identifyManagedEntityObj($entityObj, $id) {
+		ArgUtils::assertTrue(is_object($entityObj));
 		ArgUtils::assertTrue($id !== null);
 		
-		$objHash = spl_object_hash($entity);
-		if (!isset($this->managedEntities[$objHash])) {
+		$objHash = spl_object_hash($entityObj);
+		if (!isset($this->managedEntityObjs[$objHash])) {
 			throw new IllegalStateException('Unable to identify non managed entity.');
 		}
 		
@@ -358,13 +362,13 @@ class PersistenceContext {
 			if (!isset($this->entityIdentifiers[$className])) {
 				$this->entityIdentifiers[$className] = array();
 			} else if (isset($this->entityIdentifiers[$className][$idRep])) {
-				if ($this->entityIdentifiers[$className][$idRep] === $entity) return;
+				if ($this->entityIdentifiers[$className][$idRep] === $entityObj) return;
 				
 				throw new IllegalStateException('Other entity instance already exists in persistence context: ' 
 						. EntityInfo::buildEntityString($entityModel, $id));
 			}
 			
-			$this->entityIdentifiers[$className][$idRep] = $entity;
+			$this->entityIdentifiers[$className][$idRep] = $entityObj;
 		} while (null !== ($entityModel = $entityModel->getSuperEntityModel()));
 	}
 	
@@ -373,8 +377,8 @@ class PersistenceContext {
 	 * @throws \InvalidArgumentException
 	 * @return EntityModel
 	 */
-	public function getEntityModelByEntity($entity) {
-		$objHash = spl_object_hash($entity);
+	public function getEntityModelByEntityObj($entityObj) {
+		$objHash = spl_object_hash($entityObj);
 		if (isset($this->entityModels[$objHash])) {
 			return $this->entityModels[$objHash];
 		}
@@ -386,15 +390,15 @@ class PersistenceContext {
 	 * @param object $entity
 	 * @param array $values
 	 */
-	public function mapValues($entity, array $values) {
-		$this->validateEntityManaged($entity);
+	public function mapValues($entityObj, array $values) {
+		$this->validateEntityObjManaged($entityObj);
 		
-		$entityModel = $this->getEntityModelByEntity($entity);
-		$this->entityProxyManager->disposeProxyAccessListenerOf($entity);
+		$entityModel = $this->getEntityModelByEntityObj($entityObj);
+		$this->entityProxyManager->disposeProxyAccessListenerOf($entityObj);
 		
 		foreach ($entityModel->getEntityProperties() as $propertyName => $entityProperty) {
 			if (!array_key_exists($propertyName, $values)) continue;
-			$entityProperty->writeValue($entity, $values[$propertyName]);
+			$entityProperty->writeValue($entityObj, $values[$propertyName]);
 		}
 	}
 	
@@ -402,10 +406,10 @@ class PersistenceContext {
 	 * @param object $entity
 	 * @return bool
 	 */
-	public function containsValueHashes($entity) {
-		$this->validateEntityManaged($entity);
+	public function containsValueHashes($entityObj) {
+		$this->validateEntityObjManaged($entityObj);
 		
-		return isset($this->entityValuesHash[spl_object_hash($entity)]);
+		return isset($this->entityValuesHash[spl_object_hash($entityObj)]);
 	}
 	
 	/**
@@ -414,16 +418,16 @@ class PersistenceContext {
 	 * @param ValueHash[] $valueHashes
 	 * @param EntityManager $em
 	 */
-	public function updateValueHashes($entity, array $values, array $valueHashes, EntityManager $em) {
-		$this->validateEntityManaged($entity);
+	public function updateValueHashes($entityObj, array $values, array $valueHashes, EntityManager $em) {
+		$this->validateEntityObjManaged($entityObj);
 	
-		$entityModel = $this->getEntityModelByEntity($entity);
+		$entityModel = $this->getEntityModelByEntityObj($entityObj);
 		
 		$hashFactory = new ValueHashesFactory($entityModel, $em);
 		$hashFactory->setValues($values);
 		$hashFactory->setValueHashes($valueHashes);
 		
-		$this->entityValuesHash[spl_object_hash($entity)] = $hashFactory->create($entity);
+		$this->entityValuesHash[spl_object_hash($entityObj)] = $hashFactory->create($entityObj);
 	}
 	
 	/**
@@ -431,7 +435,7 @@ class PersistenceContext {
 	 * @throws IllegalStateException
 	 * @return ValueHash[]
 	 */
-	public function getValuesHashByEntity($entity) {
+	public function getValuesHashByEntityObj($entity) {
 		$objectHash = spl_object_hash($entity);
 		
 		if (isset($this->entityValuesHash[$objectHash])) {

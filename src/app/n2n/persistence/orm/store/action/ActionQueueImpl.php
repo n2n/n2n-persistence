@@ -160,7 +160,7 @@ class ActionQueueImpl implements ActionQueue {
 				
 		$this->triggerAtEndClosures();
 		
-		$this->em->getPersistenceContext()->detachNotManagedEntities();
+		$this->em->getPersistenceContext()->detachNotManagedEntityObjs();
 		
 		$this->flushing = false;
 		

@@ -102,9 +102,9 @@ class PersistActionPool {
 		
 		$persistenceContext = $this->actionQueue->getEntityManager()->getPersistenceContext();
 		if ($persistAction->isNew()) {
-			$persistenceContext->detachEntity($entity);
+			$persistenceContext->detachEntityObj($entity);
 		} else {
-			$persistenceContext->manageEntity($entity, $persistAction->getEntityModel());
+			$persistenceContext->manageEntityObj($entity, $persistAction->getEntityModel());
 		}
 	}
 	/**
@@ -191,13 +191,13 @@ class PersistActionPool {
 		$entity = $persistAction->getEntityObj();
 		
 		$persistenceContext = $this->actionQueue->getEntityManager()->getPersistenceContext();
-		$persistenceContext->manageEntity($entity, $entityModel);
+		$persistenceContext->manageEntityObj($entity, $entityModel);
 		
 		if ($persistAction->hasId()) {
-			$persistenceContext->identifyManagedEntity($entity, $persistAction->getId());
+			$persistenceContext->identifyManagedEntityObj($entity, $persistAction->getId());
 		} else {		
 			$persistAction->executeAtEnd(function () use ($entity, $persistenceContext, $persistAction) {
-				$persistenceContext->identifyManagedEntity($persistAction->getEntityObj(), $persistAction->getId());
+				$persistenceContext->identifyManagedEntityObj($persistAction->getEntityObj(), $persistAction->getId());
 				$persistAction->getEntityModel()->getIdDef()->getEntityProperty()
 						->writeValue($entity, $persistAction->getId());
 			});
@@ -303,7 +303,7 @@ class PersistActionPool {
 		$values = array();
 		$valuesHash = $hasher->create($entity, $values);
 		$oldValuesHash = $this->actionQueue->getEntityManager()->getPersistenceContext()
-				->getValuesHashByEntity($entity);
+				->getValuesHashByEntityObj($entity);
 		
 		if ($valuesHash->matches($oldValuesHash)) {
 			return null;
