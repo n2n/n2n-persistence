@@ -258,12 +258,12 @@ class PersistenceContext {
 	}
 	
 	/**
-	 * @param object $entity
+	 * @param object $entityObj
 	 * @return bool
 	 */
-	public function containsManagedEntityObj($entity) {
-		ArgUtils::assertTrue(is_object($entity));
-		return isset($this->managedEntityObjs[spl_object_hash($entity)]);
+	public function containsManagedEntityObj($entityObj) {
+		ArgUtils::assertTrue(is_object($entityObj));
+		return isset($this->managedEntityObjs[spl_object_hash($entityObj)]);
 	}
 	
 	/**
@@ -275,6 +275,15 @@ class PersistenceContext {
 		$objHash = spl_object_hash($entity);
 		unset($this->managedEntityObjs[$objHash]);
 		$this->removedEntityObjs[$objHash] = $entity;
+	}
+	
+	/**
+	 * @param object $entityObj
+	 * @return bool
+	 */
+	public function containsRemovedEntityObj($entityObj) {
+		ArgUtils::assertTrue(is_object($entityObj));
+		return isset($this->removedEntityObjs[spl_object_hash($entityObj)]);
 	}
 	
 	/**
