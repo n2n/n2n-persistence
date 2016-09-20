@@ -22,6 +22,7 @@
 namespace n2n\persistence\orm\store\action;
 
 use n2n\persistence\orm\LifecycleEvent;
+use n2n\persistence\orm\LifecycleListener;
 
 interface ActionQueue {
 	/**
@@ -67,6 +68,17 @@ interface ActionQueue {
 	 * @param string $type
 	 */
 	public function announceLifecycleEvent(LifecycleEvent $e);
+
+	/**
+	 * @param LifecycleListener $listener
+	 */
+	public function registerLifecycleListener(LifecycleListener $listener);
+	
+	/**
+	 * @param LifecycleListener $listener
+	 */
+	public function unregisterLifecycleListener(LifecycleListener $listener);
+	
 	/**
 	 * 
 	 */

@@ -23,18 +23,19 @@ namespace n2n\persistence\orm\store\action\supply;
 
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\action\EntityAction;
+use n2n\persistence\orm\store\ValuesHash;
 
 abstract class SupplyJobAdapter implements SupplyJob {
 	protected $entityAction;
 	protected $onResetClosures = array();
 	protected $whenInitializedClosures = array();
-	protected $oldValueHashes;
+	protected $oldValuesHash;
 	protected $values;
 	protected $init = false;
 	
-	public function __construct(EntityAction $entityAction, array $oldValueHashes = null){
+	public function __construct(EntityAction $entityAction, ValuesHash $oldValuesHash = null){
 		$this->entityAction = $entityAction;
-		$this->oldValueHashes = $oldValueHashes;
+		$this->oldValuesHash = $oldValuesHash;
 		
 		$that = $this;
 		$entityAction->executeOnDisable(function () use ($that) {
@@ -47,7 +48,7 @@ abstract class SupplyJobAdapter implements SupplyJob {
 	}
 	
 	public function isInsert() {
-		return $this->oldValueHashes === null;
+		return $this->oldValuesHash === null;
 	}
 	
 	public function executeOnReset(\Closure $closure) {
@@ -89,8 +90,8 @@ abstract class SupplyJobAdapter implements SupplyJob {
 		$this->reset();
 	}
 
-	public function getOldValueHashes() {
-		return $this->oldValueHashes;
+	public function getOldValuesHash() {
+		return $this->oldValuesHash;
 	}
 	
 	public function setValues(array $values) {
@@ -102,9 +103,9 @@ abstract class SupplyJobAdapter implements SupplyJob {
 	}
 	
 	protected function getOldValueHash($propertyName) {
-		IllegalStateException::assertTrue($this->oldValueHashes !== null 
-				&& array_key_exists($propertyName, $this->oldValueHashes));
-		return $this->oldValueHashes[$propertyName];
+		IllegalStateException::assertTrue($this->oldValuesHash !== null 
+				&& $this->oldValuesHash->containsPropertyName($propertyName));
+		return $this->oldValuesHash->getValuesHash($propertyName);
 	}
 
 	protected function getValue($propertyName) {

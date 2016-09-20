@@ -23,10 +23,11 @@ namespace n2n\persistence\orm\property;
 
 use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
+use n2n\persistence\orm\store\ValueHash;
 
 interface CascadableEntityProperty extends EntityProperty {
 	
-	public function prepareSupplyJob($value, $oldValueHash, SupplyJob $supplyJob);
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null);
 	/**
 	 * @param mixed $value
 	 * @param int $cascadeType

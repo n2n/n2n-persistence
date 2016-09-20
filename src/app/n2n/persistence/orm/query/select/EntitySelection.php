@@ -101,7 +101,7 @@ class EntitySelection implements Selection {
 		}
 	
 		try {
-			$entityObj = $persistenceContext->createManagedEntity($entityModel, $id);
+			$entityObj = $persistenceContext->createManagedEntityObj($entityModel, $id);
 		} catch(EntityCreationFailedException $e) {
 			throw new CorruptedDataException('Data in database incompatible with entity: ' 
 					. EntityInfo::buildEntityString($entityModel, $id), 0, $e);

@@ -40,7 +40,7 @@ class DetachOperation implements CascadeOperation {
 		$persistenceContext = $em->getPersistenceContext();
 		
 		$this->actionQueue->removeAction($entity);
-		$persistenceContext->detachEntity($entity);
+		$persistenceContext->detachEntityObj($entity);
 		
 		$entityInfo = $persistenceContext->getEntityInfo($entity, $em->getEntityModelManager());
 		$this->cascader->cascadeProperties($entityInfo->getEntityModel(), $entity);

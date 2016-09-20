@@ -199,7 +199,7 @@ class LazyEntityManager implements EntityManager {
 		
 		$entityModel = $this->entityModelManager->getEntityModelByClass($class);
 		
-		if (null !== ($entity = $this->persistenceContext->getManagedEntity($entityModel, $id))) {
+		if (null !== ($entity = $this->persistenceContext->getManagedEntityObj($entityModel, $id))) {
 			return $entity;
 		}
 		
@@ -284,7 +284,7 @@ class LazyEntityManager implements EntityManager {
 		$this->ensureTransactionOpen('Flush');
 		
 		$persistOperation = new PersistOperation($this->actionQueue);
-		foreach ($this->persistenceContext->getManagedEntities() as $entity) {
+		foreach ($this->persistenceContext->getManagedEntityObjs() as $entity) {
 			$persistOperation->cascade($entity);
 		}
 		
@@ -310,7 +310,7 @@ class LazyEntityManager implements EntityManager {
 	public function contains($object) {
 		$this->ensureEntityManagerOpen();
 		
-		$this->getPersistenceContext()->containsManagedEntity($object);
+		$this->getPersistenceContext()->containsManagedEntityObj($object);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\EntityManager::clear()
