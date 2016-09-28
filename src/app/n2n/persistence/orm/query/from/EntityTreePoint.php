@@ -24,7 +24,7 @@ namespace n2n\persistence\orm\query\from;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
-use n2n\persistence\orm\query\select\EntitySelection;
+use n2n\persistence\orm\query\select\EntityObjSelection;
 use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
 
 abstract class EntityTreePoint extends ExtendableTreePoint {
@@ -47,7 +47,7 @@ abstract class EntityTreePoint extends ExtendableTreePoint {
 	
 	public function requestSelection() {
 		if ($this->entitySelection !== null) return $this->entitySelection;
-		return $this->entityselection = new EntitySelection($this->entityModel, $this->queryState, $this);
+		return $this->entityselection = new EntityObjSelection($this->entityModel, $this->queryState, $this);
 	}
 	
 	public function requestRepresentableQueryItem() {

@@ -25,7 +25,7 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\query\select\EntityValuesSelection;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\meta\data\QueryComparator;
-use n2n\persistence\orm\query\select\EntitySelection;
+use n2n\persistence\orm\query\select\EntityObjSelection;
 use n2n\persistence\meta\data\QueryPlaceMarker;
 
 class SimpleLoader {
@@ -38,7 +38,7 @@ class SimpleLoader {
 	public function loadEntity(EntityModel $entityModel, $id) {
 		$utils = new SimpleLoaderUtils($this->em, $entityModel);
 		$utils->initialize();
-		$utils->setSelection(new EntitySelection($entityModel, $utils->queryState, $utils->metaTreePoint));
+		$utils->setSelection(new EntityObjSelection($entityModel, $utils->queryState, $utils->metaTreePoint));
 		
 		$selectBuilder = $utils->build();
 		$idProperty = $entityModel->getIdDef()->getEntityProperty();

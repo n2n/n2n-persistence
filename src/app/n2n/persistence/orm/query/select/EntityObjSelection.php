@@ -28,8 +28,9 @@ use n2n\persistence\PdoStatement;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\EntityCreationFailedException;
 use n2n\persistence\orm\CorruptedDataException;
+use n2n\persistence\orm\proxy\EntityProxy;
 
-class EntitySelection implements Selection {
+class EntityObjSelection implements Selection {
 	private $em;
 	private $selectionGroup;
 	
@@ -94,17 +95,20 @@ class EntitySelection implements Selection {
 			return new EagerValueBuilder(null);
 		}
 		
-		$entityObj = null;
+		$entityObj = $persistenceContext->getEntityById($entityModel, $id);
 		
-		if (null !== ($entityObj = $persistenceContext->getEntityById($entityModel, $id))) {
-			return new EagerValueBuilder($entityObj);
-		}
-	
-		try {
-			$entityObj = $persistenceContext->createManagedEntityObj($entityModel, $id);
-		} catch(EntityCreationFailedException $e) {
-			throw new CorruptedDataException('Data in database incompatible with entity: ' 
-					. EntityInfo::buildEntityString($entityModel, $id), 0, $e);
+		if (null !== $entityObj) {
+			if (!($entityObj instanceof EntityProxy) 
+					|| $persistenceContext->getEntityProxyManager()->isProxyInitialized($entityObj)) {
+				return new EagerValueBuilder($entityObj);
+			}
+		} else {
+			try {
+				$entityObj = $persistenceContext->createManagedEntityObj($entityModel, $id);
+			} catch(EntityCreationFailedException $e) {
+				throw new CorruptedDataException('Data in database incompatible with entity: ' 
+						. EntityInfo::buildEntityString($entityModel, $id), 0, $e);
+			}
 		}
 		
 		return new LazyValueBuilder(function () use ($entityObj, $id, $valueBuilders) {
