@@ -497,21 +497,21 @@ class HavingQueryPointResolver implements QueryPointResolver {
 // 	}
 // }
 
-// private function buildHiddenEntitySelections() {
+// private function buildHiddenEntityObjSelections() {
 // 	$selectStmtBuilder = $this->queryState->getSelectStatementBuilder();
-// 	foreach ($this->queryState->getHiddenEntitySelectionTableAliases() as $tableAlias) {
-// 		if (isset($this->hiddenEntitySelections[$tableAlias])) continue;
+// 	foreach ($this->queryState->getHiddenEntityObjSelectionTableAliases() as $tableAlias) {
+// 		if (isset($this->hiddenEntityObjSelections[$tableAlias])) continue;
 // 		throw new NotYetImplementedException();
 // 		// 			$entityModel = $this->queryState->getEntityModelByTableAlias($tableAlias);
-// 		// 			$hiddenEntitySelection = new EntityCriteriaSelection($queryState, $queryPoint);
-// 		// 			$hiddenEntitySelection->applyColumnsToSelectStatementBuilder($selectStmtBuilder, $tableAlias, $this->queryState);
-// 		// 			$this->hiddenEntitySelections[$tableAlias]= $hiddenEntitySelection;
+// 		// 			$hiddenEntityObjSelection = new EntityCriteriaSelection($queryState, $queryPoint);
+// 		// 			$hiddenEntityObjSelection->applyColumnsToSelectStatementBuilder($selectStmtBuilder, $tableAlias, $this->queryState);
+// 		// 			$this->hiddenEntityObjSelections[$tableAlias]= $hiddenEntityObjSelection;
 // 	}
 // }
 
 // private function createStmt() {
 // 	$this->buildCriteriaSelections();
-// 	$this->buildHiddenEntitySelections();
+// 	$this->buildHiddenEntityObjSelections();
 
 // 	$dbh = $this->queryState->getEntityManager()->getPdo();
 // 	$stmt = $dbh->prepare($this->queryState->getSelectStatementBuilder()->toSqlString());
