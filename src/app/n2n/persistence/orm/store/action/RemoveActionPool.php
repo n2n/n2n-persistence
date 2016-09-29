@@ -128,7 +128,7 @@ class RemoveActionPool {
 		$objHash = spl_object_hash($entity);
 		if (!isset($this->removeActions[$objHash])) return;
 	
-		IllegalStateException::assertTrue(!$this->frozen);
+// 		IllegalStateException::assertTrue(!$this->frozen);
 		
 		$this->removeActions[$objHash]->disable();
 		$this->actionQueue->remove($this->removeActions[$objHash]);

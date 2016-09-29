@@ -87,11 +87,12 @@ class PersistActionPool {
 	}
 	
 	public function removeAction($entity) {
-		IllegalStateException::assertTrue(!$this->frozen);
 		
 		ArgUtils::assertTrue(is_object($entity));
 		$objHash = spl_object_hash($entity);
 		if (!isset($this->persistActions[$objHash])) return;
+		
+// 		IllegalStateException::assertTrue(!$this->frozen);
 		
 		$persistAction = $this->persistActions[$objHash];
 		

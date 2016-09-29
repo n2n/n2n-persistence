@@ -70,7 +70,6 @@ abstract class SupplyJobAdapter implements SupplyJob {
 	public function init() {
 		IllegalStateException::assertTrue(!$this->init);
 		
-		$this->onResetClosures = array();
 		while (null !== ($closure = array_shift($this->whenInitializedClosures))) {
 			$closure();
 		}
@@ -78,12 +77,11 @@ abstract class SupplyJobAdapter implements SupplyJob {
 	}
 	
 	protected function reset() {
-		IllegalStateException::assertTrue(!$this->init);
-		
 		$this->whenInitializedClosures = array();
-		while (null !== ($closure = array_shift($this->whenInitializedClosures))) {
+		while (null !== ($closure = array_shift($this->onResetClosures))) {
 			$closure();
 		}
+		$this->init = false;
 	}
 	
 	public function prepare() {
