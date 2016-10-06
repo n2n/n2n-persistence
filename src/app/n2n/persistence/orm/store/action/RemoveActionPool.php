@@ -149,11 +149,11 @@ class RemoveActionPool {
 	}
 	
 	public function freeze() {
+		$this->frozen = true;
+		
 		foreach ($this->supplyJobs as $supplyJob) {
 			$supplyJob->init();
 		}
-		
-		$this->frozen = true;
 	}
 
 	public function prepareSupplyJobs() {
