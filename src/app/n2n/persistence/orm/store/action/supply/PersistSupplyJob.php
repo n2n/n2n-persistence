@@ -65,7 +65,7 @@ class PersistSupplyJob extends SupplyJobAdapter {
 	}
 
 	public function prepare() {
-		parent::prepare();
+// 		parent::prepare();
 		
 		if ($this->isDisabled()) return;
 

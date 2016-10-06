@@ -38,6 +38,8 @@ interface SupplyJob {
 	 * @return boolean
 	 */
 	public function isRemove();
+	
+	
 	/**
 	 * @param \Closure $closure
 	 */

@@ -27,6 +27,8 @@ use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\CascadeType;
 use n2n\reflection\ArgUtils;
+use n2n\persistence\orm\store\EntityInfo;
+use n2n\persistence\orm\property\EntityProperty;
 
 class OperationCascader {
 	private $cascadedEntities = array();
@@ -54,17 +56,18 @@ class OperationCascader {
 	 * @param object $entity
 	 * @throws PersistenceOperationException
 	 */
-	public function cascadeProperties(EntityModel $entityModel, $entity, EntityProperty &$entityProperty = null) {
+	public function cascadeProperties(EntityModel $entityModel, $entityObj, EntityProperty &$entityProperty = null) {
 		foreach ($entityModel->getEntityProperties() as $entityProperty) {
 			if (!($entityProperty instanceof CascadableEntityProperty))  continue;
 			
 			try {
-				$entityProperty->cascade($entityProperty->readValue($entity),
+				$entityProperty->cascade($entityProperty->readValue($entityObj),
 						$this->cascadeType, $this->cascadeOperation);
 			} catch (PersistenceOperationException $e) {
 				throw new PersistenceOperationException('Failed to cascade ' 
 						. CascadeType::buildString($this->cascadeType) . ' to property '
-						. $entityProperty->toPropertyString(), 0, $e);
+						. $entityProperty->toPropertyString() . ' of Entity Object ' 
+						. EntityInfo::buildEntityStringFromEntityObj($entityModel, $entityObj), 0, $e);
 			}
 		}
 	}

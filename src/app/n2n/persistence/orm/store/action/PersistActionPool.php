@@ -37,7 +37,7 @@ class PersistActionPool {
 	private $actionQueue;
 	private $persistActions = array();
 	private $unsuppliedPersistActions = array();
-	private $supplyJobs = array();
+	private $persistSupplyJobs = array();
 	private $emptyPersistActions = array();
 	private $frozen;
 	
@@ -87,12 +87,11 @@ class PersistActionPool {
 	}
 	
 	public function removeAction($entity) {
-		
 		ArgUtils::assertTrue(is_object($entity));
 		$objHash = spl_object_hash($entity);
 		if (!isset($this->persistActions[$objHash])) return;
 		
-// 		IllegalStateException::assertTrue(!$this->frozen);
+		IllegalStateException::assertTrue(!$this->frozen);
 		
 		$persistAction = $this->persistActions[$objHash];
 		
@@ -221,9 +220,11 @@ class PersistActionPool {
 	}
 	
 	public function freeze() {
-		$this->frozen = true;
+		IllegalStateException::assertTrue(!$this->frozen && empty($this->unsuppliedPersistActions));
 		
-		foreach ($this->supplyJobs as $supplyJob) {
+		$this->frozen = true;
+			
+		foreach ($this->persistSupplyJobs as $supplyJob) {
 			$supplyJob->init();
 		}
 	}
@@ -232,18 +233,18 @@ class PersistActionPool {
 		$this->frozen = false;
 		$this->persistActions = array();
 		$this->unsuppliedPersistActions = array();
-		$this->supplyJobs = array();
+		$this->persistSupplyJobs = array();
 		$this->emptyPersistActions = array();
 	}
 	
 	public function supply() {
 		IllegalStateException::assertTrue($this->frozen);
 				
-		foreach ($this->supplyJobs as $supplyJob) {
+		foreach ($this->persistSupplyJobs as $supplyJob) {
 			$supplyJob->execute();
 		}
 		
-		$this->supplyJobs = array();
+		$this->persistSupplyJobs = array();
 	}
 
 	public function prepareSupplyJobs() {
@@ -258,13 +259,13 @@ class PersistActionPool {
 				if ($persistAction->isDisabled()) continue;
 				
 				if ($persistAction->isNew()) {
-					$this->refreshSupplyJob($this->supplyJobs[] = new PersistSupplyJob($persistAction));
+					$this->refreshSupplyJob($this->persistSupplyJobs[] = new PersistSupplyJob($persistAction));
 					continue;
 				}
 
-				if (null !== ($supplyJob = $this->checkDiff($persistAction))) {
+				if (null !== ($persistSupplyJob = $this->checkDiff($persistAction))) {
 					$updatePersistActions[] = $persistAction;
-					$this->supplyJobs[] = $supplyJob;
+					$this->persistSupplyJobs[] = $persistSupplyJob;
 				} else {
 					$this->emptyPersistActions[] = $persistAction;
 				}
@@ -276,18 +277,18 @@ class PersistActionPool {
 					$persistOperation->cascade($updatePersistAction->getEntityObj());
 				}
 				
-				foreach ($this->supplyJobs as $supplyJob) {
-					$this->refreshSupplyJob($supplyJob);
+				foreach ($this->persistSupplyJobs as $persistSupplyJob) {
+					$this->refreshSupplyJob($persistSupplyJob);
 				}
 				
 				$updatePersistActions = array();
 				foreach ($this->emptyPersistActions as $key => $emptyPersistAction) {
 					if ($emptyPersistAction->isDisabled()) continue;
 		
-					if (null !== ($supplyJob = $this->checkDiff($emptyPersistAction))) {
+					if (null !== ($persistSupplyJob = $this->checkDiff($emptyPersistAction))) {
 						$updatePersistActions[] = $emptyPersistAction;
 						unset($this->emptyPersistActions[$key]);
-						$this->supplyJobs[] = $supplyJob;
+						$this->persistSupplyJobs[] = $persistSupplyJob;
 					}
 				}
 			}
@@ -296,6 +297,10 @@ class PersistActionPool {
 		return true;
 	}
 
+	/**
+	 * @param PersistActionAdapter $persistAction
+	 * @return \n2n\persistence\orm\store\action\supply\PersistSupplyJob|null
+	 */
 	private function checkDiff(PersistActionAdapter $persistAction) {
 		$entityModel = $persistAction->getEntityModel();
 		$entity = $persistAction->getEntityObj();

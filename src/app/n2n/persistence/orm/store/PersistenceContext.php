@@ -272,6 +272,10 @@ class PersistenceContext {
 	public function removeEntityObj($entity) {
 		$this->validateEntityObjManaged($entity);
 		
+		if (get_class($entity) == 'n2n\persistence\orm\proxy\entities\page\bo\PageContent') {
+			throw new \Exception();
+		}
+		
 		$objHash = spl_object_hash($entity);
 		unset($this->managedEntityObjs[$objHash]);
 		$this->removedEntityObjs[$objHash] = $entity;

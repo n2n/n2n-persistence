@@ -130,7 +130,7 @@ class UninitializedPersistAction implements PersistAction {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\store\action\EntityAction::isDisabled()
 	 */
-	public function isDisabled() {
+	public function isDisabled(): bool {
 		throw new UnsupportedOperationException();
 	}
 
@@ -140,4 +140,15 @@ class UninitializedPersistAction implements PersistAction {
 	public function disable() {
 		throw new UnsupportedOperationException();
 	}
+	
+	public function isSupplied(): bool {
+		throw new UnsupportedOperationException();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see \n2n\persistence\orm\store\action\EntityAction::disable()
+	 */
+	public function setSupplied(bool $supplied) {
+		throw new UnsupportedOperationException();
+	}	
 }

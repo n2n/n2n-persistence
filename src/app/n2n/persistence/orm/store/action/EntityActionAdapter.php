@@ -62,12 +62,12 @@ abstract class EntityActionAdapter extends ActionAdapter implements EntityAction
 		return $this->entity;
 	}
 	
-	public function isSupplied() {
+	public function isSupplied(): bool {
 		return $this->supplied;
 	}
 	
-	public function setSupplied($supplied) {
-		$this->supplied = (boolean) $supplied;
+	public function setSupplied(bool $supplied) {
+		$this->supplied = $supplied;
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\store\action\PersistAction::executeOnDisable()
@@ -79,7 +79,7 @@ abstract class EntityActionAdapter extends ActionAdapter implements EntityAction
 	 * 
 	 */
 	public function disable() {
-		IllegalStateException::assertTrue(!$this->executed);
+		IllegalStateException::assertTrue(!$this->supplied && !$this->executed);
 		
 		$this->disabled = true;
 		while (null !== ($closure = array_shift($this->onDisableClosures))) {
@@ -87,7 +87,7 @@ abstract class EntityActionAdapter extends ActionAdapter implements EntityAction
 		}
 	}
 	
-	public function isDisabled() {
+	public function isDisabled(): bool {
 		return $this->disabled;
 	}
 	

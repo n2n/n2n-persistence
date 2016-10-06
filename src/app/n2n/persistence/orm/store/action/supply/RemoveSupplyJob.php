@@ -57,7 +57,7 @@ class RemoveSupplyJob extends SupplyJobAdapter {
 	public function prepare() {
 		if ($this->isDisabled()) return;
 		
-		parent::prepare();		
+// 		parent::prepare();		
 
 		foreach ($this->entityAction->getEntityModel()->getEntityProperties()
 				as $propertyName => $entityProperty) {

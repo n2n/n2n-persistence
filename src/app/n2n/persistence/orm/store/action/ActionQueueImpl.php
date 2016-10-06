@@ -38,6 +38,7 @@ class ActionQueueImpl implements ActionQueue {
 	protected $actionJobs = array();
 	protected $atStartClosures = array();
 	protected $atEndClosures = array();
+	protected $atPrepareCycleEndClosures = array();
 	private $persistActionPool;
 	private $removeActionPool;
 	private $flushing = false;
@@ -122,6 +123,10 @@ class ActionQueueImpl implements ActionQueue {
 		$this->atEndClosures[] = $closure;
 	}
 	
+	public function executeAtPrepareCycleEnd(\Closure $closure) {
+		$this->atPrepareCycleEndClosures[] = $closure;
+	}
+	
 	protected function triggerAtStartClosures() {
 		while (null !== ($closure = array_shift($this->atStartClosures))) {
 			$closure($this);
@@ -134,6 +139,16 @@ class ActionQueueImpl implements ActionQueue {
 		}
 	}
 	
+	protected function triggerAtPrepareCycleEndClosures() {
+		if (empty($this->atPrepareCycleEndClosures)) return false;
+		
+		while (null !== ($closure = array_shift($this->atPrepareCycleEndClosures))) {
+			$closure($this);
+		}
+		
+		return true;
+	}
+	
 	public function flush() {
 		IllegalStateException::assertTrue(!$this->flushing);
 		$this->flushing = true;
@@ -142,10 +157,9 @@ class ActionQueueImpl implements ActionQueue {
 		
 		do {
 			$this->persistActionPool->prepareSupplyJobs();
-		} while ($this->removeActionPool->prepareSupplyJobs());
+		} while ($this->removeActionPool->prepareSupplyJobs() || $this->triggerAtPrepareCycleEndClosures());
 
 		$this->persistActionPool->freeze();
-		$this->removeActionPool->prepareSupplyJobs();
 		$this->removeActionPool->freeze();
 		
 		$this->persistActionPool->supply();
