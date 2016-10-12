@@ -141,7 +141,7 @@ class NestedSetUtils {
 	/**
 	 * @return \n2n\persistence\orm\util\NestedSetItem[] 
 	 */
-	public function fetch($baseEntity = null, $childrenOnly = false, Criteria $criteria = null): array {
+	public function fetch($baseEntity = null, $descendantsOnly = false, Criteria $criteria = null): array {
 		if ($criteria === null) {
 			$criteria = $this->em->createCriteria()->from($this->class, self::NODE_ALIAS);
 		}
@@ -165,19 +165,19 @@ class NestedSetUtils {
 			
 			$criteria->where()
 					->match(CrIt::p(self::NODE_ALIAS, $this->leftCriteriaProperty),
-							($childrenOnly ? CriteriaComparator::OPERATOR_LARGER_THAN 
+							($descendantsOnly ? CriteriaComparator::OPERATOR_LARGER_THAN 
 									: CriteriaComparator::OPERATOR_LARGER_THAN_OR_EQUAL_TO), 
 							CrIt::c($baseLft))
 					->andMatch(CrIt::p(self::NODE_ALIAS, $this->rightCriteriaProperty),
-							($childrenOnly ? CriteriaComparator::OPERATOR_SMALLER_THAN 
+							($descendantsOnly ? CriteriaComparator::OPERATOR_SMALLER_THAN 
 									: CriteriaComparator::OPERATOR_SMALLER_THAN_OR_EQUAL_TO),
 							CrIt::c($baseRgt))
 					->andMatch(CrIt::p(self::PARENT_ALIAS, $this->leftCriteriaProperty),
-							($childrenOnly ? CriteriaComparator::OPERATOR_LARGER_THAN 
+							($descendantsOnly ? CriteriaComparator::OPERATOR_LARGER_THAN 
 									: CriteriaComparator::OPERATOR_LARGER_THAN_OR_EQUAL_TO),
 							CrIt::c($baseLft))
 					->andMatch(CrIt::p(self::PARENT_ALIAS, $this->rightCriteriaProperty),
-							($childrenOnly ? CriteriaComparator::OPERATOR_SMALLER_THAN
+							($descendantsOnly ? CriteriaComparator::OPERATOR_SMALLER_THAN
 									: CriteriaComparator::OPERATOR_SMALLER_THAN_OR_EQUAL_TO),
 							CrIt::c($baseRgt));
 		}
