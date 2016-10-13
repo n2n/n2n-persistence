@@ -193,7 +193,7 @@ class NestedSetUtils {
 		return $items;
 	}
 	
-	public function fetchParents($entityObj, bool $includeSelf = false, string $direction = null, Criteria $criteria = null) {
+	public function fetchParents($entityObj, bool $includeSelf = false, string $direction = 'DESC', Criteria $criteria = null) {
 		if ($criteria === null) {
 			$criteria = $this->em->createCriteria()->from($this->class, self::NODE_ALIAS);
 		}
