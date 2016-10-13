@@ -193,6 +193,26 @@ class NestedSetUtils {
 		return $items;
 	}
 	
+	public function fetchParents($entityObj, bool $includeSelf = false, string $direction = null, Criteria $criteria = null) {
+		if ($criteria === null) {
+			$criteria = $this->em->createCriteria()->from($this->class, self::NODE_ALIAS);
+		}
+		
+		$result = $this->lookupLftRgt($entityObj);
+		if ($result === null) return array();
+		$lft = $result['lft'];
+		$rgt = $result['rgt'];
+		
+		$criteria->select(self::NODE_ALIAS, self::RESULT_ENTITY_ALIAS)
+				->from($this->class, self::NODE_ALIAS)
+				->where()
+				->match(CrIt::p(self::NODE_ALIAS, $this->leftCriteriaProperty), ($includeSelf ? '<=' : '<'), $lft)
+				->andMatch(CrIt::p(self::NODE_ALIAS, $this->rightCriteriaProperty), ($includeSelf ? '>=' : '>'), $rgt);
+		$criteria->order(CrIt::p(self::NODE_ALIAS, $this->leftCriteriaProperty), $direction);
+		
+		return $criteria->toQuery()->fetchArray();
+	}
+	
 	/**
 	 * @param unknown $entity
 	 */
@@ -546,6 +566,8 @@ class NestedSetUtils {
 		}
 		$this->em->flush();
 	}
+	
+	
 	
 
 // 	private function move($id, $up) {
