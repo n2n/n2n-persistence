@@ -40,6 +40,7 @@ use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\data\OrderDirection;
 use n2n\persistence\orm\criteria\compare\ComparatorCriteria;
 use n2n\reflection\ReflectionUtils;
+use n2n\persistence\orm\criteria\compare\SelectColumnComparable;
 
 class Criteria {
 	const ORDER_DIRECTION_ASC = OrderDirection::ASC;
@@ -456,7 +457,13 @@ class HavingQueryPointResolver implements QueryPointResolver {
 	 */
 	public function requestPropertyComparisonStrategy(TreePath $treePath) {
 		$queryPoint = $this->findSelectQueryPoint($treePath);
-		$comparisonStrategy = $queryPoint->requestPropertyComparisonStrategy($treePath);
+		$comparisonStrategy = null;
+		if ($treePath->hasNext()) {
+			$comparisonStrategy = $queryPoint->requestPropertyComparisonStrategy($treePath);
+		} else {
+			$comparisonStrategy = $queryPoint->requestComparisonStrategy();
+		}
+		
 		if ($comparisonStrategy->getType() != ComparisonStrategy::TYPE_COLUMN) {
 			throw new QueryConflictException('Property can not be compared in having clause: '
 					. TreePath::prettyPropertyStr($treePath->getDones()));
@@ -477,7 +484,12 @@ class HavingQueryPointResolver implements QueryPointResolver {
 	 */
 	public function requestPropertyRepresentableQueryItem(TreePath $treePath) {
 		$queryPoint = $this->findSelectQueryPoint($treePath);
-		$queryItem = $queryPoint->requestPropertyRepresentableQueryItem($treePath);
+		$queryItem = null;
+		if ($treePath->hasNext()) {
+			$queryItem = $queryPoint->requestPropertyRepresentableQueryItem($treePath);
+		} else {
+			$queryItem = $queryPoint->requestRepresentableQueryItem();
+		}
 		
 		$columnAlias = $this->queryModel->getQueryItemSelect()->selectQueryItem($queryItem);
 		return new QueryColumn($columnAlias);

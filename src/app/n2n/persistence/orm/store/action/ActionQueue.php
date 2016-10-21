@@ -87,4 +87,19 @@ interface ActionQueue {
 	 * 
 	 */
 	public function clear();
+	
+	/**
+	 * @param \Closure $closure
+	 */
+	public function executeAtStart(\Closure $closure);
+	
+	/**
+	 * @param \Closure $closure
+	 */
+	public function executeAtEnd(\Closure $closure);
+	
+	/**
+	 * @param \Closure $closure
+	 */
+	public function executeAtPrepareCycleEnd(\Closure $closure);
 }

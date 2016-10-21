@@ -96,4 +96,9 @@ class EntityInfo {
 		
 		return $entityModel->getClass()->getName() . '#' . ($idRep === null ? '<null>' : $idRep);
 	}
+	
+	public static function buildEntityStringFromEntityObj(EntityModel $entityModel, $entityObj) {
+		return self::buildEntityString($entityModel, 
+				$entityModel->getIdDef()->getEntityProperty()->readValue($entityObj));
+	}
 }

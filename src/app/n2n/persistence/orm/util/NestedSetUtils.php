@@ -141,7 +141,7 @@ class NestedSetUtils {
 	/**
 	 * @return \n2n\persistence\orm\util\NestedSetItem[] 
 	 */
-	public function fetch($baseEntity = null, $childrenOnly = false, Criteria $criteria = null): array {
+	public function fetch($baseEntity = null, $descendantsOnly = false, Criteria $criteria = null): array {
 		if ($criteria === null) {
 			$criteria = $this->em->createCriteria()->from($this->class, self::NODE_ALIAS);
 		}
@@ -165,19 +165,19 @@ class NestedSetUtils {
 			
 			$criteria->where()
 					->match(CrIt::p(self::NODE_ALIAS, $this->leftCriteriaProperty),
-							($childrenOnly ? CriteriaComparator::OPERATOR_LARGER_THAN 
+							($descendantsOnly ? CriteriaComparator::OPERATOR_LARGER_THAN 
 									: CriteriaComparator::OPERATOR_LARGER_THAN_OR_EQUAL_TO), 
 							CrIt::c($baseLft))
 					->andMatch(CrIt::p(self::NODE_ALIAS, $this->rightCriteriaProperty),
-							($childrenOnly ? CriteriaComparator::OPERATOR_SMALLER_THAN 
+							($descendantsOnly ? CriteriaComparator::OPERATOR_SMALLER_THAN 
 									: CriteriaComparator::OPERATOR_SMALLER_THAN_OR_EQUAL_TO),
 							CrIt::c($baseRgt))
 					->andMatch(CrIt::p(self::PARENT_ALIAS, $this->leftCriteriaProperty),
-							($childrenOnly ? CriteriaComparator::OPERATOR_LARGER_THAN 
+							($descendantsOnly ? CriteriaComparator::OPERATOR_LARGER_THAN 
 									: CriteriaComparator::OPERATOR_LARGER_THAN_OR_EQUAL_TO),
 							CrIt::c($baseLft))
 					->andMatch(CrIt::p(self::PARENT_ALIAS, $this->rightCriteriaProperty),
-							($childrenOnly ? CriteriaComparator::OPERATOR_SMALLER_THAN
+							($descendantsOnly ? CriteriaComparator::OPERATOR_SMALLER_THAN
 									: CriteriaComparator::OPERATOR_SMALLER_THAN_OR_EQUAL_TO),
 							CrIt::c($baseRgt));
 		}
@@ -191,6 +191,26 @@ class NestedSetUtils {
 		}
 		
 		return $items;
+	}
+	
+	public function fetchParents($entityObj, bool $includeSelf = false, string $direction = 'DESC', Criteria $criteria = null) {
+		if ($criteria === null) {
+			$criteria = $this->em->createCriteria()->from($this->class, self::NODE_ALIAS);
+		}
+		
+		$result = $this->lookupLftRgt($entityObj);
+		if ($result === null) return array();
+		$lft = $result['lft'];
+		$rgt = $result['rgt'];
+		
+		$criteria->select(self::NODE_ALIAS, self::RESULT_ENTITY_ALIAS)
+				->from($this->class, self::NODE_ALIAS)
+				->where()
+				->match(CrIt::p(self::NODE_ALIAS, $this->leftCriteriaProperty), ($includeSelf ? '<=' : '<'), $lft)
+				->andMatch(CrIt::p(self::NODE_ALIAS, $this->rightCriteriaProperty), ($includeSelf ? '>=' : '>'), $rgt);
+		$criteria->order(CrIt::p(self::NODE_ALIAS, $this->leftCriteriaProperty), $direction);
+		
+		return $criteria->toQuery()->fetchArray();
 	}
 	
 	/**
@@ -546,6 +566,8 @@ class NestedSetUtils {
 		}
 		$this->em->flush();
 	}
+	
+	
 	
 
 // 	private function move($id, $up) {

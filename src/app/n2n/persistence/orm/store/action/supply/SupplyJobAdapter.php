@@ -70,26 +70,26 @@ abstract class SupplyJobAdapter implements SupplyJob {
 	public function init() {
 		IllegalStateException::assertTrue(!$this->init);
 		
-		$this->onResetClosures = array();
+		$this->init = true;
 		while (null !== ($closure = array_shift($this->whenInitializedClosures))) {
 			$closure();
 		}
-		$this->init = true;
 	}
+
+// 	public function prepare() {
+// 		$this->reset();
+// 	}
 	
 	protected function reset() {
 		IllegalStateException::assertTrue(!$this->init);
 		
 		$this->whenInitializedClosures = array();
-		while (null !== ($closure = array_shift($this->whenInitializedClosures))) {
+		while (null !== ($closure = array_shift($this->onResetClosures))) {
 			$closure();
 		}
+		$this->init = false;
 	}
 	
-	public function prepare() {
-		$this->reset();
-	}
-
 	public function getOldValuesHash() {
 		return $this->oldValuesHash;
 	}

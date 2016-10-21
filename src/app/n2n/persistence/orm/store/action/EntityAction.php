@@ -43,9 +43,15 @@ interface EntityAction extends Action {
 	/**
 	 * @return boolean 
 	 */
-	public function isDisabled();
+	public function isDisabled(): bool;
 	
 	public function disable();
+	
+	public function isSupplied(): bool;
+	
+	public function setSupplied(bool $supplied);
+	
+	
 	/**
 	 * @param \Closure $closure
 	 */

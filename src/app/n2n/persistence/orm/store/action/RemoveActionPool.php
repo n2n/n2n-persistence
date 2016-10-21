@@ -34,7 +34,7 @@ class RemoveActionPool {
 	private $removeActions = array();
 	private $unsuppliedRemoveActions = array();
 	private $frozen = false;
-	private $supplyJobs = array();
+	private $removeSupplyJobs = array();
 	
 	public function __construct(ActionQueue $actionQueue) {
 		$this->actionQueue = $actionQueue;
@@ -139,7 +139,7 @@ class RemoveActionPool {
 	public function supply() {
 		IllegalStateException::assertTrue($this->frozen);
 		
-		foreach ($this->supplyJobs as $supplyJob) {
+		foreach ($this->removeSupplyJobs as $supplyJob) {
 			$supplyJob->execute();
 		}
 	}	
@@ -149,11 +149,13 @@ class RemoveActionPool {
 	}
 	
 	public function freeze() {
-		foreach ($this->supplyJobs as $supplyJob) {
-			$supplyJob->init();
-		}
-		
+		IllegalStateException::assertTrue(!$this->frozen && empty($this->unsuppliedPersistActions));
+	
 		$this->frozen = true;
+		
+		foreach ($this->removeSupplyJobs as $removeSupplyJob) {
+			$removeSupplyJob->init();
+		}
 	}
 
 	public function prepareSupplyJobs() {
@@ -164,7 +166,7 @@ class RemoveActionPool {
 		while (null !== ($removeAction = array_pop($this->unsuppliedRemoveActions))) {
 			if ($removeAction->isDisabled()) continue;
 			
-			$this->supplyJobs[] = $this->createRemoveSupplyJob($removeAction);
+			$this->removeSupplyJobs[] = $this->createRemoveSupplyJob($removeAction);
 		}
 		
 		return true;
@@ -193,6 +195,6 @@ class RemoveActionPool {
 		$this->frozen = false;
 		$this->supplyRemoveOperation = null;
 		$this->removeActions = array();	
-		$this->supplyJobs = array();		
+		$this->removeSupplyJobs = array();		
 	}
 }
