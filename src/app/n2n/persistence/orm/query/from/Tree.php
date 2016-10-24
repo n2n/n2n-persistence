@@ -32,6 +32,7 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\criteria\Criteria;
 use n2n\persistence\orm\query\QueryModel;
 use n2n\reflection\ReflectionUtils;
+use n2n\persistence\orm\criteria\CriteriaConflictException;
 
 class Tree implements QueryPointResolver {
 	private $queryState;
@@ -114,8 +115,13 @@ class Tree implements QueryPointResolver {
 		$treePoint = $this->getTreePointByAlias($treePath->next());
 		
 		while ($treePath->hasNext()) {
-			$this->treePoints[] = $treePoint = $treePoint->createPropertyJoinTreePoint(
-					$treePath->next(), $joinType);
+			try {
+				$this->treePoints[] = $treePoint = $treePoint->createPropertyJoinTreePoint(
+						$treePath->next(), $joinType);
+			} catch (OrmException $e) {
+				throw new QueryConflictException('Unresovalble property: ' 
+						. TreePath::prettyPropertyStr($treePath->getDones()), 0, $e);
+			}
 		}
 		
 		return $this->namedTreePoints[$alias] = $treePoint;

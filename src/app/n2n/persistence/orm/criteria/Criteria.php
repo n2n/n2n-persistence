@@ -202,8 +202,12 @@ class Criteria {
 		$this->treeModClosures[] = function (QueryModel $queryModel, QueryState $queryState)
 				use ($joinType, $criteriaProperty, $alias, $fetch, $onCriteriaComparator) {
 		
-			$treePoint = $queryModel->getTree()->createPropertyJoinedTreePoint($joinType,
-					new TreePath($criteriaProperty->getPropertyNames()), $alias);
+			try {
+				$treePoint = $queryModel->getTree()->createPropertyJoinedTreePoint($joinType,
+						new TreePath($criteriaProperty->getPropertyNames()), $alias);
+			} catch (QueryConflictException $e) {
+				throw new CriteriaConflictException('Unable to perform ' . $joinType . ' JOIN ' . $criteriaProperty, 0, $e);
+			}
 			
 			if ($onCriteriaComparator !== null) {
 				$onCriteriaComparator->apply($treePoint->getOnQueryComparator(), $queryState, $queryModel->getTree());
