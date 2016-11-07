@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2\persistence\orm\query\select;
+namespace n2n\persistence\orm\query\select;
 
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\MetaTreePoint;
@@ -29,6 +29,7 @@ use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\EntityCreationFailedException;
 use n2n\persistence\orm\CorruptedDataException;
 use n2n\persistence\orm\proxy\EntityProxy;
+use n2n\persistence\orm\query\select\Selection;
 
 class EntityObjSelection implements Selection {
 	private $em;
