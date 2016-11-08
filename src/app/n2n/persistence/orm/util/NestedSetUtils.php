@@ -32,7 +32,6 @@ use n2n\persistence\orm\criteria\item\CrIt;
 use n2n\persistence\orm\OrmUtils;
 use n2n\util\ex\IllegalStateException;
 use rocket\spec\ei\manage\util\model\UnknownEntryException;
-use n2n\persistence\orm\proxy\EntityProxy;
 
 class NestedSetUtils {
 	const DEFAULT_LEFT_PROPERTY_NAME = 'lft';
@@ -200,11 +199,11 @@ class NestedSetUtils {
 		
 		$result = $this->lookupLftRgt($entityObj);
 		if ($result === null) return array();
+		
 		$lft = $result['lft'];
 		$rgt = $result['rgt'];
 		
 		$criteria->select(self::NODE_ALIAS, self::RESULT_ENTITY_ALIAS)
-				->from($this->class, self::NODE_ALIAS)
 				->where()
 				->match(CrIt::p(self::NODE_ALIAS, $this->leftCriteriaProperty), ($includeSelf ? '<=' : '<'), $lft)
 				->andMatch(CrIt::p(self::NODE_ALIAS, $this->rightCriteriaProperty), ($includeSelf ? '>=' : '>'), $rgt);
