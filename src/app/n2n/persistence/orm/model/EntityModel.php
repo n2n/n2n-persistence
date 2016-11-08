@@ -29,7 +29,6 @@ use n2n\persistence\orm\query\from\meta\TablePerClassTreePointMeta;
 use n2n\persistence\orm\query\from\meta\SingleTableTreePointMeta;
 use n2n\persistence\orm\query\from\meta\JoinedTreePointMeta;
 use n2n\persistence\orm\query\from\meta\SimpleTreePointMeta;
-use n2n\impl\persistence\orm\property\IdProperty;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\query\QueryState;
 use n2n\util\ex\IllegalStateException;
@@ -37,8 +36,6 @@ use n2n\persistence\orm\property\IdDef;
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\InheritanceType;
 use n2n\reflection\ArgUtils;
-use n2n\persistence\orm\store\action\PersistAction;
-use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\reflection\ReflectionUtils;
 
 class EntityModel implements EntityPropertyCollection {	
