@@ -29,6 +29,7 @@ use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\EntityCreationFailedException;
 use n2n\persistence\orm\CorruptedDataException;
 use n2n\persistence\orm\proxy\EntityProxy;
+use n2n\persistence\orm\query\select\Selection;
 
 class EntityObjSelection implements Selection {
 	private $em;

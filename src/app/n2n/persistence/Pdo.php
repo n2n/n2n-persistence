@@ -23,10 +23,10 @@ namespace n2n\persistence;
 
 use n2n\persistence\PersistenceUnitConfig;
 use n2n\persistence\meta\MetaData;
-use n2n\core\config\DatabaseConfiguration;
 use n2n\reflection\ReflectionUtils;
 use n2n\core\container\TransactionManager;
 use n2n\core\container\Transaction;
+use n2n\core\container\CommitFailedException;
 
 class Pdo extends \PDO {
 	private $dataSourceName;
@@ -37,15 +37,11 @@ class Pdo extends \PDO {
 	private $transactionManager;
 	private $listeners = array();
 	
-	/**
-	 * 
-	 * @param DatabaseConfiguration $persistenceUnitConfig
-	 */
 	public function __construct(PersistenceUnitConfig $persistenceUnitConfig, TransactionManager $transactionManager = null) {
 		try {
 			parent::__construct($persistenceUnitConfig->getDsnUri(), $persistenceUnitConfig->getUser(),
-					$persistenceUnitConfig->getPassword(), array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-							PDO::ATTR_STATEMENT_CLASS => array('n2n\persistence\PdoStatement', array())));
+					$persistenceUnitConfig->getPassword(), array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+							\PDO::ATTR_STATEMENT_CLASS => array('n2n\persistence\PdoStatement', array())));
 		} catch (\PDOException $e) {
 			throw new PdoException($e);
 		}
@@ -69,7 +65,13 @@ class Pdo extends \PDO {
 			$transactionManager->registerResource(new PdoTransactionalResource(
 					function (Transaction $transaction) use ($that) { $that->performBeginTransaction($transaction); },
 					function (Transaction $transaction) use ($that) { return $that->prepareCommit($transaction); },
-					function (Transaction $transaction) use ($that) { $that->performCommit($transaction); },
+					function (Transaction $transaction) use ($that) {
+						try {
+							$that->performCommit($transaction);
+						} catch (PdoCommitException $e) {
+							throw new CommitFailedException('Pdo commit failed. Reason: ' . $e->getMessage(), 0, $e);
+						}
+					},
 					function (Transaction $transaction) use ($that) { $that->performRollBack($transaction); }));
 		}
 	}
@@ -119,10 +121,7 @@ class Pdo extends \PDO {
 			throw new PdoStatementException($e, $statement);
 		}
 	}
-	/**
-	 *
-	 * @return NN6PdoStatement
-	 */
+
 	public function query($statement) {
 		try {
 			$mtime = microtime(true);
@@ -169,7 +168,6 @@ class Pdo extends \PDO {
 		if ($this->transactionManager === null) {
 			$this->prepareCommit();
 			$this->performCommit();
-			return;
 		}
 		
 		if ($this->transactionManager->hasOpenTransaction()) {
@@ -207,7 +205,18 @@ class Pdo extends \PDO {
 	
 	private function performCommit(Transaction $transaction = null) {
 		$mtime = microtime(true);
-		parent::commit();
+		
+		$preErr = error_get_last();
+		$result = @parent::commit();
+		$postErr = error_get_last();
+		
+		// Problem: Warining: Error while sending QUERY packet. PID=223316 --> parent::commit() will return true but 
+		// triggers warning. 
+		// http://php.net/manual/de/pdo.transactions.php
+		if (!$result || $preErr !== $postErr) {
+			throw new PdoCommitException($postErr['message'] ?? 'Commit failed due to unknown reason.');
+		}
+		
 		$this->logger->addTransactionCommit(microtime(true) - $mtime);
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_COMMITTED, $transaction);
 	}
