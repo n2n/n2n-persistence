@@ -72,12 +72,14 @@ class RemoveActionPool {
 		$this->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::PRE_REMOVE, $entity,
 				$removeAction->getEntityModel(), $removeAction->getId()));
 		
+		$this->actionQueue->getEntityManager()->getPersistenceContext()->removeEntityObj($entity);
+		
 		$that = $this;
 		$removeAction->executeAtEnd(function () use ($that, $removeAction) {
 			$that->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::POST_REMOVE,
 					$removeAction->getEntityObj(), $removeAction->getEntityModel(), $removeAction->getId()));
 		});
-				
+
 		return $removeAction;
 	}
 	
@@ -117,7 +119,6 @@ class RemoveActionPool {
 		$actionMeta->setIdRawValue($entityModel->getIdDef()->getEntityProperty()
 				->buildRaw($entityInfo->getId(), $this->actionQueue->getEntityManager()->getPdo()));
 		
-		$persistenceContext->removeEntityObj($entity);
 		return new RemoveActionImpl($this->actionQueue, $entityModel, $id, $entity,
 				$actionMeta, $oldValuesHash);		
 	}
