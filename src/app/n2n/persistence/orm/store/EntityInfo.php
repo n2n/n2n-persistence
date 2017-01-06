@@ -42,7 +42,7 @@ class EntityInfo {
 		$this->entityModel = $entityModel;
 		$this->id = $id;
 		
-		if ($id === null && ($state == self::STATE_MANAGED || $state == self::STATE_REMOVED)) {
+		if ($id === null && (/*$state == self::STATE_MANAGED ||*/ $state == self::STATE_REMOVED)) {
 			throw new \InvalidArgumentException('No id defined for Entity: ' 
 					. self::buildEntityString($entityModel, $id));
 		}
