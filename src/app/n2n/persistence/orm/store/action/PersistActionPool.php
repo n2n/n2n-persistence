@@ -127,22 +127,25 @@ class PersistActionPool {
 				$em->getEntityModelManager());
 		$entityModel = $entityInfo->getEntityModel();
 		
-		$persistAction = $this->createPersistAction($entity, $entityInfo);
+		$prePersistEvent = null;
+		return $this->createPersistAction($entity, $entityInfo);
+	}
+	
+	private function registerPersistAction($entity, PersistAction $persistAction) {
 		$objHash = spl_object_hash($entity);
 		$this->persistActions[$objHash] = $persistAction;
 		$this->unsuppliedPersistActions[$objHash] = $persistAction;
 		$this->actionQueue->add($persistAction);
-					
-		return $persistAction;
 	}
 	
-	private function createPersistAction($entity, EntityInfo $entityInfo) {
+	private function createPersistAction($entity, EntityInfo $entityInfo, LifecycleEvent &$prePersistEvent = null) {
 		$entityModel = $entityInfo->getEntityModel();
 		
 		switch ($entityInfo->getState()) {
 			case EntityInfo::STATE_NEW:
 				$persistAction = new InsertPersistAction($this->actionQueue, $entityModel,
 						$entityInfo->getId(), $entity, $this->createActionMeta($entityModel, $entityInfo));
+				$this->registerPersistAction($entity, $persistAction);
 				$this->manage($persistAction);
 				return $persistAction;
 		
@@ -151,8 +154,10 @@ class PersistActionPool {
 					throw new IllegalStateException('Unable to update entity with unkown id: '
 							. $entityInfo->toEntityString());
 				}
-				return new UpdatePersistAction($this->actionQueue, $entityModel, $entityInfo->getId(), 
+				$persistAction = new UpdatePersistAction($this->actionQueue, $entityModel, $entityInfo->getId(), 
 						$entity, $this->createActionMeta($entityModel, $entityInfo));
+				$this->registerPersistAction($entity, $persistAction);
+				return $persistAction;
 		
 			case EntityInfo::STATE_REMOVED:
 				if (!$entityInfo->hasId()) {
@@ -161,6 +166,7 @@ class PersistActionPool {
 				}
 				$persistAction = new UpdatePersistAction($this->actionQueue, $entityModel, $entityInfo->getId(),
 						$entity, $this->createActionMeta($entityModel, $entityInfo));
+				$this->registerPersistAction($entity, $persistAction);
 				$this->manage($persistAction);
 				return $persistAction;
 				
@@ -186,9 +192,12 @@ class PersistActionPool {
 		return $this->persistActions;
 	}
 	
-	private function manage(PersistActionAdapter $persistAction) {
+	private function manage(PersistActionAdapter $persistAction, LifecycleEvent &$prePersistEvent = null) {
 		$entityModel = $persistAction->getEntityModel();
 		$entity = $persistAction->getEntityObj();
+		
+		$this->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::PRE_PERSIST, $entity, 
+				$entityModel, $persistAction->getId()));
 		
 		$persistenceContext = $this->actionQueue->getEntityManager()->getPersistenceContext();
 		$persistenceContext->manageEntityObj($entity, $entityModel);
@@ -202,9 +211,6 @@ class PersistActionPool {
 						->writeValue($entity, $persistAction->getId());
 			});
 		}
-		
-		$this->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::PRE_PERSIST, $entity, 
-				$entityModel, $persistAction->getId()));
 		
 		$that = $this;
 		$persistAction->executeAtEnd(function () use ($that, $persistAction) {
