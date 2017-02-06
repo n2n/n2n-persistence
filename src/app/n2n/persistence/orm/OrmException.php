@@ -21,6 +21,8 @@
  */
 namespace n2n\persistence\orm;
 
-class OrmException extends \RuntimeException {
-	
+use n2n\util\ex\DocumentableRuntimeException;
+
+class OrmException extends DocumentableRuntimeException {
+
 }
