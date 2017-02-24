@@ -21,13 +21,9 @@
  */
 namespace n2n\persistence\orm;
 
-use n2n\persistence\orm\criteria\item\CriteriaFunction;
-use n2n\persistence\orm\criteria\item\CrIt;
-use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\criteria\item\CriteriaProperty;
-use n2n\persistence\orm\model\UnknownEntityPropertyException;
 use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 
@@ -82,7 +78,7 @@ class OrmUtils {
 	
 	public static function initializeProxy(EntityManager $em, $obj) {
 		if ($obj instanceof EntityProxy) {
-			$this->em->getPersistenceContext()->getEntityProxyManager()
+			$em->getPersistenceContext()->getEntityProxyManager()
 					->initializeProxy($obj);
 			return;
 		}

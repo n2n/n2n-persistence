@@ -23,9 +23,7 @@ namespace n2n\persistence\orm\store;
 
 use n2n\persistence\orm\store\action\ActionQueue;
 use n2n\persistence\orm\LifecycleEvent;
-use n2n\persistence\orm\query\QueryState;
 use n2n\util\ex\IllegalStateException;
-use n2n\persistence\orm\query\Query;
 
 class LoadingQueue {
 	private $persistenceContext;

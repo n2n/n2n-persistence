@@ -27,7 +27,6 @@ use n2n\persistence\orm\store\SimpleLoader;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\EntityNotFoundException;
-use n2n\persistence\orm\LifecycleEvent;
 
 class RefreshOperation implements CascadeOperation {
 	private $em;
@@ -44,8 +43,7 @@ class RefreshOperation implements CascadeOperation {
 		if (!$this->cascader->markAsCascaded($entity)) return;
 	
 		$persistenceContext = $this->em->getPersistenceContext();
-		$entityInfo = $persistenceContext->getEntityInfo($entity, 
-				$this->em->getEntityModelManager());
+		$entityInfo = $persistenceContext->getEntityInfo($entity, $this->em->getEntityModelManager());
 		
 		switch ($entityInfo->getState()) {
 			case EntityInfo::STATE_DETACHED:
