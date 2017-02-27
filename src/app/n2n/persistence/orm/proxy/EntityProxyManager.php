@@ -126,7 +126,7 @@ class EntityProxyManager {
 			$phpParameterCallStrs = array();
 			foreach ($method->getParameters() as $parameter) {				
 				$phpParameterStrs[] = $this->buildPhpParamerStr($parameter);
-				$phpParameterCallStrs[] = $this->buildDollar($parameter) . $parameter->getName();
+				$phpParameterCallStrs[] = $this->buildDollar($parameter, false) . $parameter->getName();
 			}
 				
 			$methodReturnTypeStr = '';
@@ -151,8 +151,16 @@ class EntityProxyManager {
 		return new \ReflectionClass($proxyNamespaceName . '\\' . $proxyClassName);
 	}
 
-	private function buildDollar(\ReflectionParameter $parameter) {
-		return $parameter->isVariadic() ? '...$' : '$';
+	private function buildDollar(\ReflectionParameter $parameter, bool $includeRef) {
+		$str = '';
+		if ($parameter->isVariadic()) {
+			$str .= '...';
+		}
+		if ($includeRef && $parameter->isPassedByReference()) {
+			$str .= '&';
+		}
+		$str .= '$';
+		return $str;
 	}
 	
 	private function buildPhpParamerStr(\ReflectionParameter $parameter) {
@@ -162,7 +170,7 @@ class EntityProxyManager {
 			$phpParamStr .= $this->buildTypeStr($type) . ' ';
 		}
 		
-		$phpParamStr .= $this->buildDollar($parameter) . $parameter->getName();
+		$phpParamStr .= $this->buildDollar($parameter, true) . $parameter->getName();
 		
 		if ($parameter->isDefaultValueAvailable()) {
 			if ($parameter->isDefaultValueConstant()) {
