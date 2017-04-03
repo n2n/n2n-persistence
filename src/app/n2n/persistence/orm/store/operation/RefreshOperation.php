@@ -53,6 +53,8 @@ class RefreshOperation implements CascadeOperation {
 						. ' entity: ' . $entityInfo->toEntityString(), 0);
 		}
 		
+		$this->em->getLoadingQueue()->registerLoading($this);
+		
 		$values = $this->valueLoader->loadValues($entityInfo->getEntityModel(), $entityInfo->getId());
 		if ($values === null) {
 			throw new EntityNotFoundException('Entity no longer exists in the database: ' 
@@ -60,6 +62,7 @@ class RefreshOperation implements CascadeOperation {
 		}
 		
 		$this->em->getLoadingQueue()->mapValues($entity, $entityInfo->getId(), $values, array());
+		$this->em->getLoadingQueue()->finalizeLoading($this);
 		
 // 		$persistenceContext->mapValues($entity, $values);
 // 		$persistenceContext->updateValueHashes($entity, $values, array(), $this->em);
