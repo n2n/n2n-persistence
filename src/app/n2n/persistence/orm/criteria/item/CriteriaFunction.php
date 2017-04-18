@@ -85,9 +85,9 @@ class CriteriaFunction implements CriteriaItem {
 		return new FunctionQueryPoint($this->name, $parameterQueryPoints, $queryState);
 	}
 	
-	public function createSelection(QueryState $queryState) {
-		return new ConstantCriteriaSelection($queryState, $this->toQueryItem($queryState, null));
-	}
+// 	public function createSelection(QueryState $queryState) {
+// 		return new ConstantCriteriaSelection($queryState, $this->toQueryItem($queryState, null));
+// 	}
 	
 	public static function isGroupFunction($name) {
 		return in_array($name, self::getGroupNames());

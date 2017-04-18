@@ -23,7 +23,6 @@ namespace n2n\persistence\orm\criteria\item;
 
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\property\EntityProperty;
-use n2n\persistence\orm\OrmUtils;
 use n2n\reflection\ReflectionUtils;
 
 class CrIt {

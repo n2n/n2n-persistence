@@ -130,7 +130,7 @@ class PdoStatement extends \PDOStatement {
 	
 
 	public function fetch($fetch_style = null, $cursor_orientation = null, $cursor_offset = null) {
-		$return = parent::fetch($fetch_style , $cursor_orientation, $cursor_offset);
+		$return = parent::fetch($fetch_style, $cursor_orientation, $cursor_offset);
 		
 		if ($fetch_style == PDO::FETCH_BOUND) {
 			$this->supplySharedBounds();
