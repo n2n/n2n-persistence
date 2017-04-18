@@ -108,6 +108,12 @@ class PdoStatement extends \PDOStatement {
 			if (isset($this->logger)) {
 				$this->logger->addPreparedExecution($this->queryString, $this->boundValues, (microtime(true) - $mtime));
 			}
+			
+			if (!$return) {
+				$err = error_get_last();
+				throw new \PDOException($err['message']);
+			}
+			
 			return $return;
 		} catch (\PDOException $e) {
 			throw new PdoPreparedExecutionException($e, $this->queryString, $this->boundValues);
