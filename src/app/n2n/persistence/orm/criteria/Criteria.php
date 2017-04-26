@@ -262,7 +262,7 @@ class Criteria {
 	 * @param string $direction
 	 * @return Criteria
 	 */
-	public function order($expression, $direction) {
+	public function order($expression, $direction = self::ORDER_DIRECTION_ASC) {
 		ArgUtils::valEnum($direction, self::getOrderDirections());
 		$this->orderDefs[] = array('criteriaItem' => CrIt::pf($expression),
 				'direction' => $direction);

@@ -39,6 +39,7 @@ use n2n\persistence\orm\nql\NqlParser;
 use n2n\persistence\Pdo;
 use n2n\persistence\orm\criteria\item\CriteriaProperty;
 use n2n\persistence\orm\store\LoadingQueue;
+use n2n\persistence\orm\criteria\item\CriteriaFunction;
 
 class LazyEntityManager implements EntityManager {
 	private $closed = false;
@@ -158,7 +159,8 @@ class LazyEntityManager implements EntityManager {
 	 * @param int $num
 	 * @return \n2n\persistence\orm\criteria\BaseCriteria
 	 */
-	public function createSimpleCriteria(\ReflectionClass $class, array $matches = null, array $order = null, $limit = null, $num = null) {
+	public function createSimpleCriteria(\ReflectionClass $class, array $matches = null, array $order = null, 
+			$limit = null, $num = null) {
 		$this->ensureEntityManagerOpen();
 			
 		$criteria = $this->createCriteria();
@@ -167,23 +169,38 @@ class LazyEntityManager implements EntityManager {
 
 		$whereSelector = $criteria->where();
 		foreach ((array) $matches as $propertyExpression => $constant) {
-			if ($constant instanceof CriteriaProperty) {
-				$constant = $constant->prep(self::SIMPLE_ALIAS);
+			if ($constant instanceof CriteriaProperty || $constant instanceof CriteriaFunction) {
+				$constant = $this->preCriteriaItem($constant);
 			}
-			// @todo pre function properties
+
 			$whereSelector->match(
-					CrIt::p($propertyExpression)->prep(self::SIMPLE_ALIAS),
+					$this->preCriteriaItem(CrIt::pf($propertyExpression)),
 					CriteriaComparator::OPERATOR_EQUAL, $constant);
 		}
-	
+
 		foreach ((array) $order as $propertyExpression => $direction) {
-			$criteria->order(CrIt::p($propertyExpression)
-					->prep(self::SIMPLE_ALIAS), $direction);
+			$criteria->order($this->preCriteriaItem(CrIt::pf($propertyExpression)), $direction);
 		}
 	
 		$criteria->limit($limit, $num);
 
 		return $criteria;
+	}
+	
+	private function preCriteriaItem($criteriaItem) {
+		if ($criteriaItem instanceof CriteriaProperty) {
+			return $criteriaItem->prep(self::SIMPLE_ALIAS);
+		}
+		
+		if (!($criteriaItem instanceof CriteriaFunction)) {
+			return $criteriaItem;
+		}
+		
+		$newParameters = array();
+		foreach ($criteriaItem->getParameters() as $parameter) {
+			$newParameters[] = $this->preCriteriaItem($parameter);
+		}
+		return new CriteriaFunction($criteriaItem->getName(), $newParameters);
 	}
 	
 	public function createNqlCriteria($nql, array $params = array()) {
