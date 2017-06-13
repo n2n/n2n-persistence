@@ -21,6 +21,7 @@
  */
 namespace n2n\persistence\orm\nql;
 
+use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 class Nql {
 	const GROUP_START = '(';
 	const GROUP_END = ')';
@@ -45,9 +46,32 @@ class Nql {
 	const KEYWORD_LIMIT = 'LIMIT';
 	const KEYWORD_NOT = 'NOT';
 	const KEYWORD_EXISTS = 'EXISTS';
+	const KEYWORD_NULL = 'NULL';
+	const KEYWORD_IS = 'IS';
+	const KEYWORD_CONTAINS = CriteriaComparator::OPERATOR_CONTAINS;
 	
 	public static function getNoticeableKeyWords() {
 		return array(self::KEYWORD_SELECT, self::KEYWORD_FROM, self::KEYWORD_WHERE, 
 				self::KEYWORD_GROUP, self::KEYWORD_HAVING, self::KEYWORD_ORDER, self::KEYWORD_LIMIT);
+	}
+	
+	public static function isKeywordNot($token) {
+		return self::compare($token, Nql::KEYWORD_NOT);
+	}
+	
+	public static function isKeywordNull($token) {
+		return self::compare($token, Nql::KEYWORD_NULL);
+	}
+	
+	public static function isKeywordIs($token) {
+		return self::compare($token, Nql::KEYWORD_IS);
+	}
+	
+	public static function isKeywordContains($token) {
+		return self::compare($token, Nql::KEYWORD_CONTAINS);
+	}
+	
+	private static function compare($token, $keyword) {
+		return mb_strtoupper($token) === $keyword;
 	}
 }

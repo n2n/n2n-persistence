@@ -31,10 +31,8 @@ class OrderProcessor extends KeywordProcesserAdapter {
 	
 	private $direction;
 	private $currentItem;
-	private $processedString;
 	
 	public function processChar($char) {
-		$this->processedString .= $char;
 		if (!(StringUtils::isEmpty($char) || $char == Nql::EXPRESSION_SEPERATOR)) {
 			$this->currentToken .= $char;
 			return;

@@ -45,6 +45,7 @@ class Comparison {
 	private $testOperator;
 	private $inTest = false;
 	private $testExpression;
+	private $processedTokens = array();
 	
 	public function __construct(ParsingState $parsingState) {
 		$this->parsingState = $parsingState;
@@ -96,6 +97,7 @@ class Comparison {
 	public function processToken($token) {
 		if (empty($token)) return;
 		
+		$this->processedTokens[] = $token;
 		if (null === $this->connectionType || null === $this->comparator) {
 			throw $this->createNqlParseException('Missing \'' . Nql::KEYWORD_AND .'\' or \'' 
 					. Nql::KEYWORD_OR . '\' in comparison statement');
@@ -173,10 +175,6 @@ class Comparison {
 		return mb_strtoupper($token) === Nql::KEYWORD_EXISTS;
 	}
 	
-	private function isKeywordNot($token) {
-		return mb_strtoupper($token) === Nql::KEYWORD_NOT;
-	}
-	
 	private function processLeftItem($token) {
 		$tokens = $this->splitByOperator($token);
 		$tokenCount = count($tokens);
@@ -185,12 +183,12 @@ class Comparison {
 			throw $this->createNqlParseException('Invalid expression in comparison statement', $token);
 		}
 		
-		if ($tokenCount > 2) {
+		if ($tokenCount === 3) {
 			$this->rightItemExpression = $tokens[2];
 			return;
 		}
 		
-		if ($tokenCount > 1) {
+		if ($tokenCount === 2) {
 			$this->operator = $tokens[1];
 			$this->currentOperatorParts[] = $this->operator;
 			$this->leftItemExpression .= $tokens[0];
@@ -203,7 +201,7 @@ class Comparison {
 			return;
 		}
 		
-		if ($this->isKeywordNot($token)) {
+		if (Nql::isKeywordNot($token)) {
 			$this->expectKeywordTest = true;
 			$this->testOperator = $token . ' ';
 			return;
@@ -228,13 +226,18 @@ class Comparison {
 			}
 		}
 		
-		$this->currentOperatorParts[] = mb_strtoupper($token);
-		if (!in_array(implode(' ', $this->currentOperatorParts),
-				CriteriaComparator::getOperators())) {
+		if (Nql::isKeywordNull($token)) {
+			$this->applyCurrentOperatorParts();
+			$this->rightItemExpression = Nql::KEYWORD_NULL;
 			return;
 		}
 		
-		$this->operator = implode(' ', $this->currentOperatorParts);
+		$this->currentOperatorParts[] = mb_strtoupper($token);
+		if (!in_array(implode(' ', $this->currentOperatorParts), CriteriaComparator::getOperators())) {
+			return;
+		}
+		
+		$this->applyCurrentOperatorParts();
 	}
 	
 	public function isEmpty() {
@@ -262,13 +265,29 @@ class Comparison {
 						$this->connectionType == ConditionParser::CONNECTION_TYPE_AND);
 			}
 		} catch (\InvalidArgumentException $e) {
-			throw $this->createNqlParseException('Invalid comparison statement', null, $e);
+			throw $this->createNqlParseException('Invalid comparison statement: ' . implode(' ', $this->processedTokens), 
+					null, $e);
 		}
 		
 		$this->reset();
 	}
 	
+	private function applyCurrentOperatorParts() {
+		$this->operator = strtoupper(implode(' ', $this->currentOperatorParts));
+		
+		if ($this->operator === Nql::KEYWORD_IS) {
+			$this->operator = CriteriaComparator::OPERATOR_EQUAL;
+		}
+		
+		if ($this->operator === Nql::KEYWORD_IS . ' ' . Nql::KEYWORD_NOT) {
+			$this->operator = CriteriaComparator::OPERATOR_NOT_EQUAL;
+		}
+	}	
+	
 	private function parseExpression($expression, $nextPart = null) {
+		if ($expression === Nql::KEYWORD_NULL) {
+			return null;
+		}
 		return $this->parsingState->parse($expression, $nextPart);
 	}
 	
@@ -283,6 +302,7 @@ class Comparison {
 		$this->testExpression = null;
 		$this->testOperator = null;
 		$this->inTest = false;
+		$this->processedTokenString = array();
 	}
 
 	private function createNqlParseException($message, $donePart = null, \Exception $previous = null) {

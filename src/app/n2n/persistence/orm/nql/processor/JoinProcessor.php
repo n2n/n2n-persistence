@@ -43,6 +43,7 @@ class JoinProcessor extends KeywordProcesserAdapter {
 	
 	private $joinType = null;
 	private $expectingKeywordJoin = false;
+	private $processedTokensString; 
 	
 	public function isExpectingKeywordJoin() {
 		return $this->expectingKeywordJoin;
@@ -99,7 +100,9 @@ class JoinProcessor extends KeywordProcesserAdapter {
 	}
 	
 	private function processCurrentToken() {
+		$this->processedTokensString .= $this->currentToken;
 		if (StringUtils::isEmpty($this->currentToken)) return;
+		
 
 		if (null !== $this->joinCriteria || null !== $this->joinEntityClass || null !== $this->joinProperty) {
 			if (mb_strtoupper($this->currentToken) == Nql::KEYWORD_ON) {
@@ -176,6 +179,8 @@ class JoinProcessor extends KeywordProcesserAdapter {
 		$this->processGroups = true;
 		
 		$this->currentToken = '';
+		$this->processedTokensString = '';
+		$this->processedString = '';
 	}
 	
 	private function doJoin() {
@@ -183,6 +188,10 @@ class JoinProcessor extends KeywordProcesserAdapter {
 		$this->processGroups = false;
 		
 		if (null !== $this->joinProperty) {
+			if (null === $this->alias) {
+				throw $this->createNqlParseException('Invalid join statement. Joined properties must have an alias: ' 
+						. $this->processedTokensString, $this->currentToken);
+			}
 			$this->criteria->joinProperty($this->joinProperty, $this->alias, $this->joinType, $this->fetch);
 			return;
 		}
