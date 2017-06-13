@@ -68,15 +68,15 @@ class ParsingState {
 				0, $previous, $this->queryString, $this->params);
 	}
 	
-	public function parse($expression) {
+	public function parse($expression, $nextPart = null) {
 		try {
 			return $this->expressionParser->parse($expression);
 		} catch (\InvalidArgumentException $e) {
-			throw $this->createNqlParseException('Invalid expression' . $expression, null, $e);
+			throw $this->createNqlParseException('Invalid expression ' . $expression, $nextPart, $e);
 		}
 	}
 	
-	public function getClassForEntityName($entityName) {
+	public function getClassForEntityName($entityName, $strict = true) {
 		$entityName = NqlUtils::removeQuotationMarks($entityName);
 		
 		if (StringUtils::startsWith('\\', $entityName)) {
@@ -86,20 +86,28 @@ class ParsingState {
 		if (isset($this->entityClasses[$entityName])) return $this->entityClasses[$entityName];
 	
 		$class = null;
+		$registeredClassNames = array();
 		foreach ($this->entityModelManager->getEntityClasses() as $entityClass) {
 // 			test($entityName . '==' . $entityClass->getName());
+//			@todo check if EntityName is the Whole name, otherwise Article will find Entity with name BlogArticle
 			if (!StringUtils::endsWith($entityName, $entityClass->getName())) continue;
 
-			if ($class === null) {
-				$class = $entityClass;
-				continue;
+			$registeredClassNames[] = $entityClass->getName();
+			$class = $entityClass;
+		}
+		
+		
+		if (null === 0) {
+			if ($strict) {
+				throw $this->createNqlParseException('No registered Entity with name: ' . $entityName);
 			}
 			
-			throw $this->createNqlParseException('More than one registered Entity with name: ' . $entityName);
-		}
-	
-		if (null === $class) {
-			throw $this->createNqlParseException('No registered Entity with name: ' . $entityName);
+			return null;
+		} 
+		
+		if (count($registeredClassNames) > 1) {
+			throw $this->createNqlParseException($entityName . ' is ambiguos as entity name. Multiple entities are defined with this name: ' 
+					. implode(', ', $registeredClassNames));
 		}
 	
 		return $this->entityClasses[$entityName] = $class;

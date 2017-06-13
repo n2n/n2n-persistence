@@ -248,7 +248,6 @@ class Comparison {
 	
 	public function doCompare() {
 		if (!empty($this->groupStack)) {
-			test($this->groupStack);
 			throw $this->createNqlParseException('\'' . Nql::GROUP_END . '\' expected');
 		}
 		
@@ -257,13 +256,11 @@ class Comparison {
 				$this->comparator->test($this->testOperator, $this->parseExpression($this->testExpression), 
 						$this->connectionType == ConditionParser::CONNECTION_TYPE_AND);
 			} else {
-				$this->comparator->match($this->parseExpression($this->leftItemExpression), 
+				$this->comparator->match($this->parseExpression($this->leftItemExpression, 
+								' ' . $this->operator . ' ' . $this->rightItemExpression), 
 						$this->operator, $this->parseExpression($this->rightItemExpression), 
 						$this->connectionType == ConditionParser::CONNECTION_TYPE_AND);
 			}
-			
-			
-			
 		} catch (\InvalidArgumentException $e) {
 			throw $this->createNqlParseException('Invalid comparison statement', null, $e);
 		}
@@ -271,8 +268,8 @@ class Comparison {
 		$this->reset();
 	}
 	
-	private function parseExpression($expression) {
-		return $this->parsingState->parse($expression);
+	private function parseExpression($expression, $nextPart = null) {
+		return $this->parsingState->parse($expression, $nextPart);
 	}
 	
 	private function reset() {

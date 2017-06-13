@@ -49,12 +49,17 @@ class ExpressionParser {
 			
 			return new CriteriaConstant($params[mb_substr($expression, 1)]);
 		}
-
-		$this->propertyExpressionParser->parse($expression);
-		if (null !== ($property = $this->propertyExpressionParser->getProperty())) {
-			return $property;
-		}
 		
+		$this->propertyExpressionParser->parse($expression);
+//		try {
+			//@todo the Crit-testExpressionForProperty-method doesnt work properly
+			//NQL Example: SELECT u FROM atusch\bo\Article u WHERE u.active = :active AND DATE_FORMAT(u.birthday, "%m-%d") = :now
+			if (null !== ($property = $this->propertyExpressionParser->getProperty())) {
+				return $property;
+			}
+// 		} catch (\InvalidArgumentException $e) {
+			
+// 		}
 		
 		if (NqlUtils::isCriteria($expression)) {
 			$parser = new CriteriaParser($this->parsingState, new ComparatorCriteria());
