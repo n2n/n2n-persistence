@@ -43,7 +43,7 @@ class CrIt {
 	 * @throws \InvalidArgumentException
 	 * @return \n2n\persistence\orm\criteria\item\CriteriaProperty
 	 */
-	public static function p(... $args): CriteriaProperty {
+	public static function p(...$args): CriteriaProperty {
 		if (empty($args)) {
 			return new CriteriaProperty(array());
 		}
@@ -125,12 +125,18 @@ class CrIt {
 			return $expression;
 		}
 		
-		if (null !== ($item = self::testExpressionForFunction($expression))) {
-			return $item;
+		if (is_scalar($expression)) {
+			if (null !== ($item = self::testExpressionForFunction($expression))) {
+				return $item;
+			}
+			
+			if (null !== ($item = self::testExpressionForProperty($expression))) {
+				return $item;
+			}
 		}
 		
-		if (null !== ($item = self::testExpressionForProperty($expression))) {
-			return $item;
+		if (is_array($expression)) {
+			return self::p(...$expression);
 		}
 		
 		throw new \InvalidArgumentException('Invalid property or function expression: ' 
@@ -174,8 +180,8 @@ class CrIt {
 	 * @param string $expression
 	 * @return \n2n\persistence\orm\criteria\item\CriteriaFunction
 	 */
-	public static function testExpressionForFunction($expression) {	
-		if (preg_match('/^(\w+)\((.+)?\)$/', (string) $expression, $matches)) {
+	public static function testExpressionForFunction(string $expression) {	
+		if (preg_match('/^(\w+)\((.+)?\)$/', $expression, $matches)) {
 			return new CriteriaFunction($matches[1], (isset($matches[2]) ?
 					array(self::pfc($matches[2])) : array()));
 		}
@@ -186,9 +192,7 @@ class CrIt {
 	 * @param string $expression
 	 * @return \n2n\persistence\orm\criteria\item\CriteriaProperty
 	 */
-	public static function testExpressionForProperty($expression) {
-		$expression = (string) $expression;
-		
+	public static function testExpressionForProperty(string $expression) {
 		if (!preg_match('/(\"|\\\'|\(|\))/', $expression)) {
 			return new CriteriaProperty(explode(TreePath::PROPERTY_NAME_SEPARATOR, $expression));
 		}

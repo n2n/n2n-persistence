@@ -56,7 +56,6 @@ class OrderProcessor extends KeywordProcesserAdapter {
 
 	private function processCurrentToken() {
 		if (empty($this->currentToken)) return;
-		
 		if (null === $this->currentItem) {
 			$this->currentItem = $this->parseExpr($this->currentToken);
 			return;
@@ -67,7 +66,8 @@ class OrderProcessor extends KeywordProcesserAdapter {
 			return;
 		}
 		
-		throw $this->createNqlParseException('Expression seperator (,) expected ' . $this->currentToken . ' given');
+		throw $this->createNqlParseException('Expression seperator (,) expected ' . $this->currentToken . ' given', 
+				$this->processedString);
 	}
 	
 	private function doOrder() {
@@ -75,7 +75,7 @@ class OrderProcessor extends KeywordProcesserAdapter {
 			$this->criteria->order($this->currentItem, (null !== $this->direction) ? 
 					$this->direction : Criteria::ORDER_DIRECTION_ASC);
 		} catch (\InvalidArgumentException $e) {
-			throw $this->createNqlParseException('Invalid ORDER statement');
+			throw $this->createNqlParseException('Invalid ORDER statement: ', Nql::KEYWORD_ORDER . ' ' . $this->processedString);
 		}
 		
 		$this->currentItem = null;

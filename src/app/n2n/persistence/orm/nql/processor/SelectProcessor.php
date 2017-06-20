@@ -36,13 +36,25 @@ class SelectProcessor extends KeywordProcesserAdapter {
 	private $alias;
 
 	private $expectAlias = false;
+	private $inString = false;
 
 	private $waitForDistinct = false;
 	private $firstToken = true;
 	
 	public function processChar($char) {
+		if ($this->inString) {
+			$this->currentToken .= $char;
+			if ($char === NQL::QUOTATION_MARK) {
+				$this->inString = false;
+			}
+			return;
+		}
+		
 		if (!StringUtils::isEmpty($char) && $char != Nql::EXPRESSION_SEPERATOR) {
 			$this->currentToken .= $char; 
+			if ($char === NQL::QUOTATION_MARK) {
+				$this->inString = true;
+			}
 			return;
 		}
 		

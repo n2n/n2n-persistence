@@ -39,6 +39,7 @@ abstract class KeywordProcesserAdapter implements KeywordProcessor {
 	protected $currentToken = '';
 	
 	protected $processGroups = true;
+	protected $processedString;
 	
 	public function initialize(ParsingState $parsingState, Criteria $criteria) {
 		$this->parsingState = $parsingState;
@@ -56,6 +57,7 @@ abstract class KeywordProcesserAdapter implements KeywordProcessor {
 	}
 	
 	public function process($currentChar) {
+		$this->processedString .= $currentChar;
 		if (StringUtils::isEmpty($currentChar) && empty($this->currentToken)) return;
 		
 		if (!$this->processGroups) {

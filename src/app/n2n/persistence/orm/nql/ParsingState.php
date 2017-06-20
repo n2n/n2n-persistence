@@ -63,45 +63,56 @@ class ParsingState {
 	}
 	
 	public function createNqlParseException($message, $donePart = null, \Exception $previous = null) {
-		return new NqlParseException($message . '. Position: \'' 
-						. $donePart . implode('', array_reverse($this->tokenizerStack)) . '\'', 
-				0, $previous, $this->queryString, $this->params);
+		$positionString = $donePart . implode('', array_reverse($this->tokenizerStack));
+		if (!empty($positionString)) {
+			$positionString = '. Position: \'' . $positionString . '\'';
+		}
+		
+		return new NqlParseException($message . $positionString, 0, $previous, $this->queryString, $this->params);
 	}
 	
-	public function parse($expression) {
+	public function parse($expression, $nextPart = null) {
 		try {
 			return $this->expressionParser->parse($expression);
 		} catch (\InvalidArgumentException $e) {
-			throw $this->createNqlParseException('Invalid expression' . $expression, null, $e);
+			throw $this->createNqlParseException('Invalid expression ' . $expression, $nextPart, $e);
 		}
 	}
 	
-	public function getClassForEntityName($entityName) {
-		$entityName = NqlUtils::removeQuotationMarks($entityName);
+	public function getClassForEntityName($entityName, $strict = true) {
+		$comparableEntityName = NqlUtils::removeQuotationMarks($entityName);
 		
-		if (StringUtils::startsWith('\\', $entityName)) {
-			$entityName = ltrim($entityName, '\\');
+		if (!StringUtils::startsWith('\\', $comparableEntityName)) {
+			$comparableEntityName = '\\' . $comparableEntityName;
 		}
 		
-		if (isset($this->entityClasses[$entityName])) return $this->entityClasses[$entityName];
+		if (isset($this->entityClasses[$comparableEntityName])) return $this->entityClasses[$comparableEntityName];
 	
 		$class = null;
+		$registeredClassNames = array();
 		foreach ($this->entityModelManager->getEntityClasses() as $entityClass) {
 // 			test($entityName . '==' . $entityClass->getName());
-			if (!StringUtils::endsWith($entityName, $entityClass->getName())) continue;
+//			@todo check if EntityName is the Whole name, otherwise Article will find Entity with name BlogArticle
+			if (!StringUtils::endsWith($comparableEntityName, '\\' . $entityClass->getName())) continue;
 
-			if ($class === null) {
-				$class = $entityClass;
-				continue;
+			$registeredClassNames[] = $entityClass->getName();
+			$class = $entityClass;
+		}
+		
+		
+		if (null === 0) {
+			if ($strict) {
+				throw $this->createNqlParseException('No registered Entity with name: ' . $entityName);
 			}
 			
-			throw $this->createNqlParseException('More than one registered Entity with name: ' . $entityName);
+			return null;
+		} 
+		
+		if (count($registeredClassNames) > 1) {
+			throw $this->createNqlParseException($entityName . ' is ambiguos as entity name. Multiple entities are defined with this name: ' 
+					. implode(', ', $registeredClassNames));
 		}
 	
-		if (null === $class) {
-			throw $this->createNqlParseException('No registered Entity with name: ' . $entityName);
-		}
-	
-		return $this->entityClasses[$entityName] = $class;
+		return $this->entityClasses[$comparableEntityName] = $class;
 	}
 }

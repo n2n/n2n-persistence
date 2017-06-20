@@ -26,7 +26,6 @@ use n2n\persistence\orm\nql\NqlUtils;
 use n2n\persistence\orm\nql\ConditionParser;
 use n2n\persistence\orm\nql\Nql;
 use n2n\persistence\orm\criteria\item\CrIt;
-use n2n\persistence\orm\nql\NqlParseException;
 use n2n\util\StringUtils;
 
 class JoinProcessor extends KeywordProcesserAdapter {
@@ -44,6 +43,7 @@ class JoinProcessor extends KeywordProcesserAdapter {
 	
 	private $joinType = null;
 	private $expectingKeywordJoin = false;
+	private $processedTokensString; 
 	
 	public function isExpectingKeywordJoin() {
 		return $this->expectingKeywordJoin;
@@ -100,12 +100,20 @@ class JoinProcessor extends KeywordProcesserAdapter {
 	}
 	
 	private function processCurrentToken() {
+		$this->processedTokensString .= $this->currentToken;
 		if (StringUtils::isEmpty($this->currentToken)) return;
 		
+
 		if (null !== $this->joinCriteria || null !== $this->joinEntityClass || null !== $this->joinProperty) {
 			if (mb_strtoupper($this->currentToken) == Nql::KEYWORD_ON) {
 				if (null !== $this->joinProperty) {
-					throw $this->createNqlParseException('Keyword \'' . Nql::KEYWORD_ON . '\' not allowed with joined properties');	
+					$propertyName = $this->joinProperty;
+					if (null !== $this->alias) {
+						$propertyName .= ' ' . $this->alias;
+					}
+					
+					throw $this->createNqlParseException('Invalid join statement for property \'' . $propertyName 
+							. '\'. Keyword \'' . Nql::KEYWORD_ON . '\' is not allowed with joined properties' );	
 				}
 				
 				$this->doJoin();
@@ -121,9 +129,9 @@ class JoinProcessor extends KeywordProcesserAdapter {
 		if (NqlUtils::isCriteria($this->currentToken)) {
 			$this->joinCriteria = $this->parseExpr($this->currentToken);
 		} else {
-			try {
-				$this->joinEntityClass = $this->getParsingState()->getClassForEntityName($this->currentToken);
-			} catch (NqlParseException $e) {
+			$this->joinEntityClass = $this->getParsingState()->getClassForEntityName($this->currentToken, false);
+			
+			if (null === $this->joinEntityClass) {
 				$this->joinProperty = CrIt::testExpressionForProperty($this->currentToken);
 				
 				if (null === $this->joinProperty) {
@@ -171,6 +179,8 @@ class JoinProcessor extends KeywordProcesserAdapter {
 		$this->processGroups = true;
 		
 		$this->currentToken = '';
+		$this->processedTokensString = '';
+		$this->processedString = '';
 	}
 	
 	private function doJoin() {
@@ -178,6 +188,10 @@ class JoinProcessor extends KeywordProcesserAdapter {
 		$this->processGroups = false;
 		
 		if (null !== $this->joinProperty) {
+			if (null === $this->alias) {
+				throw $this->createNqlParseException('Invalid join statement. Joined properties must have an alias: ' 
+						. $this->processedTokensString, $this->currentToken);
+			}
 			$this->criteria->joinProperty($this->joinProperty, $this->alias, $this->joinType, $this->fetch);
 			return;
 		}
