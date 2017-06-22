@@ -146,7 +146,7 @@ class Comparison {
 				|| StringUtils::startsWith(self::SEPARATOR, $token)) {
 			if (empty($this->rightItemExpression) 
 					&& mb_strtoupper($this->operator) === CriteriaComparator::OPERATOR_CONTAINS
-					&& $this->isKeywordNot($token)) {
+					&& Nql::isKeywordNot($token)) {
 				$this->operator .= ' ' . $token;
 				return;
 			}
