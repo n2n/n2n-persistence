@@ -91,8 +91,6 @@ class ParsingState {
 		$class = null;
 		$registeredClassNames = array();
 		foreach ($this->entityModelManager->getEntityClasses() as $entityClass) {
-// 			test($entityName . '==' . $entityClass->getName());
-//			@todo check if EntityName is the Whole name, otherwise Article will find Entity with name BlogArticle
 			if (!StringUtils::endsWith($comparableEntityName, '\\' . $entityClass->getName())) continue;
 
 			$registeredClassNames[] = $entityClass->getName();
@@ -100,7 +98,7 @@ class ParsingState {
 		}
 		
 		
-		if (null === 0) {
+		if (null === $class) {
 			if ($strict) {
 				throw $this->createNqlParseException('No registered Entity with name: ' . $entityName);
 			}

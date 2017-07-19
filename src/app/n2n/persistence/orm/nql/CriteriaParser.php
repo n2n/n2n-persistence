@@ -139,7 +139,7 @@ class CriteriaParser {
 	
 	private function finalize() {
 		if (!empty($this->groupStack)) {
-			throw $this->parsingState->createNqlParseException(count($this->groupStack) . ' group open missing in statement');
+			throw $this->parsingState->createNqlParseException(count($this->groupStack) . ' group close missing in statement');
 		}
 		
 		$this->parsingState->popTokenizer();
