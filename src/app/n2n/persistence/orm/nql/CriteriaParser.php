@@ -109,11 +109,14 @@ class CriteriaParser {
 			$this->currentToken .= $char;
 			return true;
 		}
-		 
+		
 		//Emtpy
 		if (empty($this->groupStack) && NqlUtils::isNoticeableKeyword($this->currentToken)) {
-			if (!($this->firstToken && (mb_strtoupper($this->currentToken) == Nql::KEYWORD_SELECT))) {
-				$this->setProcessorForKeyWord($this->currentToken);
+			
+			if (!($this->firstToken && (mb_strtoupper($this->currentToken) == Nql::KEYWORD_SELECT)) ) {
+				if ($this->currentProcessor->isReadyToFinalize()) {
+					$this->setProcessorForKeyWord($this->currentToken);
+				}
 				$this->currentToken = '';
 				return true;
 			}

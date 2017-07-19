@@ -150,6 +150,10 @@ class FromProcessor extends KeywordProcesserAdapter {
 		$this->joinProcessor->setJoinType($this->currentToken);
 	}
 	
+	public function isReadyToFinalize() {
+		return $this->inJoin || null !== $this->fromCriteria || null !== $this->fromEntityClass;
+	}
+	
 	public function finalize() {
 		parent::finalize();
 		

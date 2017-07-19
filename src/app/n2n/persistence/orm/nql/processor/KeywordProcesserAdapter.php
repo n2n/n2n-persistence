@@ -88,6 +88,10 @@ abstract class KeywordProcesserAdapter implements KeywordProcessor {
 		}
 	}
 	
+	public function isReadyToFinalize() {
+		return true;
+	}
+	
 	protected function createNqlParseException($message, $donePart = null, \Exception $previous = null) {
 		return $this->parsingState->createNqlParseException($message, $donePart, $previous);
 	}

@@ -30,12 +30,20 @@ interface KeywordProcessor {
 	 * @param Criteria $criteria
 	 */
 	public function initialize(ParsingState $parsingState, Criteria $criteria);
+	
 	/**
 	 * @param string $currentChar
 	 */
+	
 	public function process($currentChar);
+	
+	/**
+	 * check if finalization is possible, otherwise the next keyword will be disregarded
+	 */
+	public function isReadyToFinalize();
 	/**
 	 * 
 	 */
 	public function finalize();
+	
 }
