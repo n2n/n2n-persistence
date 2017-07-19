@@ -76,6 +76,7 @@ class ConditionParser {
 	private function processGroup($char) {
 		$this->processCurrentToken();
 		$this->currentToken = '';
+		
 		if (!$this->comparison->isEmpty() && !$this->comparison->isReadyToCompare()) {
 			if ($char == Nql::GROUP_START) {
 				$this->comparison->groupStart();

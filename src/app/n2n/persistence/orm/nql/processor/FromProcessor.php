@@ -107,6 +107,13 @@ class FromProcessor extends KeywordProcesserAdapter {
 	}
 	
 	private function processJoin($char) {
+		if ($char === Nql::EXPRESSION_SEPERATOR) {
+			$this->joinProcessor->finalize();
+			$this->currentToken = '';
+			$this->inJoin = false;
+			return;
+		}
+		
 		if (!StringUtils::isEmpty($char)) {
 			$this->currentToken .= $char;
 		
@@ -143,10 +150,14 @@ class FromProcessor extends KeywordProcesserAdapter {
 		$this->joinProcessor->setJoinType($this->currentToken);
 	}
 	
+	public function isReadyToFinalize() {
+		return $this->inJoin || null !== $this->fromCriteria || null !== $this->fromEntityClass;
+	}
+	
 	public function finalize() {
 		parent::finalize();
 		
-		if (null !== $this->joinProcessor) {
+		if ($this->inJoin) {
 			$this->joinProcessor->finalize();
 			return;
 		} 

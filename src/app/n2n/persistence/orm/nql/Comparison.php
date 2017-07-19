@@ -27,7 +27,7 @@ use n2n\persistence\orm\query\from\TreePath;
 
 class Comparison {
 	
-	const OPERATOR_SPLIT_PATTERN = '/[!=><]+/';
+	const OPERATOR_SPLIT_PATTERN = '/([!=><])+/';
 	const SEPARATOR = TreePath::PROPERTY_NAME_SEPARATOR;
 	
 	private $parsingState;
@@ -214,7 +214,6 @@ class Comparison {
 		if (empty($this->currentOperatorParts)) {
 			$tokens = $this->splitByOperator($token);
 			$tokenCount = count($tokens);
-			
 			if ($tokenCount > 2) {
 				throw $this->createNqlParseException('Invalid expression in comparison statement', $token);
 			}
@@ -310,7 +309,7 @@ class Comparison {
 	}
 	
 	private function splitByOperator($string) {
-		return array_filter(preg_split(self::OPERATOR_SPLIT_PATTERN, 
-				$string, null, PREG_SPLIT_DELIM_CAPTURE));
+		return array_values(array_filter(preg_split(self::OPERATOR_SPLIT_PATTERN, 
+				$string, null, PREG_SPLIT_DELIM_CAPTURE)));
 	}
 }
