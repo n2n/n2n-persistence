@@ -29,7 +29,6 @@ use n2n\persistence\orm\criteria\item\CriteriaConstant;
 use n2n\persistence\orm\criteria\item\CriteriaProperty;
 use n2n\persistence\orm\criteria\item\CriteriaPlaceholder;
 use n2n\reflection\property\ValueIncompatibleWithConstraintsException;
-use n2n\persistence\meta\data\QueryPlaceMarker;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\reflection\property\TypeConstraint;
 use n2n\persistence\orm\query\Placeholder;
@@ -160,34 +159,34 @@ class QueryComparatorBuilder {
 	
 	private function buildPropertyPlaceholderComparison(CriteriaProperty $criteriaProperty, $operator,
 			CriteriaPlaceholder $criteriaPlaceholder, $useAnd) {
-		$comparisonStrategy = $criteriaProperty->createQueryPoint($this->queryState, $this->queryPointResolver)
-				->requestComparisonStrategy();
-		$value = $criteriaContstant->getValue();
-	throw new NotYetImplementedException('todo');
-		if ($comparisonStrategy->getType() == ComparisonStrategy::TYPE_COLUMN) {
-			$columnComparable = $columnComparable->getAvailableOperators();
+		throw new NotYetImplementedException('todo');
+// 		$comparisonStrategy = $criteriaProperty->createQueryPoint($this->queryState, $this->queryPointResolver)
+// 				->requestComparisonStrategy();
+// 		$value = $criteriaContstant->getValue();
+// 		if ($comparisonStrategy->getType() == ComparisonStrategy::TYPE_COLUMN) {
+// 			$columnComparable = $columnComparable->getAvailableOperators();
 				
-			$this->validateOperators($columnComparable, $operator);
-			$typeConstraint = self::oppositeTypeConstraint($columnComparable, $operator);
-			$placeholderName = $this->queryState->createPlaceholderName();
-			$placeholder = new ColumnComparablePlaceholder($placeholderName,
-					$columnComparable, $operator, $typeConstraint);
-			$this->queryState->registerPlaceholder($criteriaPlaceholder->getName(),
-					$placeholder);
+// 			$this->validateOperators($columnComparable, $operator);
+// 			$typeConstraint = self::oppositeTypeConstraint($columnComparable, $operator);
+// 			$placeholderName = $this->queryState->createPlaceholderName();
+// 			$placeholder = new ColumnComparablePlaceholder($placeholderName,
+// 					$columnComparable, $operator, $typeConstraint);
+// 			$this->queryState->registerPlaceholder($criteriaPlaceholder->getName(),
+// 					$placeholder);
 			
-			$queryPlaceMarker = new QueryPlaceMarker($placeholderName);
+// 			$queryPlaceMarker = new QueryPlaceMarker($placeholderName);
 	
-			$this->queryComparator->match($comparisonStrategy->buildQueryItem($operator), $operator,
-					$queryPlaceMarker);
-			return;
-		}
+// 			$this->queryComparator->match($comparisonStrategy->buildQueryItem($operator), $operator,
+// 					$queryPlaceMarker);
+// 			return;
+// 		}
 	
-		if ($comparisonStrategy instanceof CustomComparable && $comparisonStrategy->isComparableWithValue($operator, $value)) {
-			$comparisonStrategy->compareWithValue(self::groupQueryComparator($queryComparator, $useAnd), $operator, $value);
-			return;
-		}
+// 		if ($comparisonStrategy instanceof CustomComparable && $comparisonStrategy->isComparableWithValue($operator, $value)) {
+// 			$comparisonStrategy->compareWithValue(self::groupQueryComparator($queryComparator, $useAnd), $operator, $value);
+// 			return;
+// 		}
 	
-		throw $this->createIncompatibleCriteriaItemsException($criteriaProperty, $operator, $criteriaContstant);
+// 		throw $this->createIncompatibleCriteriaItemsException($criteriaProperty, $operator, $criteriaContstant);
 	}
 
 	private function buildComparison(CriteriaItem $criteriaItem1,
@@ -313,7 +312,7 @@ class ColumnComparablePlaceholder implements Placeholder {
 	
 	public function apply(PdoStatement $stmt, $value) {
 		try {
-			$typeConstraint->validate($value);
+			$this->typeConstraint->validate($value);
 		} catch (ValueIncompatibleWithConstraintsException $e) {
 			throw new \InvalidArgumentException('Invalid placeholder value.', 0, $e);
 		}

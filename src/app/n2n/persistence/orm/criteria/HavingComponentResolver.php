@@ -21,74 +21,74 @@
  */
 namespace n2n\persistence\orm\criteria;
 
-use n2n\persistence\orm\query\from\ComponentResolver;
-use n2n\persistence\orm\query\from\TreePath;
-use n2n\util\ex\UnsupportedOperationException;
-use n2n\persistence\orm\query\QueryModel;
-use n2n\persistence\orm\query\from\DecoratedColumnComparable;
+// use n2n\persistence\orm\query\from\ComponentResolver;
+// use n2n\persistence\orm\query\from\TreePath;
+// use n2n\util\ex\UnsupportedOperationException;
+// use n2n\persistence\orm\query\QueryModel;
+// use n2n\persistence\orm\query\from\DecoratedColumnComparable;
 
-class HavingComponentResolver implements ComponentResolver {
-	private $queryState;
-	private $queryModel;
+// class HavingComponentResolver implements ComponentResolver {
+// 	private $queryState;
+// 	private $queryModel;
 	
-	public function __construct(QueryState $queryState, QueryModel $queryModel) {
-		$this->queryState = $queryState;
-		$this->queryModel = $queryModel;
-	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\query\from\ComponentResolver::requestComparisonStrategy()
-	 */
-	public function requestComparisonStrategy(TreePath $treePath) {
-		$comparisonStrategy = $this->findCriteriaItem($treePath)->createComparableStrategy($this->queryState, $this->queryState->getTree());
-		if ($comparisonStrategy->getType() != ComparisonStrategy::TYPE_COLUMN) {
-			throw new CriteriaConflictException('cannot be compared in having');
-		}
+// 	public function __construct(QueryState $queryState, QueryModel $queryModel) {
+// 		$this->queryState = $queryState;
+// 		$this->queryModel = $queryModel;
+// 	}
+// 	/* (non-PHPdoc)
+// 	 * @see \n2n\persistence\orm\query\from\ComponentResolver::requestComparisonStrategy()
+// 	 */
+// 	public function requestComparisonStrategy(TreePath $treePath) {
+// 		$comparisonStrategy = $this->findCriteriaItem($treePath)->createComparableStrategy($this->queryState, $this->queryState->getTree());
+// 		if ($comparisonStrategy->getType() != ComparisonStrategy::TYPE_COLUMN) {
+// 			throw new CriteriaConflictException('cannot be compared in having');
+// 		}
 	
-		$columnComparable = $comparisonStrategy->getColumnComparable();
-		$columnAlias = $this->queryState->selectQueryItem($columnComparable->getQueryItem());
+// 		$columnComparable = $comparisonStrategy->getColumnComparable();
+// 		$columnAlias = $this->queryState->selectQueryItem($columnComparable->getQueryItem());
 	
-		return new DecoratedColumnComparable($columnComparable, new QueryColumn($columnAlias));
-	}
+// 		return new DecoratedColumnComparable($columnComparable, new QueryColumn($columnAlias));
+// 	}
 	
-	private function findCriteriaItem(TreePath $treePath) {
-		$propertyNames = $treePath->nexts();
+// 	private function findCriteriaItem(TreePath $treePath) {
+// 		$propertyNames = $treePath->nexts();
 	
-		$selectedCriteriaItems = $this->queryState->getSelectedCriteriaItems();
+// 		$selectedCriteriaItems = $this->queryState->getSelectedCriteriaItems();
 	
-		if (count($propertyNames) == 1) {
-			$propertyName = current($propertyNames);
+// 		if (count($propertyNames) == 1) {
+// 			$propertyName = current($propertyNames);
 				
-			if (isset($selectedCriteriaItems[$propertyName])) {
-				return $selectedCriteriaItems[$propertyName];
-			}
-		}
+// 			if (isset($selectedCriteriaItems[$propertyName])) {
+// 				return $selectedCriteriaItems[$propertyName];
+// 			}
+// 		}
 	
-		foreach ($selectedCriteriaItems as $selectedCriteriaItem) {
-			if ($selectedCriteriaItem instanceof CriteriaProperty
-					&& $selectedCriteriaItem->getPropertyNames() === $propertyNames) {
-				return $selectedCriteriaItem;
-			}
-		}
+// 		foreach ($selectedCriteriaItems as $selectedCriteriaItem) {
+// 			if ($selectedCriteriaItem instanceof CriteriaProperty
+// 					&& $selectedCriteriaItem->getPropertyNames() === $propertyNames) {
+// 				return $selectedCriteriaItem;
+// 			}
+// 		}
 	
-		throw new CriteriaConflictException();
-	}
+// 		throw new CriteriaConflictException();
+// 	}
 	
 
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\query\from\ComponentResolver::createSelection()
-	 */
-	public function createSelection(TreePath $treePath) {
-		throw new UnsupportedOperationException();
-	}
+// 	/* (non-PHPdoc)
+// 	 * @see \n2n\persistence\orm\query\from\ComponentResolver::createSelection()
+// 	 */
+// 	public function createSelection(TreePath $treePath) {
+// 		throw new UnsupportedOperationException();
+// 	}
 
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\query\from\ComponentResolver::createRepresentableQueryItem()
-	 */
-	public function createRepresentableQueryItem(TreePath $treePath) {
-		throw new UnsupportedOperationException();
-	}
+// 	/* (non-PHPdoc)
+// 	 * @see \n2n\persistence\orm\query\from\ComponentResolver::createRepresentableQueryItem()
+// 	 */
+// 	public function createRepresentableQueryItem(TreePath $treePath) {
+// 		throw new UnsupportedOperationException();
+// 	}
 
 	
 	
 	
-}
+// }
