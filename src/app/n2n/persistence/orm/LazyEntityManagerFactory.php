@@ -22,9 +22,6 @@
 namespace n2n\persistence\orm;
 
 use n2n\core\container\PdoPool;
-use n2n\persistence\PdoListener;
-use n2n\persistence\TransactionEvent;
-use n2n\core\container\ContainerConflictException;
 use n2n\util\ex\IllegalStateException;
 
 class LazyEntityManagerFactory implements EntityManagerFactory {
@@ -35,11 +32,19 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 	private $shared;
 	private $transactionalEm;
 	
-	public function __construct($persistenceUnitName, PdoPool $pdoPool) {
+	/**
+	 * @param string|null $persistenceUnitName
+	 * @param PdoPool $pdoPool
+	 */
+	public function __construct(string $persistenceUnitName = null, PdoPool $pdoPool) {
 		$this->persistenceUnitName = $persistenceUnitName;
 		$this->pdoPool = $pdoPool;	
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\EntityManagerFactory::getTransactional()
+	 */
 	public function getTransactional() {
 		if ($this->transactionalEm !== null && $this->transactionalEm->isOpen()) {
 			return $this->transactionalEm;
@@ -56,6 +61,10 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 		return $this->transactionalEm;
 	}	
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\EntityManagerFactory::getExtended()
+	 */
 	public function getExtended() {
 		if (!isset($this->shared)) {
 			$this->shared = $this->create();
@@ -63,39 +72,43 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 		return $this->shared;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\EntityManagerFactory::create()
+	 */
 	public function create() {
 		return new LazyEntityManager($this->persistenceUnitName, $this->pdoPool, false);
 	}
 }
 
-class TransactionalEmContainer implements PdoListener {
-	private $em;
+// class TransactionalEmContainer implements PdoListener {
+// 	private $em;
 	
-	public function __construct(EntityManager $em) {
-		$dbh = $em->getPdo();
-		if (!$dbh->inTransaction()) {
-			throw new ContainerConflictException(SysTextUtils::get('n2n_error_persitence_orm_no_transaction_active'));
-		}
-		$dbh->registerListener($this);
+// 	public function __construct(EntityManager $em) {
+// 		$dbh = $em->getPdo();
+// 		if (!$dbh->inTransaction()) {
+// 			throw new ContainerConflictException(SysTextUtils::get('n2n_error_persitence_orm_no_transaction_active'));
+// 		}
+// 		$dbh->registerListener($this);
 		
-		$this->em = $em;
-	}
+// 		$this->em = $em;
+// 	}
 	
-	public function isAvailable() {
-		return isset($this->em);
-	}
+// 	public function isAvailable() {
+// 		return isset($this->em);
+// 	}
 	
-	public function getEntityManager() {
-		return $this->em;
-	}
+// 	public function getEntityManager() {
+// 		return $this->em;
+// 	}
 	
-	public function onTransactionEvent(TransactionEvent $e) {
-		if ($e->getType() == TransactionEvent::TYPE_COMMITTED 
-				|| $e->getType() == TransactionEvent::TYPE_ROLLED_BACK) {
-			if ($this->isAvailable()) {
-				$this->em->close();
-				$this->em = null;
-			}
-		}
-	}
-}
+// 	public function onTransactionEvent(TransactionEvent $e) {
+// 		if ($e->getType() == TransactionEvent::TYPE_COMMITTED 
+// 				|| $e->getType() == TransactionEvent::TYPE_ROLLED_BACK) {
+// 			if ($this->isAvailable()) {
+// 				$this->em->close();
+// 				$this->em = null;
+// 			}
+// 		}
+// 	}
+// }

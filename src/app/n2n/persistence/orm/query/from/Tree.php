@@ -32,7 +32,6 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\criteria\Criteria;
 use n2n\persistence\orm\query\QueryModel;
 use n2n\reflection\ReflectionUtils;
-use n2n\persistence\orm\criteria\CriteriaConflictException;
 
 class Tree implements QueryPointResolver {
 	private $queryState;

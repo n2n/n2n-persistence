@@ -25,7 +25,6 @@ use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\meta\data\QueryItem;
 use n2n\persistence\meta\data\QueryColumn;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
-use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;

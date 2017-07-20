@@ -28,13 +28,6 @@ use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\meta\data\QueryColumn;
 use n2n\persistence\meta\data\QueryComparator;
-use n2n\persistence\orm\criteria\compare\ColumnComparableAdapter;
-use n2n\persistence\orm\criteria\compare\CriteriaComparator;
-use n2n\reflection\property\TypeConstraint;
-use n2n\persistence\meta\data\QueryItem;
-use n2n\util\ex\NotYetImplementedException;
-use n2n\reflection\ArgUtils;
-use n2n\persistence\meta\data\QueryPlaceMarker;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 
 class SingleTableTreePointMeta extends TreePointMetaAdapter {

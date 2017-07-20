@@ -21,20 +21,20 @@
  */
 namespace n2n\persistence\orm\criteria;
 
-use n2n\persistence\orm\criteria\compare\OnCriteriaComparator;
-use n2n\persistence\meta\data\QueryComparator;
+// use n2n\persistence\orm\criteria\compare\OnCriteriaComparator;
+// use n2n\persistence\meta\data\QueryComparator;
 
-class JoinedSubCriteria extends SubCriteria {
-	private $onCriteriaComparator;
+// class JoinedSubCriteria extends SubCriteria {
+// 	private $onCriteriaComparator;
 	
-	public function __construct(QueryState $queryState, Criteria $parentCriteria, 
-			QueryComparator $onQueryComparator) {
-		parent::__construct($queryState);
-		$this->parentCriteria = $parentCriteria;
-		$this->onCriteriaComparator = new OnCriteriaComparator($queryState, $onQueryComparator, $this);
-	}
+// 	public function __construct(QueryState $queryState, Criteria $parentCriteria, 
+// 			QueryComparator $onQueryComparator) {
+// 		parent::__construct($queryState);
+// 		$this->parentCriteria = $parentCriteria;
+// 		$this->onCriteriaComparator = new OnCriteriaComparator($queryState, $onQueryComparator, $this);
+// 	}
 	
-	public function on() {
-		return $this->onCriteriaComparator;
-	}
-}
+// 	public function on() {
+// 		return $this->onCriteriaComparator;
+// 	}
+// }
