@@ -112,15 +112,15 @@ class RemoveActionPool {
 		}
 
 		$persistenceContext = $em->getPersistenceContext();
-		$oldValuesHash = $persistenceContext->getValuesHashByEntityObj($entity);
-		IllegalStateException::assertTrue($oldValuesHash !== null);
+		$oldValueHashCol = $persistenceContext->getValueHashColByEntityObj($entity);
+		IllegalStateException::assertTrue($oldValueHashCol !== null);
 
 		$actionMeta = $entityModel->createActionMeta();
 		$actionMeta->setIdRawValue($entityModel->getIdDef()->getEntityProperty()
 				->buildRaw($entityInfo->getId(), $this->actionQueue->getEntityManager()->getPdo()));
 		
 		return new RemoveActionImpl($this->actionQueue, $entityModel, $id, $entity,
-				$actionMeta, $oldValuesHash);		
+				$actionMeta, $oldValueHashCol);		
 	}
 	
 	public function removeAction($entity) {
@@ -177,14 +177,14 @@ class RemoveActionPool {
 		$entityModel = $removeAction->getEntityModel();
 		$entity = $removeAction->getEntityObj();
 
-		$oldValuesHash = $this->actionQueue->getEntityManager()->getPersistenceContext()
-				->getValuesHashByEntityObj($entity);
+		$oldValueHashCol = $this->actionQueue->getEntityManager()->getPersistenceContext()
+				->getValueHashColByEntityObj($entity);
 		$values = array();
 		foreach ($entityModel->getEntityProperties() as $propertyName => $entityProperty) {
 			$values[$propertyName] = $entityProperty->readValue($entity);
 		}
 		
-		$supplyJob = new RemoveSupplyJob($removeAction, $oldValuesHash);
+		$supplyJob = new RemoveSupplyJob($removeAction, $oldValueHashCol);
 		$supplyJob->setValues($values);
 		
 		$supplyJob->prepare();

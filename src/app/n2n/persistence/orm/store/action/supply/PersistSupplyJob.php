@@ -25,14 +25,14 @@ use n2n\persistence\orm\store\action\PersistAction;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\property\CascadableEntityProperty;
-use n2n\persistence\orm\store\ValuesHash;
+use n2n\persistence\orm\store\ValueHashCol;
 
 class PersistSupplyJob extends SupplyJobAdapter {
-	private $valueHashes = array();
+	private $valueHashCol = array();
 	private $prepared = false;
 
-	public function __construct(PersistAction $persistAction, ValuesHash $oldValueHashes = null) {
-		parent::__construct($persistAction, $oldValueHashes);
+	public function __construct(PersistAction $persistAction, ValueHashCol $oldValueHashCol = null) {
+		parent::__construct($persistAction, $oldValueHashCol);
 	}
 
 	public function getPersistAction() {
@@ -51,17 +51,17 @@ class PersistSupplyJob extends SupplyJobAdapter {
 		return false;
 	}
 
-	public function setValueHashes(ValuesHash $valuesHash) {
-		$this->valueHashes = $valuesHash->getValueHashes();
+	public function setValueHashCol(ValueHashCol $valueHashCol) {
+		$this->valueHashCol = $valueHashCol->getValueHashes();
 	}
 
-	public function getValueHashes() {
-		return $this->valueHashes;
+	public function getValueHashCol() {
+		return $this->valueHashCol;
 	}
 	
 	private function getValueHash($propertyName) {
-		IllegalStateException::assertTrue(array_key_exists($propertyName, $this->valueHashes));
-		return $this->valueHashes[$propertyName];
+		IllegalStateException::assertTrue(array_key_exists($propertyName, $this->valueHashCol));
+		return $this->valueHashCol[$propertyName];
 	}
 
 	public function prepare() {
@@ -107,18 +107,19 @@ class PersistSupplyJob extends SupplyJobAdapter {
 		$idDef = $entityModel->getIdDef();
 		$idPropertyName = $idDef->getPropertyName();
 		foreach ($entityModel->getEntityProperties() as $propertyName => $property) {
-			if ($idPropertyName === $propertyName && ($idDef->isGenerated()
-					|| !$this->entityAction->isNew())) {
+			if ($idPropertyName === $propertyName && ($idDef->isGenerated() || !$this->entityAction->isNew())) {
 				continue;
 			}
 				
 			$oldValueHash = null;
+			$valueHash = $this->getValueHash($propertyName);
 			if (!$this->entityAction->isNew()) {
 				$oldValueHash = $this->getOldValueHash($propertyName);
-				if ($oldValueHash->matches($this->getValueHash($propertyName))) continue;
+				if ($oldValueHash->matches($valueHash)) continue;
 			}
 			
-			$property->supplyPersistAction($this->entityAction, $this->getValue($propertyName), $oldValueHash);
+			$property->supplyPersistAction($this->entityAction, $this->getValue($propertyName), $valueHash, $oldValueHash);
+			
 		}
 
 		foreach ($entityModel->getActionDependencies() as $actionDependency) {
@@ -130,7 +131,7 @@ class PersistSupplyJob extends SupplyJobAdapter {
 			$em = $that->getActionQueue()->getEntityManager();
 			$this->entityAction->getActionQueue()->getEntityManager()->getPersistenceContext()
 					->updateValueHashes($that->entityAction->getEntityObj(),
-							$that->values, $that->valueHashes, $em);
+							$that->values, $that->valueHashCol, $em);
 		});
 	}
 }

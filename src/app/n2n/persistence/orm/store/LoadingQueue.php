@@ -37,7 +37,7 @@ class LoadingQueue {
 		$this->actionQueue = $actionQueue;
 	}
 	
-	public function mapValues($entity, $id, array $values, array $valuesHashes) {
+	public function mapValues($entity, $id, array $values, array $valueHashes) {
 		$this->persistenceContext->mapValues($entity, $values);
 		
 		if (empty($this->loadingContainerStack)) {
@@ -46,7 +46,7 @@ class LoadingQueue {
 
 		$objHash = spl_object_hash($entity);
 		
-		$this->valueHashJobs[$objHash] = array('entity' => $entity, 'values' => $values, 'valueHashes' => $valuesHashes);		
+		$this->valueHashJobs[$objHash] = array('entity' => $entity, 'values' => $values, 'valueHashes' => $valueHashes);		
 		
 		$this->postLoadEvents[$objHash] = new LifecycleEvent(LifecycleEvent::POST_LOAD, $entity, 
 				$this->persistenceContext->getEntityModelByEntityObj($entity), $id); 

@@ -90,7 +90,7 @@ interface EntityProperty {
 	 * @param mixed $mappedValue
 	 * @param PersistAction $persistingJob
 	 */
-	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $oldValueHash = null);
+	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $valueHash, ValueHash $oldValueHash = null);
 	
 	/**
 	 * @param mixed $mappedValue

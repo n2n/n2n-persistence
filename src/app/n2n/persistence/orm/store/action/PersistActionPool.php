@@ -29,7 +29,7 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\LifecycleEvent;
-use n2n\persistence\orm\store\ValueHashesFactory;
+use n2n\persistence\orm\store\ValueHashColFactory;
 use n2n\persistence\orm\store\action\supply\PersistSupplyJob;
 use n2n\persistence\orm\store\operation\PersistOperation;
 
@@ -310,20 +310,20 @@ class PersistActionPool {
 	private function checkDiff(PersistActionAdapter $persistAction) {
 		$entityModel = $persistAction->getEntityModel();
 		$entity = $persistAction->getEntityObj();
-		$hasher = new ValueHashesFactory($entityModel, $persistAction->getActionQueue()->getEntityManager());
+		$hasher = new ValueHashColFactory($entityModel, $persistAction->getActionQueue()->getEntityManager());
 	
 		$values = array();
-		$valuesHash = $hasher->create($entity, $values);
-		$oldValuesHash = $this->actionQueue->getEntityManager()->getPersistenceContext()
-				->getValuesHashByEntityObj($entity);
+		$valueHashCol = $hasher->create($entity, $values);
+		$oldValueHashCol = $this->actionQueue->getEntityManager()->getPersistenceContext()
+				->getValueHashColByEntityObj($entity);
 		
-		if ($valuesHash->matches($oldValuesHash)) {
+		if ($valueHashCol->matches($oldValueHashCol)) {
 			return null;
 		}
 		
-		$supplyJob = new PersistSupplyJob($persistAction, $oldValuesHash);
+		$supplyJob = new PersistSupplyJob($persistAction, $oldValueHashCol);
 		$supplyJob->setValues($values);
-		$supplyJob->setValueHashes($valuesHash);
+		$supplyJob->setValueHashCol($valueHashCol);
 		
 		$supplyJob->prepare();
 		return $supplyJob;
@@ -337,15 +337,15 @@ class PersistActionPool {
 		$entityModel = $persistAction->getEntityModel();
 		$entity = $persistAction->getEntityObj();
 		
-		$hasher = new ValueHashesFactory($entityModel, $this->actionQueue->getEntityManager());
+		$hasher = new ValueHashColFactory($entityModel, $this->actionQueue->getEntityManager());
 		$values = array();
-		$valueHashes = $hasher->create($entity, $values);
+		$valueHashCol = $hasher->create($entity, $values);
 
 // 		cascade could destroy this
 // 		if ($valueHashes === $supplyJob->getValueHashes()) return;
 		
 		$supplyJob->setValues($values);
-		$supplyJob->setValueHashes($valueHashes);
+		$supplyJob->setValueHashCol($valueHashCol);
 		
 		$supplyJob->prepare();
 	}

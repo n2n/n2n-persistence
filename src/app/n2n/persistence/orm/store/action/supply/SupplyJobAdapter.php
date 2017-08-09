@@ -23,19 +23,19 @@ namespace n2n\persistence\orm\store\action\supply;
 
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\action\EntityAction;
-use n2n\persistence\orm\store\ValuesHash;
+use n2n\persistence\orm\store\ValueHashCol;
 
 abstract class SupplyJobAdapter implements SupplyJob {
 	protected $entityAction;
 	protected $onResetClosures = array();
 	protected $whenInitializedClosures = array();
-	protected $oldValuesHash;
+	protected $oldValueHashCol;
 	protected $values;
 	protected $init = false;
 	
-	public function __construct(EntityAction $entityAction, ValuesHash $oldValuesHash = null){
+	public function __construct(EntityAction $entityAction, ValueHashCol $oldValueHashCol = null){
 		$this->entityAction = $entityAction;
-		$this->oldValuesHash = $oldValuesHash;
+		$this->oldValueHashCol = $oldValueHashCol;
 		
 		$that = $this;
 		$entityAction->executeOnDisable(function () use ($that) {
@@ -48,7 +48,7 @@ abstract class SupplyJobAdapter implements SupplyJob {
 	}
 	
 	public function isInsert() {
-		return $this->oldValuesHash === null;
+		return $this->oldValueHashCol === null;
 	}
 	
 	public function executeOnReset(\Closure $closure) {
@@ -90,8 +90,8 @@ abstract class SupplyJobAdapter implements SupplyJob {
 		$this->init = false;
 	}
 	
-	public function getOldValuesHash() {
-		return $this->oldValuesHash;
+	public function getOldValueHashCol() {
+		return $this->oldValueHashCol;
 	}
 	
 	public function setValues(array $values) {
@@ -103,9 +103,9 @@ abstract class SupplyJobAdapter implements SupplyJob {
 	}
 	
 	protected function getOldValueHash($propertyName) {
-		IllegalStateException::assertTrue($this->oldValuesHash !== null 
-				&& $this->oldValuesHash->containsPropertyName($propertyName));
-		return $this->oldValuesHash->getValuesHash($propertyName);
+		IllegalStateException::assertTrue($this->oldValueHashCol !== null 
+				&& $this->oldValueHashCol->containsPropertyName($propertyName));
+		return $this->oldValueHashCol->getValueHash($propertyName);
 	}
 
 	protected function getValue($propertyName) {

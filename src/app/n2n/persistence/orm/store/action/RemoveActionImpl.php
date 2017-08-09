@@ -26,27 +26,27 @@ use n2n\persistence\meta\data\QueryPlaceMarker;
 use n2n\persistence\meta\data\QueryColumn;
 use n2n\persistence\orm\store\action\meta\ActionMeta;
 use n2n\persistence\orm\model\EntityModel;
-use n2n\persistence\orm\store\ValuesHash;
+use n2n\persistence\orm\store\ValueHashCol;
 
 class RemoveActionImpl extends EntityActionAdapter implements RemoveAction {
 	private $meta;
-	private $oldValuesHash;
+	private $oldValueHashCol;
 	/**
 	 * @param RemoveActionQueue $actionQueue
 	 * @param ActionMeta $meta
 	 */
 	public function __construct(ActionQueue $actionQueue, EntityModel $entityModel, $id, $entity, 
-			ActionMeta $meta, ValuesHash $oldValuesHash) {
+			ActionMeta $meta, ValueHashCol $oldValueHashCol) {
 		parent::__construct($actionQueue, $entityModel, $id, $entity);
 		$this->meta = $meta;
-		$this->oldValuesHash = $oldValuesHash;
+		$this->oldValueHashCol = $oldValueHashCol;
 	}
 	
 	/**
-	 * @return \n2n\persistence\orm\store\ValuesHash
+	 * @return \n2n\persistence\orm\store\ValueHashCol
 	 */
-	public function getOldValuesHash() {
-		return $this->oldValuesHash;
+	public function getOldValueHashCol() {
+		return $this->oldValueHashCol;
 	}
 	
 	protected function exec() {
