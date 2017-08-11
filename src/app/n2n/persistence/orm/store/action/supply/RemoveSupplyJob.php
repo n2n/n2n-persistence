@@ -25,12 +25,12 @@ use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\property\CascadableEntityProperty;
-use n2n\persistence\orm\store\ValuesHash;
+use n2n\persistence\orm\store\ValueHashCol;
 
 class RemoveSupplyJob extends SupplyJobAdapter {
 
-	public function __construct(RemoveAction $removeAction, ValuesHash $oldValuesHash) {
-		parent::__construct($removeAction, $oldValuesHash);
+	public function __construct(RemoveAction $removeAction, ValueHashCol $oldValueHashCol) {
+		parent::__construct($removeAction, $oldValueHashCol);
 	}
 
 	public function getPersistAction() {
@@ -49,10 +49,10 @@ class RemoveSupplyJob extends SupplyJobAdapter {
 		return true;
 	}
 
-	private function getValueHash($propertyName) {
-		IllegalStateException::assertTrue(array_key_exists($propertyName, $this->valueHashes));
-		return $this->valueHashes[$propertyName];
-	}
+// 	private function getValueHash($propertyName) {
+// 		IllegalStateException::assertTrue(array_key_exists($propertyName, $this->valueHashes));
+// 		return $this->valueHashes[$propertyName];
+// 	}
 
 	public function prepare() {
 		if ($this->isDisabled()) return;

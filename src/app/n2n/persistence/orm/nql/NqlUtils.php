@@ -39,8 +39,8 @@ class NqlUtils {
 	}
 	
 	public static function isCriteria($str) {
-		return mb_strpos(mb_strtoupper($str), Nql::KEYWORD_FROM) !== false 
-				|| mb_strpos(mb_strtoupper($str), Nql::KEYWORD_SELECT) !== false;
+		return StringUtils::pregMatch('/^\s*' . Nql::KEYWORD_SELECT . '\s+/', $str) > 0 
+				|| StringUtils::pregMatch('/^\s*' . Nql::KEYWORD_FROM . '\s+/', $str) > 0;
 	}
 	
 	public static function isQuoted($str) {

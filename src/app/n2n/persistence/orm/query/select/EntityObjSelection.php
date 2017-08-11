@@ -113,7 +113,7 @@ class EntityObjSelection implements Selection {
 		}
 		
 		return new LazyValueBuilder(function () use ($entityObj, $id, $valueBuilders) {
-// 			if (!$this->persistenceContext->containsValueHashes($entity)) {
+// 			if (!$this->persistenceContext->containsValueHashCol($entity)) {
 			$values = array();
 			foreach ($valueBuilders as $key => $valueBuilder) {
 				$values[$key] = $valueBuilder->buildValue();

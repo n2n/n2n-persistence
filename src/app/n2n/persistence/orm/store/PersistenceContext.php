@@ -44,7 +44,7 @@ class PersistenceContext {
 	private $managedEntityObjs = array();
 	private $removedEntityObjs = array();
 	
-	private $entityValuesHash = array();
+	private $entityValueHashCols = array();
 	private $entityIdReps = array();
 	private $entityIdentifiers = array();
 	private $entityModels = array();
@@ -63,7 +63,7 @@ class PersistenceContext {
 	 */
 	public function clear() {
 		$this->managedEntityObjs = array();
-		$this->entityValuesHash = array();
+		$this->entityValueHashCols = array();
 		
 		$this->removedEntityObjs = array();
 		
@@ -314,7 +314,7 @@ class PersistenceContext {
 		
 		unset($this->entityIdReps[$objHash]);
 		unset($this->managedEntityObjs[$objHash]);
-		unset($this->entityValuesHash[$objHash]);
+		unset($this->entityValueHashCols[$objHash]);
 		unset($this->removedEntityObjs[$objHash]);
 // 		$this->detachedEntities[$objHash] = $entity;
 	}
@@ -418,7 +418,7 @@ class PersistenceContext {
 	public function containsValueHashes($entityObj) {
 		$this->validateEntityObjManaged($entityObj);
 		
-		return isset($this->entityValuesHash[spl_object_hash($entityObj)]);
+		return isset($this->entityValueHashCols[spl_object_hash($entityObj)]);
 	}
 	
 	/**
@@ -432,30 +432,30 @@ class PersistenceContext {
 	
 		$entityModel = $this->getEntityModelByEntityObj($entityObj);
 		
-		$hashFactory = new ValueHashesFactory($entityModel, $em);
+		$hashFactory = new ValueHashColFactory($entityModel, $em);
 		$hashFactory->setValues($values);
 		$hashFactory->setValueHashes($valueHashes);
 		
-		$this->entityValuesHash[spl_object_hash($entityObj)] = $hashFactory->create($entityObj);
+		$this->entityValueHashCols[spl_object_hash($entityObj)] = $hashFactory->create($entityObj);
 	}
 	
 	/**
 	 * @param object $entity
 	 * @throws IllegalStateException
-	 * @return ValueHash[]
+	 * @return ValueHashCol
 	 */
-	public function getValuesHashByEntityObj($entity) {
+	public function getValueHashColByEntityObj($entity) {
 		$objectHash = spl_object_hash($entity);
 		
-		if (isset($this->entityValuesHash[$objectHash])) {
-			return $this->entityValuesHash[$objectHash];
+		if (isset($this->entityValueHashCols[$objectHash])) {
+			return $this->entityValueHashCols[$objectHash];
 		}
 		
 		throw new IllegalStateException();
 	}
 }
 
-class ValueHashesFactory {
+class ValueHashColFactory {
 	private $entityPropertyCollection;
 	private $valueHashes = array();
 	private $values = array();
@@ -502,34 +502,34 @@ class ValueHashesFactory {
 	/**
 	 * @param object $object
 	 * @param array $values
-	 * @return \n2n\persistence\orm\store\ValuesHash
+	 * @return \n2n\persistence\orm\store\ValueHashCol
 	 */
 	public function create($object, &$values = array()) {
-		$valuesHash = new ValuesHash();
+		$valueHashCol = new ValueHashCol();
 		
 		foreach ($this->entityPropertyCollection->getEntityProperties() as $propertyName => $entityProperty) {
 			if (array_key_exists($propertyName, $this->valueHashes)) {
-				$valuesHash->putValueHash($propertyName, $this->valueHashes[$propertyName]);
+				$valueHashCol->putValueHash($propertyName, $this->valueHashes[$propertyName]);
 				continue;
 			}
 			
 			if (array_key_exists($propertyName, $this->values)) {
-				$valuesHash->putValueHash($propertyName, $entityProperty->createValueHash(
+				$valueHashCol->putValueHash($propertyName, $entityProperty->createValueHash(
 						$values[$propertyName] = $this->values[$propertyName], $this->em));
 				continue;
 			}
 			
-			$valuesHash->putValueHash($propertyName, $entityProperty->createValueHash(
+			$valueHashCol->putValueHash($propertyName, $entityProperty->createValueHash(
 					$values[$propertyName] = $entityProperty->readValue($object), $this->em));
 		}
 		
-		return $valuesHash;
+		return $valueHashCol;
 	}
 }
 
 
 
-class ValuesHash {
+class ValueHashCol {
 	private $valueHashes = array();
 	
 	public function putValueHash($propertyName, ValueHash $valueHash) {
@@ -544,7 +544,7 @@ class ValuesHash {
 		return isset($this->valueHashes[$propertyName]);
 	}
 	
-	public function getValuesHash(string $propertyName) {
+	public function getValueHash(string $propertyName) {
 		if (isset($this->valueHashes[$propertyName])) {
 			return $this->valueHashes[$propertyName];
 		}
@@ -556,18 +556,18 @@ class ValuesHash {
 		return count($this->valueHashes);
 	}
 	
-	public function matches(ValuesHash $otherValuesHash) {
-		if ($this->getSize() !== $otherValuesHash->getSize()) {
+	public function matches(ValueHashCol $otherValueHashCol) {
+		if ($this->getSize() !== $otherValueHashCol->getSize()) {
 			throw new \InvalidArgumentException('Number of ValueHashes are diffrent.');
 		}
 		
-		$otherValuesHash = $otherValuesHash->getValueHashes();
+		$otherValueHashCol = $otherValueHashCol->getValueHashes();
 		foreach ($this->valueHashes as $propertyName => $valueHash) {
-			if (!isset($otherValuesHash[$propertyName])) {
+			if (!isset($otherValueHashCol[$propertyName])) {
 				throw new \InvalidArgumentException('No ValueHash for property \'' . $propertyName . '\' found.');
 			}
 			
-			if (!$valueHash->matches($otherValuesHash[$propertyName])) {
+			if (!$valueHash->matches($otherValueHashCol[$propertyName])) {
 				return false;
 			}
 		}
