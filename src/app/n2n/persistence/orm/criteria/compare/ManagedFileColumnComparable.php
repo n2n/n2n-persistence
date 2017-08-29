@@ -44,7 +44,7 @@ class ManagedFileColumnComparable extends ColumnComparableAdapter {
 	}
 	
 	public function buildCounterpartQueryItemFromValue($operator, $value) {
-		if ($operator != CriteriaComparator::OPERATOR_IN) {
+		if ($operator != CriteriaComparator::OPERATOR_IN && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
 			ArgUtils::valType($value, 'n2n\io\managed\File', true);
 			return new QueryPlaceMarker($this->registerPlaceholder($value));
 		}

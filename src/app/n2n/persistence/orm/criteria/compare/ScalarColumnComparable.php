@@ -40,7 +40,7 @@ class ScalarColumnComparable extends ColumnComparableAdapter {
 	}
 	
 	public function buildCounterpartQueryItemFromValue($operator, $value) {
-		if ($operator != CriteriaComparator::OPERATOR_IN) {
+		if ($operator != CriteriaComparator::OPERATOR_IN && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
 			ArgUtils::valType($value, 'scalar', true);
 			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue($value));
 		} 

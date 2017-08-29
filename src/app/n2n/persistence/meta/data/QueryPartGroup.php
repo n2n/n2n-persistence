@@ -39,7 +39,8 @@ class QueryPartGroup implements QueryItem {
 	}
 
 	public function buildItem(QueryFragmentBuilder $itemBuilder) {
-		if (empty($this->queryParts)) return;
+		// removed for empty IN and NOT IN groups. For example he.email NOT IN ()
+		// if (empty($this->queryParts)) return;
 		
 		$itemBuilder->openGroup();
 		foreach ($this->queryParts as $key => $queryPart) {
