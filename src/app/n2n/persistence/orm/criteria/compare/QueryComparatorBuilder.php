@@ -249,8 +249,10 @@ class QueryComparatorBuilder {
 		
 		switch ($operator) {
 			case CriteriaComparator::OPERATOR_IN:
+			case CriteriaComparator::OPERATOR_NOT_IN:
 				return TypeConstraint::createArrayLike(null, false, $typeConstraint);
 			case CriteriaComparator::OPERATOR_CONTAINS:
+			case CriteriaComparator::OPERATOR_CONTAINS_NOT:
 				$arrayFieldConstraint = $typeConstraint->getArrayFieldTypeConstraint();
 				if ($arrayFieldConstraint !== null) return $arrayFieldConstraint;
 				

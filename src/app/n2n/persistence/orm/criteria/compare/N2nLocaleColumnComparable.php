@@ -46,7 +46,7 @@ class N2nLocaleColumnComparable extends ColumnComparableAdapter {
 	}
 	
 	public function buildCounterpartQueryItemFromValue($operator, $value) {
-		if ($operator != CriteriaComparator::OPERATOR_IN) {
+		if ($operator != CriteriaComparator::OPERATOR_IN  && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
 			ArgUtils::valType($value, 'n2n\l10n\N2nLocale', true);
 			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
 					$this->buildN2nLocaleRawValue($value)));

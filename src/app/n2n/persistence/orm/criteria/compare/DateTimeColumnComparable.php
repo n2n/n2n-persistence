@@ -45,7 +45,7 @@ class DateTimeColumnComparable extends ColumnComparableAdapter {
 	}
 	
 	public function buildCounterpartQueryItemFromValue($operator, $value) {
-		if ($operator != CriteriaComparator::OPERATOR_IN) {
+		if ($operator != CriteriaComparator::OPERATOR_IN && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
 			ArgUtils::valType($value, 'DateTime', true);
 			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
 					$this->buildDateTimeRawValue($value)));
