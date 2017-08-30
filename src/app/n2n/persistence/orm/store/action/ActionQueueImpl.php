@@ -178,7 +178,7 @@ class ActionQueueImpl implements ActionQueue {
 		
 		$this->flushing = false;
 		
-		foreach ($this->bufferedEvents as $event) {
+		while (null !== ($event = array_shift($this->bufferedEvents))) {
 			$this->triggerLifecycleEvent($event);
 		}
 	}
