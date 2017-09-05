@@ -88,7 +88,7 @@ class PersistenceContext {
 				$entityModel->getIdDef()->getEntityProperty()->valueToRep($id));
 	}
 	
-	public function getEntityByIdRep(EntityModel $entityModel, $idRep) {
+	public function getEntityByIdRep(EntityModel $entityModel, string $idRep) {
 		$className = $entityModel->getClass()->getName();
 		
 		if (isset($this->entityIdentifiers[$className][$idRep])) {
@@ -219,7 +219,7 @@ class PersistenceContext {
 	public function getOrCreateEntityProxy(EntityModel $entityModel, $id, EntityManager $em) {
 		if ($id === null) return null;
 	
-		if (null !== ($entity = $this->getEntityByIdRep($entityModel, $id))) {
+		if (null !== ($entity = $this->getEntityById($entityModel, $id))) {
 			return $entity;	
 		}
 	

@@ -135,15 +135,15 @@ class EntityProxyManager {
 			}
 			
 			$phpProxyStr .= "\r\n" . 'public function ' . $method->getName() . '(' . implode(', ', $phpParameterStrs) . ') ' 
-					. $methodReturnTypeStr . ' {'
-					. '$this->' . self::PROXY_TRIGGER_ACCESS_METHOD . '();'
-					. 'return parent:: ' . $method->getName() . '(' . implode(', ', $phpParameterCallStrs) . ');'
+					. $methodReturnTypeStr . ' { '
+					. '$this->' . self::PROXY_TRIGGER_ACCESS_METHOD . '(); '
+					. 'return parent::' . $method->getName() . '(' . implode(', ', $phpParameterCallStrs) . '); '
 					. '}';
 		}
 
 		$phpProxyStr .= '}'
 		. '}';
-
+		
 		if (false === eval($phpProxyStr)) {
 			die();
 		}
