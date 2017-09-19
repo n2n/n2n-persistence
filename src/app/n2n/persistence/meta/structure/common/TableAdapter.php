@@ -24,15 +24,9 @@ namespace n2n\persistence\meta\structure\common;
 use n2n\persistence\meta\structure\MetaEntity;
 
 use n2n\persistence\meta\structure\Column;
-
-use n2n\core\SysTextUtils;
-
 use n2n\persistence\meta\structure\UnknownColumnException;
-
 use n2n\persistence\meta\structure\IndexType;
-
 use n2n\persistence\meta\structure\Index;
-
 use n2n\persistence\meta\structure\Table;
 use n2n\persistence\meta\MetaRuntimeException;
 
@@ -101,7 +95,7 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 					if (!isset($this->primaryKey)) {
 						$this->primaryKey = $index;
 					} else {
-						throw new MetaRuntimeException(SysTextUtils::get('n2n_error_persistence_meta_duplicate_primary_key', array('table' => $this->getName())));
+						throw new MetaRuntimeException('Duplicate primary key in table "' . $this->getName() . '"');
 					}
 				}
 			}

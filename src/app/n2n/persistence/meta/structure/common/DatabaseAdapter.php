@@ -22,21 +22,12 @@
 namespace n2n\persistence\meta\structure\common;
 
 use n2n\persistence\meta\structure\common\CreateMetaEntityRequest;
-
 use n2n\persistence\meta\structure\common\AlterMetaEntityRequest;
-
 use n2n\persistence\meta\structure\DuplicateMetaElementException;
-
 use n2n\persistence\meta\structure\common\MetaEntityChangeListener;
-
-use n2n\core\SysTextUtils;
-
 use n2n\persistence\meta\structure\MetaEntity;
-
 use n2n\persistence\meta\structure\UnknownMetaEntityException;
-
 use n2n\persistence\Pdo;
-
 use n2n\persistence\meta\Database;
 
 abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
@@ -110,9 +101,8 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 			$this->metaEntities[$metaEntity->getName()] = $metaEntity;
 		} else {
 			if (!($metaEntity->equals($this->getMetaEntityByName($metaEntity->getName())))) {
-				throw new DuplicateMetaElementException(
-						SysTextUtils::get('n2n_error_persistence_meta_duplicate_meta_entity',
-								array('database_name' => $this->getName(), 'table_name' => $metaEntity->getName())));
+				throw new DuplicateMetaElementException('Duplicate meta entity \"' . $metaEntity->getName() 
+						. '" in Database "' . $this->getName() . '"');
 			}
 		}
 	}
