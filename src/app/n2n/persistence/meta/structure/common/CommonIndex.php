@@ -22,15 +22,9 @@
 namespace n2n\persistence\meta\structure\common;
 
 use n2n\reflection\ArgUtils;
-
 use n2n\persistence\meta\structure\IndexType;
-
-use n2n\core\SysTextUtils;
-
 use n2n\persistence\meta\structure\Table;
-
 use n2n\persistence\meta\structure\Index;
-
 use n2n\persistence\meta\structure\UnknownColumnException;
 
 class CommonIndex implements Index {
