@@ -93,7 +93,9 @@ class ConditionParser {
 			if (empty($this->groupStack)) {
 				throw $this->createNqlParseException('No group open for group close');	
 			}
-			$this->comparison->doCompare();
+			if (!$this->comparison->isEmpty()) {
+				$this->comparison->doCompare();
+			}
 			$this->connectionType = null;
 			
 			array_pop($this->groupStack);
