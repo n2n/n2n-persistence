@@ -27,6 +27,7 @@ use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\query\QueryState;
 
 interface TreePointMeta {
+	
 	public function registerColumn(EntityModel $entityModel, $columnName);
 
 	public function getQueryColumnByName(EntityModel $entityModel, $columnName);
@@ -35,9 +36,9 @@ interface TreePointMeta {
 
 	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, QueryComparator $onComparator = null);
 
-	public function getEntityModel();
+	public function getEntityModel(): EntityModel;
 
-	public function setIdColumnName($idColumnname);
+	public function setIdColumnName(string $idColumnname);
 
 	public function setMetaGenerator(MetaGenerator $metaGenerator = null);
 	

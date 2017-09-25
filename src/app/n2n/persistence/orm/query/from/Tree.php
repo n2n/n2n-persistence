@@ -90,11 +90,22 @@ class Tree implements QueryPointResolver {
 		$this->treePoints[] = $treePoint;
 	}
 	
-	public function createBaseTreePoint(EntityModel $entityModel, $alias) {
-		$this->validateAlias($alias);
+	/**
+	 * 
+	 * @param EntityModel $entityModel
+	 * @param string $alias
+	 * @return \n2n\persistence\orm\query\from\MetaTreePoint
+	 */
+	public function createBaseTreePoint(EntityModel $entityModel, string $alias = null) {
+		$treePoint = new BaseEntityTreePoint($this->queryState, 
+				$entityModel->createTreePointMeta($this->queryState));
 		
-		return $this->treePoints[] = $this->namedTreePoints[$alias] = new BaseEntityTreePoint(
-				$this->queryState, $entityModel->createTreePointMeta($this->queryState));
+		if ($alias !== null) {
+			$this->validateAlias($alias);
+			$this->namedTreePoints[$alias] = $treePoint;
+		}
+		
+		return $this->treePoints[] = $treePoint;
 	}	
 	
 	public function createJoinedEntityTreePoint($joinType, EntityModel $entityModel, $alias) {

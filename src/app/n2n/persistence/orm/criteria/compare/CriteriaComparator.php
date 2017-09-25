@@ -46,6 +46,8 @@ class CriteriaComparator {
 	const OPERATOR_NOT_IN = QueryComparator::OPERATOR_NOT_IN;
 	const OPERATOR_CONTAINS = 'CONTAINS';
 	const OPERATOR_CONTAINS_NOT = 'CONTAINS NOT';
+	const OPERATOR_CONTAINS_ANY = 'CONTAINS ANY';
+	const OPERATOR_CONTAINS_NONE = 'CONTAINS NONE';
 	
 	const OPERATOR_EXISTS = QueryComparator::OPERATOR_EXISTS;
 	const OPERATOR_NOT_EXISTS = QueryComparator::OPERATOR_NOT_EXISTS;
@@ -77,7 +79,7 @@ class CriteriaComparator {
 	 * @return \n2n\persistence\orm\criteria\compare\CriteriaComparator
 	 */
 	public function match($arg1, $operator, $arg2, $useAnd = true) {
-		ArgUtils::valEnum($operator, self::getOperators());
+		ArgUtils::valEnum($operator, self::getOperators(true, true, true));
 		
 		$this->comparisonDefs[] = array(
 				'criteriaItem1' => $this->parseCriteriaItem($arg1, $this->expectConstForArg1), 
@@ -220,7 +222,7 @@ class CriteriaComparator {
 	}
 	
 	
-	public static function getOperators($includeContains = true, $includeIn = true) {
+	public static function getOperators($includeContains = true, $includeIn = true, $includeContainsAny = false) {
 		$operators = array(self::OPERATOR_EQUAL, self::OPERATOR_NOT_EQUAL, self::OPERATOR_LARGER_THAN, 
 				self::OPERATOR_LARGER_THAN_OR_EQUAL_TO, self::OPERATOR_SMALLER_THAN, 
 				self::OPERATOR_SMALLER_THAN_OR_EQUAL_TO, self::OPERATOR_LIKE, 
@@ -234,6 +236,10 @@ class CriteriaComparator {
 		if ($includeContains) {
 			$operators[] = self::OPERATOR_CONTAINS;
 			$operators[] = self::OPERATOR_CONTAINS_NOT;
+		}
+		
+		if ($includeContainsAny) {
+			$operators[] = self::OPERATOR_CONTAINS_ANY;
 		}
 		
 		return $operators;

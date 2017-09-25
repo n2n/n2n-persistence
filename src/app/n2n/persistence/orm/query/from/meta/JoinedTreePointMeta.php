@@ -52,7 +52,7 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 		$this->registerEntityModel($entityModel);
 	}
 
-	public function getEntityModel() {
+	public function getEntityModel(): EntityModel {
 		return $this->entityModel;
 	}
 		

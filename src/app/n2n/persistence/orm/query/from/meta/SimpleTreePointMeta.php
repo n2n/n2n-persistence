@@ -45,11 +45,11 @@ class SimpleTreePointMeta extends TreePointMetaAdapter {
 		$this->tableAlias = $queryState->createTableAlias($entityModel->getTableName());
 	}
 
-	public function getEntityModel() {
+	public function getEntityModel(): EntityModel {
 		return $this->entityModel;
 	}
 	
-	public function setIdColumnName($idColumnname) {		
+	public function setIdColumnName(string $idColumnname) {		
 	}
 	
 	public function registerColumn(EntityModel $entityModel, $columnName) {		
