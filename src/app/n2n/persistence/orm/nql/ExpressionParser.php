@@ -41,13 +41,8 @@ class ExpressionParser {
 	
 		$expression = $this->clean($expression);
 		
-		if (NqlUtils::isPlaceholder($expression) 
-				&& (array_key_exists(mb_substr($expression, 1), $params) || array_key_exists($expression, $params))) {
-			if (array_key_exists($expression, $params)) {
-				return new CriteriaConstant($params[$expression]);
-			}
-			
-			return new CriteriaConstant($params[mb_substr($expression, 1)]);
+		if (null !== ($param = $this->parsingState->getParam($expression))) {
+			return new CriteriaConstant($param);
 		}
 		
 		$this->propertyExpressionParser->parse($expression);

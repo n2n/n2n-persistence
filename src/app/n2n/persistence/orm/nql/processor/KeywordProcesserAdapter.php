@@ -29,7 +29,7 @@ use n2n\util\StringUtils;
 
 abstract class KeywordProcesserAdapter implements KeywordProcessor {
 	
-	private $parsingState;
+	protected $parsingState;
 	/**
 	 * @var Criteria
 	 */
@@ -49,6 +49,7 @@ abstract class KeywordProcesserAdapter implements KeywordProcessor {
 	protected function parseExpr($expr) {
 		return $this->parsingState->parse($expr);
 	}
+	
 	/**
 	 * @return ParsingState
 	 */
