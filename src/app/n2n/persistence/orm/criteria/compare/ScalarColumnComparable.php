@@ -55,9 +55,9 @@ class ScalarColumnComparable extends ColumnComparableAdapter {
 		return $queryPartGroup;
 	}
 	
-	public function buildCounterpartPlaceholder($operator, $value) {
+// 	public function buildCounterpartPlaceholder($operator, $value) {
 		
-	}
+// 	}
 	
 // 	public function parseComparableValue($operator, $value) {
 // 		

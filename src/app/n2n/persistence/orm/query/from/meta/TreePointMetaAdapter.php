@@ -61,7 +61,7 @@ abstract class TreePointMetaAdapter implements TreePointMeta {
 		return array();
 	}
 	
-	public function setIdColumnName($idColumnname) {	
+	public function setIdColumnName(string $idColumnname) {	
 		$this->idColumnName	= $idColumnname;
 	}
 	
