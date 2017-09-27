@@ -54,7 +54,7 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 		}
 	}
 	
-	public function getEntityModel() {
+	public function getEntityModel(): EntityModel {
 		return $this->entityModel;
 	}
 

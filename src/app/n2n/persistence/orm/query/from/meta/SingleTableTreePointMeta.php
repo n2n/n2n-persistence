@@ -46,7 +46,7 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 		$this->resolveDiscriminatedEntityModels($entityModel);
 	}
 	
-	public function getEntityModel() {
+	public function getEntityModel(): EntityModel {
 		return $this->entityModel;
 	}
 	
