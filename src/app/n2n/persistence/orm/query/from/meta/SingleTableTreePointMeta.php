@@ -50,7 +50,7 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 		return $this->entityModel;
 	}
 	
-	public function setIdColumnName($idColumnname) {
+	public function setIdColumnName(string $idColumnname) {
 	}
 	
 	public function getMetaColumnAliases() {

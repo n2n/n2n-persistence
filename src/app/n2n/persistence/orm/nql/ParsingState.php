@@ -45,6 +45,21 @@ class ParsingState {
 	public function getParams() {
 		return $this->params;
 	}
+	
+	public function getParam($name) {
+		if (!NqlUtils::isPlaceholder($name)) return null;
+		
+		if (array_key_exists(mb_substr($name, 1), $this->params)) {
+			return $this->params[mb_substr($name, 1)];
+		}
+		
+		if (array_key_exists($name, $this->params)) {
+			return $this->params[$name];
+		}
+		
+		return null;
+	}
+	
 	/**
 	 *  
 	 * @param string $nql
