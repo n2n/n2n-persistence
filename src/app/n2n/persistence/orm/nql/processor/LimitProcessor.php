@@ -57,8 +57,8 @@ class LimitProcessor extends KeywordProcesserAdapter {
 		}
 		
 		if (null === $this->limit) {
-			if (null !== ($limit = $this->parsingState->getParam($this->currentToken))) {
-				$this->limit = $limit;
+			if ($this->parsingState->hasParam($this->currentToken)) {
+				$this->limit = $this->parsingState->getParam($this->currentToken);
 				return;
 			} 
 				
@@ -67,8 +67,8 @@ class LimitProcessor extends KeywordProcesserAdapter {
 		} 
 		
 		if ($this->numExpected) {
-			if (null !== ($num = $this->parsingState->getParam($this->currentToken))) {
-				$this->num = $num;
+			if ($this->parsingState->hasParam($this->currentToken)) {
+				$this->num = $this->parsingState->getParam($this->currentToken);
 				return;
 			} 
 			$this->num = $this->currentToken;

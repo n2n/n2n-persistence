@@ -41,8 +41,8 @@ class ExpressionParser {
 	
 		$expression = $this->clean($expression);
 		
-		if (null !== ($param = $this->parsingState->getParam($expression))) {
-			return new CriteriaConstant($param);
+		if ($this->parsingState->hasParam($expression)) {
+			return new CriteriaConstant($this->parsingState->getParam($expression));
 		}
 		
 		$this->propertyExpressionParser->parse($expression);
