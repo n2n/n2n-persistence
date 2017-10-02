@@ -60,6 +60,10 @@ class ParsingState {
 		return null;
 	}
 	
+	public function hasParam($name) {
+		return NqlUtils::isPlaceholder($name) && (array_key_exists(mb_substr($name, 1), $this->params) || array_key_exists($name, $this->params));
+	}
+	
 	/**
 	 *  
 	 * @param string $nql
