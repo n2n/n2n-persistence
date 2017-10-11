@@ -39,7 +39,7 @@ interface Action {
 	 */
 	public function addDependent(Action $actionJob);
 	/**
-	 * @return n2n\persistence\orm\store\Action[]
+	 * @return Action[]
 	 */
 	public function getDependents();
 	/**

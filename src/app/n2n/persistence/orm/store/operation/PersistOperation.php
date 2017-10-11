@@ -21,7 +21,6 @@
  */
 namespace n2n\persistence\orm\store\operation;
 
-use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\persistence\orm\store\action\ActionQueue;
 use n2n\persistence\orm\CascadeType;
 

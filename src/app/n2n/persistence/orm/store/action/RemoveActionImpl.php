@@ -32,7 +32,7 @@ class RemoveActionImpl extends EntityActionAdapter implements RemoveAction {
 	private $meta;
 	private $oldValueHashCol;
 	/**
-	 * @param RemoveActionQueue $actionQueue
+	 * @param ActionQueue $actionQueue
 	 * @param ActionMeta $meta
 	 */
 	public function __construct(ActionQueue $actionQueue, EntityModel $entityModel, $id, $entity, 

@@ -73,7 +73,7 @@ abstract class ActionMetaAdapter implements ActionMeta {
 		return $this->idRawValue;
 	}
 
-	public function setIdRawValue($idRawValue, $assign = false) {
+	public function setIdRawValue($idRawValue, bool $assign = false) {
 		$this->idRawValue = $idRawValue;
 		if ($assign) {
 			$this->assignRawValue($this->idProperty->getEntityModel(), $this->idColumnName, $idRawValue, true);
@@ -96,7 +96,7 @@ abstract class ActionMetaAdapter implements ActionMeta {
 // 		return $this->hasId();
 // 	}
 
-	public function setRawValue(EntityModel $entityModel, $columnName, $rawValue, $pdoDataType = null) {
+	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, $pdoDataType = null) {
 		if ($columnName != $this->idColumnName) {
 			$this->assignRawValue($entityModel, $columnName, $rawValue, false);
 			return;
@@ -110,7 +110,7 @@ abstract class ActionMetaAdapter implements ActionMeta {
 		$this->setIdRawValue($rawValue, true);
 	}
 	
-	public function removeRawValue(EntityModel $entityModel, $columnName) {
+	public function removeRawValue(EntityModel $entityModel, string $columnName) {
 		if ($columnName == $this->idColumnName) {
 			$this->removeId();
 			return;
