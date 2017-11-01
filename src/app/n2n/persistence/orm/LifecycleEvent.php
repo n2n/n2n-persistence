@@ -48,7 +48,7 @@ class LifecycleEvent {
 		return $this->type;
 	}
 	/**
-	 * @return \n2n\persistence\orm\Entity
+	 * @return object
 	 */
 	public function getEntityObj() {
 		return $this->entity;

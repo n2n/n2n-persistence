@@ -38,7 +38,7 @@ interface Dialect {
 	public function getName();
 	/**
 	 * @param Pdo $dbh
-	 * @param \n2n\persistence\DataSourceConfiguration $data
+	 * @param PersistenceUnitConfig $data
 	 */
 	public function initializeConnection(Pdo $dbh, PersistenceUnitConfig $data);
 	/**
