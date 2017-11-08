@@ -86,7 +86,7 @@ class NestedSetUtils {
 	}
 	
 	/**
-	 * @param unknown $entityObj
+	 * @param object $entityObj
 	 * @throws UnknownEntryException
 	 * @return array
 	 */

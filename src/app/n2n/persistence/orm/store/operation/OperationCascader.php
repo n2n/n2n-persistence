@@ -23,7 +23,6 @@ namespace n2n\persistence\orm\store\operation;
 
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\property\CascadableEntityProperty;
-use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\CascadeType;
 use n2n\reflection\ArgUtils;

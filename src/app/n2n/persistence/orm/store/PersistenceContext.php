@@ -35,7 +35,6 @@ use n2n\persistence\orm\proxy\EntityProxyInitializationException;
 use n2n\persistence\orm\proxy\CanNotCreateEntityProxyClassException;
 use n2n\reflection\ObjectCreationFailedException;
 use n2n\persistence\orm\EntityCreationFailedException;
-use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\proxy\EntityProxy;
 
 class PersistenceContext {

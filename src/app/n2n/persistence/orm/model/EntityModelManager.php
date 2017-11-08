@@ -37,9 +37,7 @@ class EntityModelManager {
 
 	public function __construct(array $entityClassNames, EntityModelFactory $entityModelFactory) {
 		foreach ($entityClassNames as $entityClassName) {
-			$entityClass = ReflectionUtils::createReflectionClass($entityClassName);
-			$this->validateEntityClass($entityClass);
-			$this->entityClasses[$entityClass->getName()] = $entityClass;
+			$this->addEntityClass(ReflectionUtils::createReflectionClass($entityClassName));
 		}
 		
 		$this->entityModelFactory = $entityModelFactory;
@@ -50,6 +48,12 @@ class EntityModelManager {
 	public function getEntityClasses() {
 		return $this->entityClasses;
 	}
+	
+	public function addEntityClass(\ReflectionClass $entityClass) {
+		$this->validateEntityClass($entityClass);
+		$this->entityClasses[$entityClass->getName()] = $entityClass;
+	}
+	
 	/**
 	 * @param \ReflectionClass $class
 	 * @return EntityModel

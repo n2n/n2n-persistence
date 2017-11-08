@@ -30,12 +30,12 @@ interface ActionMeta {
 	 * @param string $columnName
 	 * @param mixed $rawValue
 	 */
-	public function setRawValue(EntityModel $entityModel, $columnName, $rawValue, $pdoDataType = null);
+	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, $pdoDataType = null);
 	/**
 	 * @param EntityModel $entityModel
-	 * @param unknown $columnName
+	 * @param string $columnName
 	 */
-	public function removeRawValue(EntityModel $entityModel, $columnName);
+	public function removeRawValue(EntityModel $entityModel, string $columnName);
 	/**
 	 * @param bool $idGenerated
 	 */
@@ -61,9 +61,10 @@ interface ActionMeta {
 	 */
 	public function getIdColumnName();
 	/**
-	 * @param unknown $id
+	 * @param mixed $idRawValue
+	 * @param bool $assign
 	 */
-	public function setIdRawValue($id, $assign = false);
+	public function setIdRawValue($idRawValue, bool $assign = false);
 	/**
 	 * @return mixed 
 	 */

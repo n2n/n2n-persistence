@@ -19,31 +19,36 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\store\action;
+namespace n2n\persistence\orm\query\select;
 
-interface Action {
-	/**
-	 * Can be called multiple times.
+use n2n\persistence\meta\data\QueryItem;
+use n2n\persistence\PdoStatement;
+use n2n\util\uri\Url;
+
+class UrlSelection implements Selection {
+	private $queryItem;
+	private $value;
+
+	public function __construct(QueryItem $queryItem) {
+		$this->queryItem = $queryItem;
+	}
+
+	public function getSelectQueryItems() {
+		return array($this->queryItem);
+	}
+
+	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
+		$stmt->shareBindColumn($columnAliases[0], $this->value);
+	}
+	/* (non-PHPdoc)
+	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
 	 */
-	public function execute();
-	/**
-	 * @param \Closure $closure
-	 */
-	public function executeAtStart(\Closure $closure);
-	/**
-	 * @param \Closure $closure
-	 */
-	public function executeAtEnd(\Closure $closure);
-	/**
-	 * @param Action $actionJob
-	 */
-	public function addDependent(Action $actionJob);
-	/**
-	 * @return Action[]
-	 */
-	public function getDependents();
-	/**
-	 * @param Action[] $dependents
-	 */
-	public function setDependents(array $dependents);
+	public function createValueBuilder() {
+		try {
+			return new EagerValueBuilder(Url::build($this->value));
+		} catch (InvalidArgumentException $e) {
+			throw new InvalidArgumentException(null, 0, $e);
+		}
+	}
+
 }

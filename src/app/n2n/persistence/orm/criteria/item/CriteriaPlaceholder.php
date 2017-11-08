@@ -21,7 +21,6 @@
  */
 namespace n2n\persistence\orm\criteria\item;
 
-use n2n\persistence\orm\criteria\item\CriteriaItem;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryPoint;

@@ -19,31 +19,12 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\store\action;
+namespace n2n\persistence\orm\annotation;
 
-interface Action {
-	/**
-	 * Can be called multiple times.
-	 */
-	public function execute();
-	/**
-	 * @param \Closure $closure
-	 */
-	public function executeAtStart(\Closure $closure);
-	/**
-	 * @param \Closure $closure
-	 */
-	public function executeAtEnd(\Closure $closure);
-	/**
-	 * @param Action $actionJob
-	 */
-	public function addDependent(Action $actionJob);
-	/**
-	 * @return Action[]
-	 */
-	public function getDependents();
-	/**
-	 * @param Action[] $dependents
-	 */
-	public function setDependents(array $dependents);
+use n2n\reflection\annotation\PropertyAnnotation;
+use n2n\reflection\annotation\PropertyAnnotationTrait;
+use n2n\reflection\annotation\AnnotationTrait;
+
+class AnnoN2nLocale implements PropertyAnnotation {
+	use PropertyAnnotationTrait, AnnotationTrait;
 }
