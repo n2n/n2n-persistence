@@ -23,6 +23,7 @@ namespace n2n\persistence\orm\proxy;
 
 use n2n\util\ex\NotYetImplementedException;
 use n2n\reflection\ReflectionUtils;
+use n2n\util\StringUtils;
 
 class EntityProxyManager {
 	const PROXY_NAMESPACE_PREFIX = 'n2n\\persistence\\orm\\proxy\\entities';
@@ -174,7 +175,8 @@ class EntityProxyManager {
 		
 		if ($parameter->isDefaultValueAvailable()) {
 			if ($parameter->isDefaultValueConstant()) {
-				$phpParamStr .= ' = \\' . $parameter->getDefaultValueConstantName();
+				
+				$phpParamStr .= ' = ' . $this->buildDefaultConstStr($parameter->getDefaultValueConstantName());
 			} else {
 				$phpParamStr .= ' = ' . $this->buildValueStr($parameter->getDefaultValue());
 			}
@@ -189,6 +191,15 @@ class EntityProxyManager {
 		}
 	
 		return '\\' . $type;
+	}
+	
+	private function buildDefaultConstStr($defaultConstName) {
+		if (StringUtils::startsWith('self::', $defaultConstName)) {
+			return $defaultConstName;
+		}
+		
+		return '\\' . $defaultConstName;
+		
 	}
 	
 	private function buildValueStr($value) {
