@@ -35,9 +35,16 @@ class TreePath {
 		if (0 == count($propertyNames)) {
 			throw new \InvalidArgumentException();
 		}
-		
 		$this->nextPropertyNames = $propertyNames;
 	}
+	
+	/**
+	 * @return \n2n\persistence\orm\query\from\TreePath
+	 */
+	public function new() {
+		return new TreePath(array_merge($this->donePropertyNames, $this->nextPropertyNames));
+	}
+	
 	/**
 	 * @return string
 	 */
