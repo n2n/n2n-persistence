@@ -27,7 +27,7 @@ class TreePath {
 	const PROPERTY_NAME_SEPARATOR = '.';
 	
 	private $nextPropertyNames;
-	private $donePropertyNames = array();
+	protected  $donePropertyNames = array();
 	/**
 	 * @param array $propertyNames
 	 */
@@ -41,8 +41,10 @@ class TreePath {
 	/**
 	 * @return \n2n\persistence\orm\query\from\TreePath
 	 */
-	public function new() {
-		return new TreePath(array_merge($this->donePropertyNames, $this->nextPropertyNames));
+	public function copy() {
+		$treePath = new TreePath($this->nextPropertyNames);
+		$treePath->donePropertyNames = $this->donePropertyNames;
+		return $treePath;
 	}
 	
 	/**
