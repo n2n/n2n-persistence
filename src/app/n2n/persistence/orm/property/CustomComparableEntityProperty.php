@@ -23,6 +23,7 @@ namespace n2n\persistence\orm\property;
 
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
+use n2n\util\ex\UnsupportedOperationException;
 
 interface CustomComparableEntityProperty extends EntityProperty {
 	/**

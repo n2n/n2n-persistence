@@ -28,7 +28,7 @@ use n2n\persistence\Pdo;
 interface BasicEntityProperty extends ColumnEntityProperty, ColumnComparableEntityProperty {
 	
 	/**
-	 * @param scalar $value
+	 * @param mixed $value
 	 * @throws \InvalidArgumentException
 	 * @return string
 	 */
@@ -42,7 +42,7 @@ interface BasicEntityProperty extends ColumnEntityProperty, ColumnComparableEnti
 	public function repToValue(string $rep);
 	
 	/**
-	 * @param unknown $raw
+	 * @param mixed $raw
 	 * @param Pdo $pdo
 	 * @return mixed
 	 * @throws \InvalidArgumentException
@@ -50,7 +50,7 @@ interface BasicEntityProperty extends ColumnEntityProperty, ColumnComparableEnti
 	public function parseValue($raw, Pdo $pdo);
 	
 	/**
-	 * @param unknown $value
+	 * @param mixed $value
 	 * @param Pdo $pdo
 	 * @return mixed
 	 * @throws \InvalidArgumentException

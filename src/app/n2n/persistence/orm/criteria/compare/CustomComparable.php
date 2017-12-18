@@ -34,7 +34,7 @@ interface CustomComparable {
 	public function compareWithValue(QueryComparator $queryComparator, $operator, $value);
 	/**
 	 * @param QueryComparator $queryComparator
-	 * @param unknown $operator
+	 * @param string $operator
 	 * @param ComparisonStrategy $comparable
 	 */
 	public function compareWith(QueryComparator $queryComparator, $operator, ComparisonStrategy $comparable);

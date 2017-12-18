@@ -21,10 +21,7 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\common\CreateMetaEntityRequest;
-use n2n\persistence\meta\structure\common\AlterMetaEntityRequest;
 use n2n\persistence\meta\structure\DuplicateMetaElementException;
-use n2n\persistence\meta\structure\common\MetaEntityChangeListener;
 use n2n\persistence\meta\structure\MetaEntity;
 use n2n\persistence\meta\structure\UnknownMetaEntityException;
 use n2n\persistence\Pdo;
@@ -33,12 +30,12 @@ use n2n\persistence\meta\Database;
 abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 
 	/**
-	 * @var n2n\persistence\Pdo
+	 * @var \n2n\persistence\Pdo
 	 */
 	protected $dbh;
 
 	/**
-	 * @var n2n\persistence\meta\structure\common\ChangeRequestQueue
+	 * @var \n2n\persistence\meta\structure\common\ChangeRequestQueue
 	 */
 	private $changeRequestQueue;
 

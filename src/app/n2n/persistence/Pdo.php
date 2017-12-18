@@ -21,7 +21,6 @@
  */
 namespace n2n\persistence;
 
-use n2n\persistence\PersistenceUnitConfig;
 use n2n\persistence\meta\MetaData;
 use n2n\reflection\ReflectionUtils;
 use n2n\core\container\TransactionManager;
@@ -95,7 +94,7 @@ class Pdo extends \PDO {
 	}
 	/**
 	 *
-	 * @param unknown_type $pdo
+	 * @param object $pdo
 	 * @return boolean
 	 */
 	public function equals($dbh) {

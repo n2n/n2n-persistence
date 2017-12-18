@@ -91,7 +91,7 @@ class Criteria {
 	}
 	
 	/**
-	 * @param unknown $item
+	 * @param mixed $item Arg for {@see CrIt::pfLenient()}
 	 * @param string $alias
 	 * @throws CriteriaConflictException
 	 * @return Criteria
@@ -116,11 +116,11 @@ class Criteria {
 	}
 	/**
 	 * @param \ReflectionClass $entityClass
-	 * @param unknown $alias
+	 * @param string $alias
 	 * @param string $fetch
 	 * @return \n2n\persistence\orm\criteria\Criteria
 	 */
-	public function from(\ReflectionClass $entityClass, $alias, $fetch = false) {
+	public function from(\ReflectionClass $entityClass, string $alias, bool $fetch = false) {
 		$this->validateAlias($alias);
 		$this->treeModClosures[] = function (QueryModel $queryModel, QueryState $queryState) 
 				use ($entityClass, $alias, $fetch) {
@@ -136,10 +136,10 @@ class Criteria {
 	}
 	/**
 	 * @param Criteria $criteria
-	 * @param unknown $alias
+	 * @param string $alias
 	 * @return \n2n\persistence\orm\criteria\Criteria
 	 */
-	public function fromCriteria(Criteria $criteria, $alias) {
+	public function fromCriteria(Criteria $criteria, string $alias) {
 		$this->validateAlias($alias);
 		$this->treeModClosures[] = function (QueryModel $queryModel, QueryState $queryState) 
 				use ($criteria, $alias) {
@@ -150,11 +150,11 @@ class Criteria {
 	}
 	/**
 	 * @param Criteria $criteria
-	 * @param unknown $alias
-	 * @param unknown $joinType
+	 * @param string $alias
+	 * @param string $joinType
 	 * @return \n2n\persistence\orm\criteria\compare\CriteriaComparator
 	 */
-	public function joinCriteria(Criteria $criteria, $alias, $joinType = JoinType::INNER) {
+	public function joinCriteria(Criteria $criteria, string $alias, $joinType = JoinType::INNER) {
 		$this->validateAlias($alias);
 		$onCriteriaComparator = new CriteriaComparator($this, null, false, false);
 		
@@ -169,10 +169,10 @@ class Criteria {
 		return $onCriteriaComparator;
 	}
 	/**
-	 * @param unknown $propertyExpression
-	 * @param unknown $alias
-	 * @param unknown $joinType
-	 * @param string $fetch
+	 * @param mixed $propertyExpression Arg for {@see CrIt::p()}
+	 * @param string $alias
+	 * @param string $joinType
+	 * @param bool $fetch
 	 * @return \n2n\persistence\orm\criteria\Criteria
 	 */
 	public function joinProperty($propertyExpression, string $alias, string $joinType = JoinType::INNER, 
@@ -181,6 +181,13 @@ class Criteria {
 		return $this;
 	}
 	
+	/**
+	 * @param mixed $propertyExpression Arg for {@see CrIt::p()}
+	 * @param string $alias
+	 * @param string $joinType
+	 * @param bool $fetch
+	 * @return \n2n\persistence\orm\criteria\compare\CriteriaComparator
+	 */
 	public function joinPropertyOn($propertyExpression, string $alias, string $joinType = JoinType::INNER, 
 			bool $fetch = false) {
 		$onCriteriaComparator = new CriteriaComparator($this, null, false, false);
@@ -191,7 +198,15 @@ class Criteria {
 		return $onCriteriaComparator;
 	}
 	
-	private function preparePropertyJoin($propertyExpression, $alias, $joinType = JoinType::INNER, $fetch = false, 
+	/**
+	 * @param mixed $propertyExpression Arg for {@see CrIt::p()}
+	 * @param string $alias
+	 * @param string $joinType
+	 * @param boolean $fetch
+	 * @param CriteriaComparator $onCriteriaComparator
+	 * @throws CriteriaConflictException
+	 */
+	private function preparePropertyJoin($propertyExpression, string $alias, $joinType = JoinType::INNER, bool $fetch = false, 
 			CriteriaComparator $onCriteriaComparator = null) {
 		$criteriaProperty = CrIt::p($propertyExpression);
 		$this->validateAlias($alias);
@@ -221,12 +236,12 @@ class Criteria {
 	
 	/**
 	 * @param \ReflectionClass $entityClass
-	 * @param unknown $alias
-	 * @param unknown $joinType
+	 * @param string $alias
+	 * @param string $joinType
 	 * @param string $fetch
 	 * @return \n2n\persistence\orm\criteria\compare\CriteriaComparator
 	 */
-	public function join(\ReflectionClass $entityClass, $alias, $joinType = JoinType::INNER, $fetch = false) {
+	public function join(\ReflectionClass $entityClass, string $alias, $joinType = JoinType::INNER, bool $fetch = false) {
 		$this->validateAlias($alias);
 		
 		$onCriteriaComparator = new CriteriaComparator($this, null, false, false);

@@ -25,7 +25,9 @@ use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryPoint;
-use n2n\persistence\orm\criteria\item\CrIt;
+use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\meta\data\QueryItem;
 
 class CriteriaProperty implements CriteriaItem {
 	private $propertyNames;
@@ -45,7 +47,7 @@ class CriteriaProperty implements CriteriaItem {
 		return $this->propertyNames;
 	}
 
-	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver) {
+	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver): QueryPoint {
 		return new PropertyQueryPoint($this->propertyNames, $queryState, $queryPointResolver);
 	}
 	
@@ -78,7 +80,7 @@ class PropertyQueryPoint implements QueryPoint {
 		$this->queryPointResolver = $queryPointResolver;
 	}
 	
-	public function requestComparisonStrategy() {
+	public function requestComparisonStrategy(): ComparisonStrategy {
 		return $this->queryPointResolver->requestPropertyComparisonStrategy(new TreePath($this->propertyNames));
 	}
 	
@@ -87,7 +89,7 @@ class PropertyQueryPoint implements QueryPoint {
 				array_merge($this->propertyNames, $treePath->getNexts())));
 	}
 	
-	public function requestSelection() {
+	public function requestSelection(): Selection {
 		return $this->queryPointResolver->requestPropertySelection(new TreePath($this->propertyNames));
 	}
 	
@@ -96,7 +98,7 @@ class PropertyQueryPoint implements QueryPoint {
 				array_merge($this->propertyNames, $treePath->getNexts())));
 	}
 	
-	public function requestRepresentableQueryItem() {
+	public function requestRepresentableQueryItem(): QueryItem {
 		return $this->queryPointResolver->requestPropertyRepresentableQueryItem(
 				new TreePath($this->propertyNames));
 	}

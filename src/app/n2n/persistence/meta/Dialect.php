@@ -52,7 +52,7 @@ interface Dialect {
 	public function quoteField($str);
 	/**
 	 * Quotes the like wildcard chars
-	 * @param unknown $pattern
+	 * @param string $pattern
 	 */
 	public function escapeLikePattern($pattern);
 	/**

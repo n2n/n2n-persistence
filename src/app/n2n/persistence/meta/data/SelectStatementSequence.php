@@ -21,7 +21,6 @@
  */
 namespace n2n\persistence\meta\data;
 
-use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\reflection\ArgUtils;
 
 class SelectStatementSequence {

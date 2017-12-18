@@ -29,7 +29,6 @@ use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\model\EntityModel;
-use n2n\persistence\orm\criteria\Criteria;
 use n2n\persistence\orm\query\QueryModel;
 use n2n\reflection\ReflectionUtils;
 
@@ -126,7 +125,7 @@ class Tree implements QueryPointResolver {
 		
 		while ($treePath->hasNext()) {
 			try {
-				$this->treePoints[] = $treePoint = $treePoint->createPropertyJoinTreePoint(
+				$this->treePoints[] = $treePoint = $treePoint->createPropertyJoinedTreePoint(
 						$treePath->next(), $joinType);
 			} catch (OrmException $e) {
 				throw new QueryConflictException('Unresovalble property: ' 
@@ -139,21 +138,21 @@ class Tree implements QueryPointResolver {
 	
 	/**
 	 * @param QueryModel $subQueryModel
-	 * @param unknown $alias
+	 * @param string $alias
 	 * @return \n2n\persistence\orm\query\from\BaseSubCriteriaTreePoint
 	 */
-	public function createBaseCriteriaTreePoint(QueryModel $subQueryModel, $alias) {
+	public function createBaseCriteriaTreePoint(QueryModel $subQueryModel, string $alias) {
 		return $this->treePoints[] = $this->namedTreePoints[$alias] = new BaseSubCriteriaTreePoint(
 				$subQueryModel, $this->queryState);
 	}
 	
 	/**
-	 * @param unknown $joinType
+	 * @param string $joinType
 	 * @param QueryModel $subQueryModel
-	 * @param unknown $alias
+	 * @param string $alias
 	 * @return \n2n\persistence\orm\query\from\JoinedSubCriteriaTreePoint
 	 */
-	public function createJoinedCriteriaTreePoint($joinType, QueryModel $subQueryModel, $alias) {
+	public function createJoinedCriteriaTreePoint($joinType, QueryModel $subQueryModel, string $alias) {
 		$treePoint = new JoinedSubCriteriaTreePoint($subQueryModel, $this->queryState);
 		$treePoint->setJoinType($joinType);
 		

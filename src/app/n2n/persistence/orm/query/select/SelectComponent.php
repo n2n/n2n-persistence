@@ -24,7 +24,6 @@ namespace n2n\persistence\orm\query\select;
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\meta\data\QueryItem;
-use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\query\QueryPoint;
 
 interface SelectComponent extends QueryPoint {

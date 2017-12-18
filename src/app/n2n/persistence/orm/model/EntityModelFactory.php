@@ -26,7 +26,6 @@ use n2n\reflection\ReflectionContext;
 use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\InheritanceType;
 use n2n\persistence\orm\property\SetupProcess;
-use n2n\persistence\orm\model\UnknownEntityPropertyException;
 use n2n\persistence\orm\OrmConfigurationException;
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\web\dispatch\model\ModelInitializationException;

@@ -33,6 +33,8 @@ use n2n\persistence\meta\data\QueryConstant;
 use n2n\persistence\orm\query\select\SimpleSelection;
 use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\meta\data\QueryItem;
 
 class CriteriaConstant implements CriteriaItem {
 	private $value;
@@ -45,7 +47,7 @@ class CriteriaConstant implements CriteriaItem {
 		return $this->value;
 	}
 	
-	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver) {
+	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver): QueryPoint {
 		if ($this->value !== null && !is_scalar($this->value)) {
 			throw new CriteriaConflictException('CirteriaConstant is not scalar.');
 		}
@@ -67,7 +69,7 @@ class ConstantQueryPoint implements QueryPoint {
 		$this->queryState = $queryState;
 	}
 
-	public function requestComparisonStrategy() {
+	public function requestComparisonStrategy(): ComparisonStrategy {
 		return new ComparisonStrategy(new ScalarColumnComparable(
 				new QueryPlaceMarker($this->queryState->registerPlaceholderValue($this->value)),
 				$this->queryState));
@@ -77,7 +79,7 @@ class ConstantQueryPoint implements QueryPoint {
 		throw $this->createException($treePath);
 	}
 	
-	public function requestSelection() {
+	public function requestSelection(): Selection {
 		return new SimpleSelection(new QueryConstant($this->value));
 	}
 	
@@ -85,7 +87,7 @@ class ConstantQueryPoint implements QueryPoint {
 		throw $this->createException($treePath);
 	}
 	
-	public function requestRepresentableQueryItem() {
+	public function requestRepresentableQueryItem(): QueryItem {
 		return new QueryConstant($this->value);
 	}
 	

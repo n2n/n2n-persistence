@@ -24,7 +24,6 @@ namespace n2n\persistence\orm\query;
 use n2n\persistence\PdoStatement;
 use n2n\persistence\Pdo;
 use n2n\util\ex\IllegalStateException;
-use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\orm\store\LoadingQueue;
 
 class Query {

@@ -22,6 +22,7 @@
 namespace n2n\persistence\meta;
 
 use n2n\persistence\meta\structure\MetaEntity;
+use n2n\persistence\meta\structure\UnknownMetaEntityException;
 
 interface Database {
 	/**

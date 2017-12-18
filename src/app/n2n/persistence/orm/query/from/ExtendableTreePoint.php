@@ -54,7 +54,7 @@ abstract class ExtendableTreePoint extends MetaTreePointAdapter {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\from\ExtendableTreePoint::createJoinTreePoint()
 	 */
-	public function createPropertyJoinTreePoint($propertyName, $joinType) {
+	public function createPropertyJoinedTreePoint(string $propertyName, $joinType): JoinedTreePoint {
 		return $this->createCustomPropertyJoinTreePoint(
 				$this->entityPropertyCollection->getEntityPropertyByName($propertyName), $joinType);
 	}
@@ -77,7 +77,7 @@ abstract class ExtendableTreePoint extends MetaTreePointAdapter {
 				. $entityProperty->toPropertyString(), 0, $previousE);
 	}
 
-	public function requestPropertyJoinTreePoint($propertyName, $innerJoinRequired) {
+	public function requestPropertyJoinedTreePoint(string $propertyName, bool $innerJoinRequired): JoinedTreePoint {
 		$entityProperty = $this->entityPropertyCollection->getEntityPropertyByName($propertyName);
 		
 		return $this->requestCustomPropertyJoinTreePoint($entityProperty, $innerJoinRequired);
@@ -102,7 +102,7 @@ abstract class ExtendableTreePoint extends MetaTreePointAdapter {
 		$propertyName = $treePath->next();
 		
 		if ($treePath->hasNext()) {
-			return $this->requestPropertyJoinTreePoint($propertyName, false)
+			return $this->requestPropertyJoinedTreePoint($propertyName, false)
 					->requestPropertyComparisonStrategy($treePath);
 		}
 		
@@ -155,7 +155,7 @@ abstract class ExtendableTreePoint extends MetaTreePointAdapter {
 		$propertyName = $treePath->next();
 		
 		if ($treePath->hasNext()) {
-			return $this->requestPropertyJoinTreePoint($propertyName, false)
+			return $this->requestPropertyJoinedTreePoint($propertyName, false)
 					->requestPropertySelection($treePath);
 		}
 		
@@ -194,7 +194,7 @@ abstract class ExtendableTreePoint extends MetaTreePointAdapter {
 		$propertyName = $treePath->next();
 		
 		if ($treePath->hasNext()) {
-			return $this->requestPropertyJoinTreePoint($propertyName, false)
+			return $this->requestPropertyJoinedTreePoint($propertyName, false)
 					->requestPropertyRepresentableQueryItem($treePath);
 		}
 		

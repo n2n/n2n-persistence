@@ -110,7 +110,8 @@ class QueryComparatorBuilder {
 	/**
 	 * @param QueryComparator $queryComparator
 	 * @param ComparisonStrategy $comparisonStrategy
-	 * @param unknown $value
+	 * @param string $operator
+	 * @param mixed $value
 	 * @throws CriteriaConflictException
 	 * @throws ValueIncompatibleWithConstraintsException
 	 */

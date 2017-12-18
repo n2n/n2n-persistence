@@ -23,13 +23,17 @@ namespace n2n\persistence\orm\criteria\item;
 
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryPointResolver;
+use n2n\persistence\orm\query\QueryPoint;
 
 interface CriteriaItem {
 	/**
+	 * @param QueryState $queryState
+	 * @param QueryPointResolver $queryPointResolver
 	 * @return QueryPoint
-	 * @throws CriteriaConflictException
+	 * @throws \n2n\persistence\orm\criteria\CriteriaConflictException
 	 */
-	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver);
+	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver): QueryPoint;
+	
 	/**
 	 * @return string 
 	 */

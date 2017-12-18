@@ -38,14 +38,14 @@ interface ColumnComparable {
 	public function isSelectable($operator);
 	/**
 	 * @return \n2n\persistence\meta\data\QueryItem
-	 * @throws CriteriaConflictException
+	 * @throws \n2n\persistence\orm\criteria\CriteriaConflictException
 	 */
 	public function buildQueryItem($operator);
 	/**
 	 * @param string $operator
 	 * @param mixed $value
 	 * @return QueryItem
-	 * @throws CriteriaConflictException
+	 * @throws \n2n\persistence\orm\criteria\CriteriaConflictException
 	 */
 	public function buildCounterpartQueryItemFromValue($operator, $value);
 // 	/**

@@ -39,7 +39,7 @@ class ComparatorCriteria extends Criteria implements CriteriaItem {
 		throw new UnsupportedOperationException();
 	}
 	
-	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver) {
+	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver): QueryPoint {
 		return new ComparatorCriteriaQueryPoint(
 				$this->createQueryModel($queryState, $queryPointResolver), $queryState);
 	}
@@ -67,7 +67,7 @@ class ComparatorCriteriaQueryPoint implements QueryPoint {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestComparisonStrategy()
 	 */
-	public function requestComparisonStrategy() {
+	public function requestComparisonStrategy(): ComparisonStrategy {
 		if ($this->comparisonStrategy !== null) {
 			return $this->comparisonStrategy;
 		}
@@ -98,13 +98,13 @@ class ComparatorCriteriaQueryPoint implements QueryPoint {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestSelection()
 	 */
-	public function requestSelection() {
+	public function requestSelection(): Selection {
 		throw new UnsupportedOperationException();
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestRepresentableQueryItem()
 	 */
-	public function requestRepresentableQueryItem() {
+	public function requestRepresentableQueryItem(): QueryItem {
 		$selectBuilder  = $this->queryState->getPdo()->getMetaData()->createSelectStatementBuilder();
 		$this->queryModel->apply($selectBuilder);
 		

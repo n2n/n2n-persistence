@@ -91,7 +91,7 @@ class QueryState {
 		return self::COLUMN_ALIAS_PREFIX . $this->columnAliasIndex++ . '_' . $columnName;
 	}
 	/**
-	 * @param scalar $value
+	 * @param mixed $value scalar
 	 * @return string
 	 */
 	public function registerPlaceholderValue($value) {

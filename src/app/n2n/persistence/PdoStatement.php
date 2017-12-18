@@ -21,11 +21,6 @@
  */
 namespace n2n\persistence;
 
-/**
- *
- *
- * @package ch.n2n.persistence
- */
 class PdoStatement extends \PDOStatement {
 	private $logger;
 	private $boundValues = array();
@@ -36,13 +31,14 @@ class PdoStatement extends \PDOStatement {
 	public function getBindedValues() {
 		return $this->boundValues;
 	}
+	
 	/**
-	 *
-	 * @param NN6SqlLog $log
+	 * @param PdoLogger $logger
 	 */
 	public function setLogger(PdoLogger $logger) {
 		$this->logger = $logger;
 	}
+	
 	/**
 	 * (non-PHPdoc)
 	 * @see PDOStatement::bindValue()

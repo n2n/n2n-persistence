@@ -22,7 +22,6 @@
 namespace n2n\persistence\orm\query\from;
 
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
-use n2n\persistence\meta\data\QueryItem;
 use n2n\persistence\meta\data\QueryColumn;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\persistence\orm\query\select\Selection;
@@ -33,6 +32,7 @@ use n2n\persistence\orm\query\QueryModel;
 use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryItemSelect;
+use n2n\persistence\meta\data\QueryItem;
 
 abstract class SubCriteriaTreePoint implements TreePoint {
 	protected $queryModel;
@@ -51,17 +51,17 @@ abstract class SubCriteriaTreePoint implements TreePoint {
 		return $this->queryState;
 	}
 	
-	public function createPropertyJoinTreePoint($joinType, $propertyName) {
+	public function createPropertyJoinedTreePoint(string $propertyName, $joinType): JoinedTreePoint {
 		throw new CriteriaConflictException('Sub criteria cannot be joined.');
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\query\from\TreePoint::requestPropertyJoinTreePoint()
+	 * @see \n2n\persistence\orm\query\from\TreePoint::requestPropertyJoinedTreePoint()
 	 */
-	public function requestPropertyJoinTreePoint($propertyName, $innerJoinRequired) {
+	public function requestPropertyJoinedTreePoint(string $propertyName, bool $innerJoinRequired): JoinedTreePoint {
 		throw new UnsupportedOperationException();
 	}
 	
-	public function requestComparisonStrategy() {
+	public function requestComparisonStrategy(): ComparisonStrategy {
 		throw new CriteriaConflictException('Sub criteria cannot be compared.');
 	}
 	/**
@@ -109,7 +109,7 @@ abstract class SubCriteriaTreePoint implements TreePoint {
 						$this->queryModel->getQueryItemSelect(), $this->tableAlias));
 	}
 	
-	public function requestSelection() {
+	public function requestSelection(): Selection {
 		throw new CriteriaConflictException('Sub criteria cannot be selected.');
 	}
 	
@@ -136,7 +136,7 @@ abstract class SubCriteriaTreePoint implements TreePoint {
 		return new DecoratedSubSelection($selection, $subQueryItems);
 	}
 
-	public function requestRepresentableQueryItem() {
+	public function requestRepresentableQueryItem(): QueryItem {
 		throw new QueryConflictException('Sub criteria not representable by query item.');
 	}
 

@@ -26,7 +26,7 @@ class PdoLogger {
 	private $log;
 	/**
 	 *
-	 * @param unknown_type $dataSourceName
+	 * @param string $dataSourceName
 	 */
 	public function __construct($dataSourceName) {
 		$this->dsName = $dataSourceName;
@@ -42,8 +42,8 @@ class PdoLogger {
 	}
 	/**
 	 *
-	 * @param unknown_type $sqlStr
-	 * @param unknown_type $time
+	 * @param string $sqlStr
+	 * @param number $time
 	 */
 	public function addQuery($sqlStr, $time = null) {
 		$this->log[] = array('sql' => $sqlStr, 'type' => 'query', 'time' => $time);
@@ -51,8 +51,8 @@ class PdoLogger {
 	}
 	/**
 	 *
-	 * @param unknown_type $sqlStr
-	 * @param unknown_type $time
+	 * @param string $sqlStr
+	 * @param number $time
 	 */
 	public function addExecution($sqlStr, $time = null) {
 		$this->log[] = array('sql' => $sqlStr, 'type' => 'execute', 'time' => $time);
@@ -60,8 +60,8 @@ class PdoLogger {
 	}
 	/**
 	 *
-	 * @param unknown_type $sqlStr
-	 * @param unknown_type $time
+	 * @param string $sqlStr
+	 * @param number $time
 	 */
 	public function addPreparation($sqlStr, $time = null) {
 		$this->log[] = array('sql' => $sqlStr, 'type' => 'prepare', 'time' => $time);
@@ -69,9 +69,9 @@ class PdoLogger {
 	}
 	/**
 	 *
-	 * @param unknown_type $sqlStr
+	 * @param string $sqlStr
 	 * @param array $values
-	 * @param unknown_type $time
+	 * @param number $time
 	 */
 	public function addPreparedExecution($sqlStr, array $values = null, $time = null) {
 		$this->log[] = array('sql' => $sqlStr, 'values' => $values, 'type' => 'prepared-execute', 'time' => $time);
@@ -79,7 +79,7 @@ class PdoLogger {
 	}
 	/**
 	 *
-	 * @param unknown_type $time
+	 * @param number $time
 	 */
 	public function addTransactionBegin($time = null) {
 		$this->log[] = array('type' => 'begin transaction', 'time' => $time);
@@ -87,7 +87,7 @@ class PdoLogger {
 	}
 	/**
 	 *
-	 * @param unknown_type $time
+	 * @param number $time
 	 */
 	public function addTransactionRollBack($time = null) {
 		$this->log[] = array('type' => 'rollback', 'time' => $time);
@@ -95,7 +95,7 @@ class PdoLogger {
 	}
 	/**
 	 *
-	 * @param unknown_type $time
+	 * @param number $time
 	 */
 	public function addTransactionCommit($time = null) {
 		$this->log[] = array('type' => 'commit', 'time' => $time);

@@ -31,7 +31,7 @@ interface MetaEntity {
 	 */
 	public function setName($name);
 	/**
-	 * @return Database
+	 * @return \n2n\persistence\meta\Database
 	 */
 	public function getDatabase();
 	/**

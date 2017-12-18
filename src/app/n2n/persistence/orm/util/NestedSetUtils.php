@@ -104,8 +104,8 @@ class NestedSetUtils {
 	}
 	
 	/**
-	 * @param unknown $entity
-	 * @param unknown $lft
+	 * @param object $entity
+	 * @param int $lft
 	 * @throws IllegalStateException
 	 */
 	private function updateLft($entity, $lft) {
@@ -121,8 +121,8 @@ class NestedSetUtils {
 	}
 	
 	/**
-	 * @param unknown $entity
-	 * @param unknown $rgt
+	 * @param object $entity
+	 * @param int $rgt
 	 * @throws IllegalStateException
 	 */
 	private function updateRgt($entity, $rgt) {
@@ -213,7 +213,7 @@ class NestedSetUtils {
 	}
 	
 	/**
-	 * @param unknown $entity
+	 * @param object $entity
 	 */
 	public function remove($entity) {
 		$this->em->flush();
@@ -269,7 +269,7 @@ class NestedSetUtils {
 	}
 	
 	/**
-	 * @param unknown $object
+	 * @param object $object
 	 */
 	public function insertRoot($object) {
 		OrmUtils::initializeProxy($this->em, $object);
@@ -321,8 +321,8 @@ class NestedSetUtils {
 	}
 	
 	/**
-	 * @param unknown $object
-	 * @param unknown $parentObject
+	 * @param object $object
+	 * @param object $parentObject
 	 * @throws IllegalStateException
 	 */
 	public function insert($object, $parentObject = null) {
@@ -382,8 +382,8 @@ class NestedSetUtils {
 	/**
 	 * @link https://rogerkeays.com/how-to-move-a-node-in-nested-sets-with-sql
 	 * 
-	 * @param unknown $object
-	 * @param unknown $parentObject
+	 * @param object $object
+	 * @param object $parentObject
 	 * @throws IllegalStateException
 	 */
 	public function move($object, $parentObject = null) {
@@ -406,8 +406,8 @@ class NestedSetUtils {
 	}
 		
 	/**
-	 * @param unknown $entity
-	 * @param unknown $newLft
+	 * @param object $entity
+	 * @param int $newLft
 	 */
 	private function moveToLft($entity, $newLft) {
 		OrmUtils::initializeProxy($this->em, $entity);
@@ -491,7 +491,7 @@ class NestedSetUtils {
 	}
 	
 	/**
-	 * @param unknown $object
+	 * @param object $object
 	 * @param bool $moveUp
 	 */
 	public function order($object, bool $moveUp) {

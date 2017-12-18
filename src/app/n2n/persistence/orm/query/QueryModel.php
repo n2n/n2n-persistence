@@ -22,7 +22,6 @@
 namespace n2n\persistence\orm\query;
 
 use n2n\persistence\orm\query\from\Tree;
-use n2n\persistence\orm\query\QueryPoint;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\meta\data\QueryItem;

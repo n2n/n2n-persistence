@@ -22,15 +22,9 @@
 namespace n2n\persistence\meta\data\common;
 
 use n2n\persistence\meta\data\InsertValueGroup;
-
-use n2n\persistence\meta\data\common\QueryFragmentBuilderFactory;
-
 use n2n\persistence\meta\data\InsertStatementBuilder;
-
 use n2n\persistence\meta\data\QueryItem;
-
 use n2n\persistence\Pdo;
-
 use n2n\persistence\meta\data\QueryColumn;
 
 class CommonInsertStatementBuilder implements InsertStatementBuilder {

@@ -23,7 +23,7 @@ namespace n2n\persistence\meta\structure;
 
 interface MetaEntityFactory {
 	/**
-	 * @return Database
+	 * @return \n2n\persistence\meta\Database
 	 */
 	public function getDatabase();
 	/**

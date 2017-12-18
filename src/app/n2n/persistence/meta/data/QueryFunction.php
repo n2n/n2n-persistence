@@ -22,7 +22,6 @@
 namespace n2n\persistence\meta\data;
 
 use n2n\reflection\ArgUtils;
-use n2n\persistence\meta\data\QueryFragmentBuilder;
 
 class QueryFunction implements QueryItem {
 	const COUNT = 'COUNT';

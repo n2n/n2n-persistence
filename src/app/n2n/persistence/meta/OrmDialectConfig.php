@@ -26,14 +26,14 @@ interface OrmDialectConfig {
 	 * Converts a rawValue of the typical DateTime type into a DateTime object. 
 	 * If null is passed the method returns null.	
 	 * @param string $rawValue
-	 * @return DateTime
+	 * @return \DateTime
 	 * @throws \InvalidArgumentException if an invalid rawValue was passed.
 	 */
 	public function parseDateTime($rawValue);
 	/**
 	 * Converts the passed DateTime into the rawValue for the typical DateTime type. 
 	 * If null is passed the method returns null.  
-	 * @param DateTime $dateTime
+	 * @param \DateTime $dateTime
 	 * @return string
 	 */
 	public function buildDateTimeRawValue(\DateTime $dateTime = null);

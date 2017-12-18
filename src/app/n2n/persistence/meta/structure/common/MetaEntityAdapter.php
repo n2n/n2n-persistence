@@ -62,7 +62,7 @@ abstract class MetaEntityAdapter implements MetaEntity {
 		}
 	}
 	/** 
-	 * @return n2n\persistence\meta\Database
+	 * @return \n2n\persistence\meta\Database
 	 */
 	public function getDatabase() {
 		return $this->database;

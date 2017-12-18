@@ -23,12 +23,9 @@ namespace n2n\persistence\meta\structure\common;
 
 use n2n\persistence\meta\structure\MetaEntity;
 
-
-use n2n\persistence\meta\structure\common\ChangeRequest;
-
 abstract class ChangeRequestAdapter implements ChangeRequest {
 	/**
-	 * @var n2n\persistence\meta\structure\MetaEntity
+	 * @var \n2n\persistence\meta\structure\MetaEntity
 	 */
 	private $metaEntity;
 	
@@ -37,7 +34,7 @@ abstract class ChangeRequestAdapter implements ChangeRequest {
 	}
 	
 	/**
-	 * @return n2n\persistence\meta\structure\MetaEntity
+	 * @return \n2n\persistence\meta\structure\MetaEntity
 	 */
 	public function getMetaEntity() {
 		return $this->metaEntity;

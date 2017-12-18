@@ -26,6 +26,8 @@ use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\query\select\EntityObjSelection;
 use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\meta\data\QueryItem;
 
 abstract class EntityTreePoint extends ExtendableTreePoint {
 	protected $entityModel;
@@ -38,19 +40,19 @@ abstract class EntityTreePoint extends ExtendableTreePoint {
 		$this->entityModel = $treePointMeta->getEntityModel();
 	}
 	
-	public function requestComparisonStrategy() {
+	public function requestComparisonStrategy(): ComparisonStrategy {
 		$idEntityProperty = $this->entityModel->getIdDef()->getEntityProperty();
 		$idColumnComparable = $idEntityProperty->createColumnComparable($this, $this->queryState);
 		
 		return new ComparisonStrategy(new IdColumnComparableDecorator($idColumnComparable, $this->entityModel));
 	}
 	
-	public function requestSelection() {
+	public function requestSelection(): Selection {
 		if ($this->entitySelection !== null) return $this->entitySelection;
 		return $this->entityselection = new EntityObjSelection($this->entityModel, $this->queryState, $this);
 	}
 	
-	public function requestRepresentableQueryItem() {
+	public function requestRepresentableQueryItem(): QueryItem {
 		$idEntityProperty = $this->entityModel->getIdDef()->getEntityProperty();
 		return $idEntityProperty->createQueryColumn($this->getMeta(), $this->queryState);
 	}

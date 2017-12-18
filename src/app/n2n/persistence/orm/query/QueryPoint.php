@@ -21,22 +21,24 @@
  */
 namespace n2n\persistence\orm\query;
 
-use n2n\persistence\orm\query\QueryPointResolver;
+use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\meta\data\QueryItem;
 
 interface QueryPoint extends QueryPointResolver {
 	/**
 	 * @return \n2n\persistence\orm\criteria\compare\ComparisonStrategy
 	 * @throws \n2n\persistence\orm\query\QueryConflictException
 	 */
-	public function requestComparisonStrategy();
+	public function requestComparisonStrategy(): ComparisonStrategy;
 	/**
 	 * @return \n2n\persistence\orm\query\select\Selection
 	 * @throws \n2n\persistence\orm\query\QueryConflictException
 	 */
-	public function requestSelection();
+	public function requestSelection(): Selection;
 	/**
 	 * @return \n2n\persistence\meta\data\QueryItem
 	 * @throws \n2n\persistence\orm\query\QueryConflictException
 	 */
-	public function requestRepresentableQueryItem();
+	public function requestRepresentableQueryItem(): QueryItem;
 }

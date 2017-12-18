@@ -28,6 +28,9 @@ use n2n\util\ex\NotYetImplementedException;
 use n2n\persistence\meta\data\QueryPlaceMarker;
 use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\orm\query\from\TreePath;
+use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\meta\data\QueryItem;
 
 class CriteriaPlaceholder implements CriteriaItem {
 	private $name;
@@ -38,9 +41,10 @@ class CriteriaPlaceholder implements CriteriaItem {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\criteria\item\CriteriaItem::createQueryPoint()
 	 */
-	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver) {
-		return new PlaceholderQueryPoint($queryState->registerPlaceholder($this->name, new ScalarPlaceholder(
-				$queryState->createPlaceholderName())));
+	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver): QueryPoint {
+		throw new NotYetImplementedException();
+// 		return new PlaceholderQueryPoint($queryState->registerPlaceholder($this->name, new ScalarPlaceholder(
+// 				$queryState->createPlaceholderName())));
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\criteria\item\CriteriaItem::__toString()
@@ -62,19 +66,19 @@ class PlaceholderQueryPoint implements QueryPoint {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestComparisonStrategy()
 	 */
-	public function requestComparisonStrategy() {
+	public function requestComparisonStrategy(): ComparisonStrategy {
 		throw new NotYetImplementedException();
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestSelection()
 	 */
-	public function requestSelection() {
+	public function requestSelection(): Selection {
 		throw new NotYetImplementedException();
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestRepresentableQueryItem()
 	 */
-	public function requestRepresentableQueryItem() {
+	public function requestRepresentableQueryItem(): QueryItem {
 		return new QueryPlaceMarker($this->placeholderName);
 	}
 	/* (non-PHPdoc)

@@ -27,6 +27,8 @@ use n2n\persistence\orm\model\NamingStrategy;
 use n2n\reflection\property\AccessProxy;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\OrmException;
+use n2n\persistence\orm\OrmErrorException;
 
 class ClassSetup {
 	private $setupProcess;
@@ -60,7 +62,7 @@ class ClassSetup {
 		return $this->setupProcess;
 	}
 	/**
-	 * @return ReflectionClass
+	 * @return \ReflectionClass
 	 */
 	public function getClass() {
 		return $this->class;
@@ -167,13 +169,13 @@ class ClassSetup {
 	}
 	/**
 	 * Request a column to write your data.
-	 * @param unknown $propertyName
+	 * @param string $propertyName
 	 * @param string $columnName
 	 * @param string $overrideAllowed
 	 * @param array $relatedComponents
 	 * @return string
 	 */
-	public function requestColumn($propertyName, $columnName = null, array $relatedComponents = array()) {
+	public function requestColumn(string $propertyName, string $columnName = null, array $relatedComponents = array()) {
 		$determineColumnName = $this->determineColumnName($propertyName, $columnName === null, $relatedComponents);
 		if ($columnName === null) {
 			$columnName = $determineColumnName;
@@ -210,9 +212,10 @@ class ClassSetup {
 		return isset($this->entityProperties[$name]);
 	}
 	/**
-	 * @param ManagedProperty $entityProperty
-	 * @param Annotation $relatedAnnotation
-	 * @throws ModelInitializationException
+	 * @param EntityProperty $entityProperty
+	 * @param array $relatedComponents
+	 * @throws OrmException
+	 * @throws OrmErrorException
 	 */
 	public function provideEntityProperty(EntityProperty $entityProperty, 
 			array $relatedComponents = array()) {

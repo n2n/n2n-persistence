@@ -33,7 +33,6 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\query\QueryState;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\property\IdDef;
-use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\InheritanceType;
 use n2n\reflection\ArgUtils;
 use n2n\reflection\ReflectionUtils;

@@ -22,8 +22,8 @@
 namespace n2n\persistence\orm\query\select;
 
 use n2n\persistence\meta\data\QueryItem;
-use n2n\persistence\PdoStatement;
 use n2n\util\uri\Url;
+use n2n\persistence\PdoStatement;
 
 class UrlSelection implements Selection {
 	private $queryItem;
@@ -46,9 +46,8 @@ class UrlSelection implements Selection {
 	public function createValueBuilder() {
 		try {
 			return new EagerValueBuilder(Url::build($this->value));
-		} catch (InvalidArgumentException $e) {
-			throw new InvalidArgumentException(null, 0, $e);
+		} catch (\InvalidArgumentException $e) {
+			throw new \InvalidArgumentException(null, 0, $e);
 		}
 	}
-
 }

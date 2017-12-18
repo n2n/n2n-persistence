@@ -24,7 +24,6 @@ namespace n2n\persistence\orm\criteria\item;
 use n2n\persistence\meta\data\QueryItemSequence;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\data\QueryFunction;
-use n2n\persistence\orm\criteria\item\CriteriaItem;
 use n2n\persistence\orm\criteria\compare\ScalarColumnComparable;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryPointResolver;
@@ -34,6 +33,8 @@ use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\query\select\SimpleSelection;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\util\ex\IllegalStateException;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\meta\data\QueryItem;
 
 class CriteriaFunction implements CriteriaItem {
 	const COUNT = QueryFunction::COUNT;
@@ -76,7 +77,7 @@ class CriteriaFunction implements CriteriaItem {
 		return $this->parameters;
 	}
 	
-	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver) {
+	public function createQueryPoint(QueryState $queryState, QueryPointResolver $queryPointResolver): QueryPoint {
 		$parameterQueryPoints = array();
 		foreach ($this->parameters as $parameter) {
 			$parameterQueryPoints[] = $parameter->createQueryPoint($queryState, $queryPointResolver);
@@ -119,7 +120,7 @@ class FunctionQueryPoint implements QueryPoint {
 		$this->queryState = $queryState;
 	}
 	
-	public function requestComparisonStrategy() {
+	public function requestComparisonStrategy(): ComparisonStrategy {
 // 		if (CriteriaFunction::isGroupFunction($this->name)) {
 // 			throw new CriteriaConflictException('Illegal use of group function: ' . $this->name);
 // 		}
@@ -132,7 +133,7 @@ class FunctionQueryPoint implements QueryPoint {
 		throw $this->createException($treePath);
 	}
 	
-	public function requestSelection() {
+	public function requestSelection(): Selection {
 		return new SimpleSelection(new QueryFunction($this->name, $this->createParameterSequence()));
 	}
 	
@@ -140,7 +141,7 @@ class FunctionQueryPoint implements QueryPoint {
 		throw $this->createException($treePath);
 	}
 	
-	public function requestRepresentableQueryItem() {
+	public function requestRepresentableQueryItem(): QueryItem {
 		return new QueryFunction($this->name, $this->createParameterSequence());
 	}
 	

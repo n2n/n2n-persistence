@@ -21,8 +21,6 @@
  */
 namespace n2n\persistence\meta\data;
 
-use n2n\persistence\meta\data\SequenceOperator;
-
 abstract class Comparison implements SequenceItem {
 	private $sequenceOperator;
 	

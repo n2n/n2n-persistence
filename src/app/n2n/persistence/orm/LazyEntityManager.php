@@ -53,7 +53,7 @@ class LazyEntityManager implements EntityManager {
 	private $actionQueue;
 	private $nqlParser;
 	/**
-	 * @param unknown $dataSourceName
+	 * @param string $dataSourceName
 	 * @param PdoPool $dbhPool
 	 */
 	public function __construct($dataSourceName, PdoPool $dbhPool, $transactionalScoped) {

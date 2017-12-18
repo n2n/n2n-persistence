@@ -22,11 +22,13 @@
 namespace n2n\persistence\meta\structure;
 
 interface ColumnFactory {
+	
 	/**
 	 * Returns current database
 	 * @return Table
 	 */
 	public function getTable();
+	
 	/**
 	 * Creates a new IntegerColumn and applies it to the current table.
 	 * @param string $name
@@ -36,6 +38,7 @@ interface ColumnFactory {
 	 * @return IntegerColumn
 	 */
 	public function createIntegerColumn($name, $size, $signed = true);
+	
 	/**
 	 * Creates a new StringColumn and applies it to the current table.
 	 * @param string $name
@@ -44,6 +47,7 @@ interface ColumnFactory {
 	 * @return StringColumn
 	 */
 	public function createStringColumn($name, $length, $charset = null);
+	
 	/**
 	 * Creates a new TextColumn and applies it to the current table.
 	 * @param string $name
@@ -52,6 +56,7 @@ interface ColumnFactory {
 	 * @return TextColumn
 	 */
 	public function createTextColumn($name, $size, $charset = null);
+	
 	/**
 	 * Creates a new BinaryColumn and applies it to the current table.
 	 * @param string $name
@@ -59,14 +64,16 @@ interface ColumnFactory {
 	 * @return BinaryColumn
 	 */
 	public function createBinaryColumn($name, $size);
+	
 	/**
 	 * Creates a new DataTimeColumn and applies it to the current table.
 	 * @param string $name
 	 * @param bool $dateAvailable
 	 * @param bool $timeAvailable
-	 * @return DataTimeColumn
+	 * @return \n2n\persistence\meta\structure\DateTimeColumn
 	 */
 	public function createDateTimeColumn($name, $dateAvailable = true, $timeAvailable = true);
+	
 	/**
 	 * Creates a new EnumColumn and applies it to the current table.
 	 * @param string $name
@@ -74,6 +81,7 @@ interface ColumnFactory {
 	 * @return EnumColumn
 	 */
 	public function createEnumColumn($name, array $values);
+	
 	/**
 	 * Creates a new FixedPointColumn and applies it to the current table.
 	 * @param string $name
@@ -82,6 +90,7 @@ interface ColumnFactory {
 	 * @return FixedPointColumn
 	 */
 	public function createFixedPointColumn($name, $numIntegerDigits, $numDecimalDigits);
+	
 	/**
 	 * Creates a new FloatingPointColumn and applies it to the current table.
 	 * @param string $name

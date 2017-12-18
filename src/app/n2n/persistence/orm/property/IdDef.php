@@ -21,8 +21,6 @@
  */
 namespace n2n\persistence\orm\property;
 
-use n2n\persistence\orm\property\BasicEntityProperty;
-
 class IdDef {
 	private $entityProperty;
 	private $generated;

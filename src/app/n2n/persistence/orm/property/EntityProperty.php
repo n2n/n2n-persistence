@@ -30,6 +30,7 @@ use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\store\ValueHash;
+use n2n\util\ex\UnsupportedOperationException;
 
 interface EntityProperty {
 	/**
@@ -81,7 +82,7 @@ interface EntityProperty {
 	/**
 	 * @param mixed $value
 	 * @param bool $sameEntity
-	 * @param MergeOpration $mergeOperation
+	 * @param MergeOperation $mergeOperation
 	 * @return mixed
 	 */
 	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation);
@@ -99,7 +100,7 @@ interface EntityProperty {
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash);
 	
 	/**
-	 * @param unknown $value
+	 * @param mixed $value
 	 * @return mixed
 	 */
 	public function createValueHash($value, EntityManager $em): ValueHash;

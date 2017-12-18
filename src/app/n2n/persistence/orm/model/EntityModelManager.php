@@ -23,7 +23,6 @@ namespace n2n\persistence\orm\model;
 
 use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\OrmConfigurationException;
-use n2n\persistence\orm\model\EntityModel;
 use n2n\reflection\ReflectionContext;
 use n2n\persistence\orm\OrmErrorException;
 use n2n\reflection\ReflectionUtils;

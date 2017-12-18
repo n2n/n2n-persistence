@@ -23,7 +23,6 @@ namespace n2n\persistence\orm\query\select;
 
 use n2n\persistence\meta\data\QueryItem;
 use n2n\persistence\PdoStatement;
-use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\meta\OrmDialectConfig;
 use n2n\persistence\orm\CorruptedDataException;
 

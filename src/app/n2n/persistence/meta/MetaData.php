@@ -21,7 +21,6 @@
  */
 namespace n2n\persistence\meta;
 
-use n2n\persistence\meta\Dialect;
 use n2n\persistence\Pdo;
 
 class MetaData {

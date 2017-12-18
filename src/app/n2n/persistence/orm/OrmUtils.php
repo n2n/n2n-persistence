@@ -21,7 +21,6 @@
  */
 namespace n2n\persistence\orm;
 
-use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\criteria\item\CriteriaProperty;
 use n2n\persistence\orm\proxy\EntityProxy;

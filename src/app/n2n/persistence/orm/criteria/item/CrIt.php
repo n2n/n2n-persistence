@@ -101,7 +101,7 @@ class CrIt {
 		return new CriteriaConstant($value);
 	}
 	/**
-	 * @param unknown $value
+	 * @param mixed $value
 	 * @return \n2n\persistence\orm\criteria\item\CriteriaItem
 	 */
 	public static function c($value) {

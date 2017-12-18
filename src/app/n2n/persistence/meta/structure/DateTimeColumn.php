@@ -24,7 +24,7 @@ namespace n2n\persistence\meta\structure;
 interface DateTimeColumn extends Column {
 	/**
 	 * @param string $rawValue
-	 * @return DateTime
+	 * @return \DateTime
 	 */
 	public function parseDateTime($rawValue);
 	/**

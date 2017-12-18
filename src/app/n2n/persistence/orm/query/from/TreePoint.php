@@ -23,6 +23,7 @@ namespace n2n\persistence\orm\query\from;
 
 use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\query\QueryPoint;
+use n2n\persistence\orm\OrmException;
 
 interface TreePoint extends QueryPoint {
 	/**
@@ -31,15 +32,15 @@ interface TreePoint extends QueryPoint {
 	public function apply(SelectStatementBuilder $selectBuilder);
 	/**
 	 * @param string $fetchType
-	 * @return JoinTreePoint
+	 * @return JoinedTreePoint
 	 * @throws OrmException
 	 */
-	public function createPropertyJoinTreePoint($propertyName, $joinType);
+	public function createPropertyJoinedTreePoint(string $propertyName, $joinType): JoinedTreePoint;
 	/**
 	 * @param string $propertyName
 	 * @param bool $innerJoinRequired
-	 * @return JoinTreePoint
+	 * @return JoinedTreePoint
 	 * @throws OrmException
 	 */
-	public function requestPropertyJoinTreePoint($propertyName, $innerJoinRequired);
+	public function requestPropertyJoinedTreePoint(string $propertyName, bool $innerJoinRequired): JoinedTreePoint;
 }

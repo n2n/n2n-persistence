@@ -22,9 +22,6 @@
 namespace n2n\persistence\orm\nql;
 
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
-use n2n\persistence\orm\nql\Nql;
-use n2n\persistence\orm\nql\ParsingState;
-use n2n\persistence\orm\nql\NqlUtils;
 use n2n\util\StringUtils;
 
 class ConditionParser {
