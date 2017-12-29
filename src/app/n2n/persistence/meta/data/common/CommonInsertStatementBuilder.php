@@ -42,7 +42,7 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 	private $tableName;
 	private $columns;
 	private $whereSelector;
-	private $additionalValueGroups;
+	private $additionalValueGroups = array();
 
 	public function __construct(Pdo $dbh, QueryFragmentBuilderFactory $fragmentBuilderFactory) {
 		$this->dbh = $dbh;
