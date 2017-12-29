@@ -96,9 +96,9 @@ abstract class ActionMetaAdapter implements ActionMeta {
 // 		return $this->hasId();
 // 	}
 
-	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, $pdoDataType = null) {
+	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, int $pdoDataType = null) {
 		if ($columnName != $this->idColumnName) {
-			$this->assignRawValue($entityModel, $columnName, $rawValue, false);
+			$this->assignRawValue($entityModel, $columnName, $rawValue, false, $pdoDataType);
 			return;
 		}
 		
@@ -127,7 +127,7 @@ abstract class ActionMetaAdapter implements ActionMeta {
 		return true;
 	}
 
-	protected abstract function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, $pdoDataType = null);
+	protected abstract function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, int $pdoDataType = null);
 
 	protected abstract function unassignRawValue(EntityModel $entityModel, $columnName, $isId);
 }

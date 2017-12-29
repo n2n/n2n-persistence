@@ -30,7 +30,7 @@ interface ActionMeta {
 	 * @param string $columnName
 	 * @param mixed $rawValue
 	 */
-	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, $pdoDataType = null);
+	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, int $pdoDataType = null);
 	/**
 	 * @param EntityModel $entityModel
 	 * @param string $columnName

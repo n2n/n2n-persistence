@@ -32,7 +32,7 @@ class SimpleActionMeta extends ActionMetaAdapter {
 		$this->item = new ActionMetaItem($entityModel, $this->isIdGenerated());
 	}
 	
-	public function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, $pdoDataType = null) {
+	public function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, int $pdoDataType = null) {
 		$this->item->setRawValue($columnName, $rawValue, $pdoDataType);
 	}
 	

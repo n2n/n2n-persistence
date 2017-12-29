@@ -64,7 +64,7 @@ class ActionMetaItem {
 		return !(boolean) sizeof($this->rawValues);
 	}
 	
-	public function setRawValue($columnName, $rawValue, $pdoDataType = null) {
+	public function setRawValue($columnName, $rawValue, int $pdoDataType = null) {
 		$this->rawValues[$columnName] = $rawValue;
 		$this->dataTypes[$columnName] = $pdoDataType;
 	}
@@ -87,7 +87,11 @@ class ActionMetaItem {
 	
 	public function bindRawValues(PdoStatement $pdoStatement) {
 		foreach ($this->rawValues as $columnName => $rawValue) {
-			$pdoStatement->bindValue($columnName, $rawValue, $this->dataTypes[$columnName]);
+			if (isset($this->dataTypes[$columnName])) {
+				$pdoStatement->bindValue($columnName, $rawValue, $this->dataTypes[$columnName]);
+			} else {
+				$pdoStatement->autoBindValue($columnName, $rawValue);
+			}
 		}
 	}
 }
