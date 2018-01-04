@@ -43,7 +43,7 @@ class JoinedTableActionMeta extends ActionMetaAdapter {
 		$this->items = array_reverse($items);
 	}
 	
-	protected function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, $pdoDataType = null) {
+	protected function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, int $pdoDataType = null) {
 		$className = $entityModel->getClass()->getName();
 		if (!isset($this->items[$className])) {
 			throw IllegalStateException::createDefault();
