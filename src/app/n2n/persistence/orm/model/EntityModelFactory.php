@@ -113,7 +113,7 @@ class EntityModelFactory {
 		
 		if (null !== $this->annotationSet->getClassAnnotation(AnnoMappedSuperclass::class)) {
 			throw new ModelInitializationException('Could not initialize MappedSuperclass as entity: '
-					. $this->entityModel->getClass()->getName());
+					. $entityClass->getName());
 		}
 		
 		$this->entityModel = $entityModel = new EntityModel($entityClass, $superEntityModel); 
