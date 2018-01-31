@@ -84,7 +84,7 @@ class ConditionParser {
 		}
 		
 		if ($char == Nql::GROUP_START) {
-			$this->groupStack[] = $this->comparator->group($this->connectionType == self::CONNECTION_TYPE_AND);
+			$this->groupStack[] = $this->determineCurrentComparator()->group($this->connectionType == self::CONNECTION_TYPE_AND);
 			$this->connectionType = self::CONNECTION_TYPE_AND;
 		} else {
 			if (empty($this->groupStack)) {
