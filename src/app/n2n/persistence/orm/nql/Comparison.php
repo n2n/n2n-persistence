@@ -301,7 +301,7 @@ class Comparison {
 		$this->testExpression = null;
 		$this->testOperator = null;
 		$this->inTest = false;
-		$this->processedTokenString = array();
+		$this->processedTokens = array();
 	}
 
 	private function createNqlParseException($message, $donePart = null, \Exception $previous = null) {
