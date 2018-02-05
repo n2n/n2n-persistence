@@ -148,7 +148,7 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 	 * Get all of the persisted MetaEntities of the curren Database
 	 */
 	protected abstract function getPersistedMetaEntities();
-	protected abstract function createCreateMetaEntityRequest();
-	protected abstract function createAlterMetaEntityRequest();
-	protected abstract function createDropMetaEntityRequest();
+	public abstract function createCreateMetaEntityRequest(MetaEntity $metaEntity);
+	public abstract function createAlterMetaEntityRequest(MetaEntity $metaEntity);
+	public abstract function createDropMetaEntityRequest(MetaEntity $metaEntity);
 }
