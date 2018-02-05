@@ -26,6 +26,8 @@ use n2n\persistence\meta\structure\MetaEntity;
 use n2n\persistence\meta\structure\UnknownMetaEntityException;
 use n2n\persistence\Pdo;
 use n2n\persistence\meta\Database;
+use n2n\reflection\CastUtils;
+use n2n\reflection\ArgUtils;
 
 abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 
@@ -91,6 +93,7 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 	}
 
 	public function addMetaEntity(MetaEntity $metaEntity) {
+		CastUtils::assertTrue($metaEntity instanceof MetaEntityAdapter);
 		if (!($this->containsMetaEntityName($metaEntity->getName()))) {
 			$this->changeRequestQueue->add($this->createCreateMetaEntityRequest($metaEntity));
 			$metaEntity->registerChangeListener($this);
@@ -115,6 +118,7 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 		foreach ($changeRequests as $changeRequest) {
 			if ((($changeRequest instanceof AlterMetaEntityRequest) ||
 				($changeRequest instanceof CreateMetaEntityRequest))
+			&& $changeRequest instanceof ChangeRequestAdapter
 			&& ($changeRequest->getMetaEntity() === $metaEntity)) {
 				return;
 			}
@@ -124,9 +128,10 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 	}
 
 	private function removeMetaEntity(MetaEntity $metaEntity) {
+		ArgUtils::assertTrue($metaEntity instanceof MetaEntityAdapter);
 		//check if alter request already exists for this entity
 		foreach ($this->changeRequestQueue->getAll() as $changeRequest) {
-			if ((($changeRequest instanceof CreateMetaEntityRequest))
+			if ((($changeRequest instanceof ChangeRequestAdapter))
 					&& ($changeRequest->getMetaEntity() === $metaEntity)) {
 				$this->changeRequestQueue->remove($changeRequest);
 				return;
@@ -143,4 +148,7 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 	 * Get all of the persisted MetaEntities of the curren Database
 	 */
 	protected abstract function getPersistedMetaEntities();
+	protected abstract function createCreateMetaEntityRequest();
+	protected abstract function createAlterMetaEntityRequest();
+	protected abstract function createDropMetaEntityRequest();
 }

@@ -26,8 +26,8 @@ use n2n\persistence\meta\structure\Column;
 use n2n\persistence\meta\structure\DateTimeColumn;
 
 abstract class DateTimeColumnAdapter extends ColumnAdapter implements DateTimeColumn {
-	private $dateAvailable;
-	private $timeAvailable;
+	protected $dateAvailable;
+	protected $timeAvailable;
 
 	public function __construct($name, $dateAvailable, $timeAvailable) {
 		parent::__construct($name);
