@@ -38,7 +38,7 @@ abstract class BackuperAdapter implements Backuper {
 	protected $database;
 
 	/**
-	 * @var n2n\persistence\Pdo
+	 * @var \n2n\persistence\Pdo
 	 */
 	protected $dbh;
 	/**
