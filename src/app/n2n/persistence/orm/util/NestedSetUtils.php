@@ -31,7 +31,7 @@ use n2n\persistence\orm\criteria\JoinType;
 use n2n\persistence\orm\criteria\item\CrIt;
 use n2n\persistence\orm\OrmUtils;
 use n2n\util\ex\IllegalStateException;
-use rocket\spec\ei\manage\util\model\UnknownEntryException;
+use rocket\ei\manage\util\model\UnknownEntryException;
 
 class NestedSetUtils {
 	const DEFAULT_LEFT_PROPERTY_NAME = 'lft';
