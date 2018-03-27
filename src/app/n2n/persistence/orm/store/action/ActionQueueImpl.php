@@ -174,13 +174,15 @@ class ActionQueueImpl implements ActionQueue {
 				
 		$this->triggerAtEndClosures();
 		
-		$this->em->getPersistenceContext()->detachNotManagedEntityObjs();
-		
 		$this->flushing = false;
 		
 		while (null !== ($event = array_shift($this->bufferedEvents))) {
 			$this->triggerLifecycleEvent($event);
 		}
+	}
+	
+	public function commit() {
+		$this->em->getPersistenceContext()->detachNotManagedEntityObjs();
 	}
 	
 	public function clear() {

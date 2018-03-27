@@ -83,6 +83,12 @@ interface ActionQueue {
 	 * 
 	 */
 	public function flush();
+	
+	/**
+	 * 
+	 */
+	public function commit();
+	
 	/**
 	 * 
 	 */
