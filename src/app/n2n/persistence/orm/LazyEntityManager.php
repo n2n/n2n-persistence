@@ -125,10 +125,11 @@ class LazyEntityManager implements EntityManager {
 		$this->pdoListener = new ClosurePdoListener(function (TransactionEvent $e) use ($that) {
 			$transaction = $e->getTransaction();
 			$type = $e->getType();
-				
+			
 			if ($type == TransactionEvent::TYPE_ON_COMMIT && $that->isOpen()
 					&& ($transaction === null || !$transaction->isReadOnly())) {
 				$that->flush();
+				$that->actionQueue->commit();
 			}
 				
 			if ($that->transactionalScoped
