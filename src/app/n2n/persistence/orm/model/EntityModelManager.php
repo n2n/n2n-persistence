@@ -25,32 +25,52 @@ use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\OrmConfigurationException;
 use n2n\reflection\ReflectionContext;
 use n2n\persistence\orm\OrmErrorException;
-use n2n\reflection\ReflectionUtils;
 use n2n\web\dispatch\model\ModelInitializationException;
 use n2n\persistence\orm\annotation\AnnoMappedSuperclass;
-// @todo create ReflectionClass later because fatal error if class has errors
+use n2n\reflection\ArgUtils;
+use n2n\reflection\ReflectionUtils;
+
+/**
+ * Allowes you to access the {@see EntityModel} of each entity.
+ */
 class EntityModelManager {
-	private $entityClasses = array();
+	private $registeredClassNames = array();
 	private $entityModelFactory;
+	
+	private $entityClasses = null;
 	private $entityModels = array();
 
-	public function __construct(array $entityClassNames, EntityModelFactory $entityModelFactory) {
-		foreach ($entityClassNames as $entityClassName) {
-			$this->addEntityClass(ReflectionUtils::createReflectionClass($entityClassName));
-		}
+	public function __construct(array $registeredClassNames, EntityModelFactory $entityModelFactory) {
+		ArgUtils::valArray($registeredClassNames, 'string', false, 'registeredClassNames');
 		
+		$this->registeredClassNames = $registeredClassNames;
 		$this->entityModelFactory = $entityModelFactory;
 	}
+	
+	public function getRegisteredClassNames() {
+		return $this->registeredClassNames;
+	}
+	
+	public function clear() {
+		$this->entityClasses = null;
+		$this->entityModels = array();
+	}
+	
 	/**
 	 * @return \ReflectionClass[]
 	 */
 	public function getEntityClasses() {
+		if ($this->entityClasses !== null) {
+			return $this->entityClasses;
+		}
+		
+		$this->entityClasses = array();
+		foreach ($this->registeredClassNames as $entityClassName) {
+			$entityClass = ReflectionUtils::createReflectionClass($entityClassName);
+			$this->validateEntityClass($entityClass);
+			$this->entityClasses[$entityClass->getName()] = $entityClass;
+		}
 		return $this->entityClasses;
-	}
-	
-	public function addEntityClass(\ReflectionClass $entityClass) {
-		$this->validateEntityClass($entityClass);
-		$this->entityClasses[$entityClass->getName()] = $entityClass;
 	}
 	
 	/**
@@ -87,7 +107,7 @@ class EntityModelManager {
 	
 	private function initSubEntityModels(EntityModel $entityModel) {
 		$class = $entityModel->getClass();
-		foreach ($this->entityClasses as $entityClass) {
+		foreach ($this->getEntityClasses() as $entityClass) {
 			// @todo ReflectionClass::isSubclassOf(): Internal error: Failed to retrieve the reflection object
 			$entityClass = new \ReflectionClass($entityClass->getName());
 			if (!$entityClass->isSubclassOf($class)) continue;
@@ -111,12 +131,12 @@ class EntityModelManager {
 				. ' does not implement n2n\persistence\orm\Entity');
 	}
 	
-	public function isRegistered(\ReflectionClass $class) {
-		return in_array($class, $this->entityClasses);
+	public function isRegistered(string $className) {
+		return in_array($className, $this->registeredClassNames);
 	}
 	
 	private function validateRegistration(\ReflectionClass $class) {
-		if (!$this->isRegistered($class)) {
+		if (!$this->isRegistered($class->getName())) {
 			throw new OrmConfigurationException('Class not registered as entity: ' . $class->getName());
 		}
 		
@@ -130,7 +150,7 @@ class EntityModelManager {
 	}
 	
 	private function isEntityClass(\ReflectionClass $class) {
-		if (!$this->isRegistered($class)) return false;
+		if (!$this->isRegistered($class->getName())) return false;
 			
 		$this->validateEntityClass($class);
 		
