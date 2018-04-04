@@ -207,11 +207,14 @@ class EntityModel implements EntityPropertyCollection {
 				&& $this->superEntityModel->containsEntityPropertyName($name);
 	}
 	/**
-	 * @return EntityProperty[] key is the property name
+	 * @return EntityProperty[] key is NOT the property name
 	 */
 	public function getEntityProperties() {
-		if ($this->superEntityModel === null) return $this->properties;
-		return array_merge($this->superEntityModel->getEntityProperties(), $this->properties);
+		if ($this->superEntityModel === null) {
+			return array_values($this->properties);
+		}
+		
+		return array_merge($this->superEntityModel->getEntityProperties(), array_values($this->properties));
 	}
 	
 	/* (non-PHPdoc)
@@ -248,7 +251,7 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getAllEntityProperties() {
-		$properties = array_values($this->getEntityProperties());
+		$properties = $this->getEntityProperties();
 		foreach ($this->subEntityModels as $subEntityModel) {
 			$properties = array_merge($properties, $subEntityModel->getAllEntityProperties());
 		}

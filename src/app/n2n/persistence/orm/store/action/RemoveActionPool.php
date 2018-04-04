@@ -180,8 +180,8 @@ class RemoveActionPool {
 		$oldValueHashCol = $this->actionQueue->getEntityManager()->getPersistenceContext()
 				->getValueHashColByEntityObj($entity);
 		$values = array();
-		foreach ($entityModel->getEntityProperties() as $propertyName => $entityProperty) {
-			$values[$propertyName] = $entityProperty->readValue($entity);
+		foreach ($entityModel->getEntityProperties() as $entityProperty) {
+			$values[$entityProperty->toPropertyString()] = $entityProperty->readValue($entity);
 		}
 		
 		$supplyJob = new RemoveSupplyJob($removeAction, $oldValueHashCol);

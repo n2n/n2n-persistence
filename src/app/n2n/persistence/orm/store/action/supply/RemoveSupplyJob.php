@@ -59,12 +59,12 @@ class RemoveSupplyJob extends SupplyJobAdapter {
 		
 // 		parent::prepare();		
 
-		foreach ($this->entityAction->getEntityModel()->getEntityProperties()
-				as $propertyName => $entityProperty) {
+		foreach ($this->entityAction->getEntityModel()->getEntityProperties() as $entityProperty) {
 			if (!($entityProperty instanceof CascadableEntityProperty)) continue;
 
-			$entityProperty->prepareSupplyJob($this, $this->getValue($propertyName), 
-					$this->getOldValueHash($propertyName));
+			$propertyString = $entityProperty->toPropertyString();
+			$entityProperty->prepareSupplyJob($this, $this->getValue($propertyString), 
+					$this->getOldValueHash($propertyString));
 		}
 	}
 
@@ -86,9 +86,10 @@ class RemoveSupplyJob extends SupplyJobAdapter {
 		
 		$entityModel = $this->entityAction->getEntityModel();
 		
-		foreach ($entityModel->getEntityProperties() as $propertyName => $entityProperty) {
-			$entityProperty->supplyRemoveAction($this->entityAction, $this->getValue($propertyName), 
-					$this->getOldValueHash($propertyName));
+		foreach ($entityModel->getEntityProperties() as $entityProperty) {
+			$propertyString = $entityProperty->toPropertyString();
+			$entityProperty->supplyRemoveAction($this->entityAction, $this->getValue($propertyString), 
+					$this->getOldValueHash($propertyString));
 		}
 		
 		foreach ($entityModel->getActionDependencies() as $actionDependency) {

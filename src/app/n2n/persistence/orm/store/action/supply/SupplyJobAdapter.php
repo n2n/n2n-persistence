@@ -102,14 +102,14 @@ abstract class SupplyJobAdapter implements SupplyJob {
 		return $this->values;
 	}
 	
-	protected function getOldValueHash($propertyName) {
+	protected function getOldValueHash($propertyString) {
 		IllegalStateException::assertTrue($this->oldValueHashCol !== null 
-				&& $this->oldValueHashCol->containsPropertyName($propertyName));
-		return $this->oldValueHashCol->getValueHash($propertyName);
+				&& $this->oldValueHashCol->containsPropertyString($propertyString));
+		return $this->oldValueHashCol->getValueHash($propertyString);
 	}
 
-	protected function getValue($propertyName) {
-		IllegalStateException::assertTrue(array_key_exists($propertyName, $this->values));
-		return $this->values[$propertyName];
+	protected function getValue($propertyString) {
+		IllegalStateException::assertTrue(array_key_exists($propertyString, $this->values));
+		return $this->values[$propertyString];
 	}
 }
