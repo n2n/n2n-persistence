@@ -27,12 +27,13 @@ use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\OrmErrorException;
 use n2n\persistence\orm\model\NamingStrategy;
 use n2n\persistence\orm\model\OnFinalizeQueue;
+use n2n\persistence\orm\InheritanceType;
 
 class SetupProcess {
 	private $entityModel;
 	private $entityPropertyAnalyzer;
 	private $onFinalizeQueue;
-	private $registeredColumnDefs = array();
+	protected $columnDefs = array();
 	
 	public function __construct(EntityModel $entityModel, EntityPropertyAnalyzer $entityPropertyAnalyzer, 
 			OnFinalizeQueue $onFinalizeQueue) {
@@ -40,6 +41,25 @@ class SetupProcess {
 		$this->entityPropertyAnalyzer = $entityPropertyAnalyzer;
 		$this->onFinalizeQueue = $onFinalizeQueue;
 	}
+	
+	public function inherit(SetupProcess $superSetupProcess) {
+		IllegalStateException::assertTrue(empty($this->columnDefs) && $this->entityModel->hasSuperEntityModel());
+		
+		if ($this->entityModel->getInheritanceType() === InheritanceType::SINGLE_TABLE) {
+			$this->columnDefs = $superSetupProcess->columnDefs;
+			return;
+		}
+		
+		$idColumnName = $this->entityModel->getIdDef()->getEntityProperty()->getColumnName();
+		if (isset($superSetupProcess->columnDefs[$idColumnName])) {
+			$this->columnDefs[$idColumnName] = $superSetupProcess->columnDefs[$idColumnName];
+			return;
+		}
+		
+		throw new IllegalStateException('EntityProperty ' . get_class($this->entityModel->getIdDef()->getEntityProperty())
+				. ' has\'t registered its collumn and is therefore wrong implemented.');
+	}
+	
 	/**
 	 * @return EntityModel
 	 */

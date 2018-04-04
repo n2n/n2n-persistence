@@ -71,17 +71,18 @@ class PersistSupplyJob extends SupplyJobAdapter {
 
 		$new = $this->isInsert();
 		
-		foreach ($this->entityAction->getEntityModel()->getEntityProperties()
-				as $propertyName => $entityProperty) {
+		foreach ($this->entityAction->getEntityModel()->getEntityProperties() as $entityProperty) {
 			if (!($entityProperty instanceof CascadableEntityProperty)) continue;
 
+			$propertyString = $entityProperty->toPropertyString();
+			
 			$oldValueHash = null;
 			if (!$new) {
-				$oldValueHash = $this->getOldValueHash($propertyName);
-				if ($oldValueHash->matches($this->getValueHash($propertyName))) continue;
+				$oldValueHash = $this->getOldValueHash($propertyString);
+				if ($oldValueHash->matches($this->getValueHash($propertyString))) continue;
 			}
 			
-			$entityProperty->prepareSupplyJob($this, $this->values[$propertyName], $oldValueHash);
+			$entityProperty->prepareSupplyJob($this, $this->values[$propertyString], $oldValueHash);
 		}
 	}
 
@@ -105,20 +106,21 @@ class PersistSupplyJob extends SupplyJobAdapter {
 
 		$entityModel = $this->entityAction->getEntityModel();
 		$idDef = $entityModel->getIdDef();
-		$idPropertyName = $idDef->getPropertyName();
-		foreach ($entityModel->getEntityProperties() as $propertyName => $property) {
-			if ($idPropertyName === $propertyName && ($idDef->isGenerated() || !$this->entityAction->isNew())) {
+		$idPropertyString = $idDef->getEntityProperty()->toPropertyString();
+		foreach ($entityModel->getEntityProperties() as $property) {
+			$propertyString = $property->toPropertyString();
+			if ($idPropertyString === $propertyString && ($idDef->isGenerated() || !$this->entityAction->isNew())) {
 				continue;
 			}
 				
 			$oldValueHash = null;
-			$valueHash = $this->getValueHash($propertyName);
+			$valueHash = $this->getValueHash($propertyString);
 			if (!$this->entityAction->isNew()) {
-				$oldValueHash = $this->getOldValueHash($propertyName);
+				$oldValueHash = $this->getOldValueHash($propertyString);
 				if ($oldValueHash->matches($valueHash)) continue;
 			}
 			
-			$property->supplyPersistAction($this->entityAction, $this->getValue($propertyName), $valueHash, $oldValueHash);
+			$property->supplyPersistAction($this->entityAction, $this->getValue($propertyString), $valueHash, $oldValueHash);
 			
 		}
 

@@ -39,8 +39,7 @@ class EntityObjSelection implements Selection {
 		$this->em = $queryState->getEntityManager();
 		
 		$this->selectionGroup = new SelectionGroup();
-		$this->selectionGroup->addSelection(null, $metaTreePoint->getMeta()
-				->createDiscriminatorSelection());
+		$this->selectionGroup->addSelection(null, $metaTreePoint->getMeta()->createDiscriminatorSelection());
 		foreach ($entityModel->getAllEntityProperties() as $entityProperty) {			
 			$this->selectionGroup->addSelection($entityProperty->toPropertyString(), 
 			 		$metaTreePoint->requestCustomPropertySelection($entityProperty));
@@ -73,9 +72,10 @@ class EntityObjSelection implements Selection {
 		}
 		
 		$valueBuilders = array();
-		foreach ($entityModel->getEntityProperties() as $propertyName => $entityProperty) {
-			$selection = $this->selectionGroup->getSelectionByKey($entityProperty->toPropertyString());
-			$valueBuilders[$propertyName] = $selection->createValueBuilder();
+		foreach ($entityModel->getEntityProperties() as $entityProperty) {
+			$propertyString = $entityProperty->toPropertyString();
+			$selection = $this->selectionGroup->getSelectionByKey($propertyString);
+			$valueBuilders[$propertyString] = $selection->createValueBuilder();
 		}
 		return $valueBuilders;
 	}
@@ -89,7 +89,7 @@ class EntityObjSelection implements Selection {
 		} 
 				
 		$persistenceContext = $this->em->getPersistenceContext();
-		$id = $valueBuilders[$entityModel->getIdDef()->getPropertyName()]->buildValue();
+		$id = $valueBuilders[$entityModel->getIdDef()->getEntityProperty()->toPropertyString()]->buildValue();
 		
 		if ($id === null) {
 			return new EagerValueBuilder(null);

@@ -404,9 +404,12 @@ class PersistenceContext {
 		$entityModel = $this->getEntityModelByEntityObj($entityObj);
 		$this->entityProxyManager->disposeProxyAccessListenerOf($entityObj);
 		
-		foreach ($entityModel->getEntityProperties() as $propertyName => $entityProperty) {
-			if (!array_key_exists($propertyName, $values)) continue;
-			$entityProperty->writeValue($entityObj, $values[$propertyName]);
+		foreach ($entityModel->getEntityProperties() as $propertyString => $entityProperty) {
+			$propertyString = $entityProperty->toPropertyString();
+			
+			if (!array_key_exists($propertyString, $values)) continue;
+			
+			$entityProperty->writeValue($entityObj, $values[$propertyString]);
 		}
 	}
 	
@@ -506,20 +509,22 @@ class ValueHashColFactory {
 	public function create($object, &$values = array()) {
 		$valueHashCol = new ValueHashCol();
 		
-		foreach ($this->entityPropertyCollection->getEntityProperties() as $propertyName => $entityProperty) {
-			if (array_key_exists($propertyName, $this->valueHashes)) {
-				$valueHashCol->putValueHash($propertyName, $this->valueHashes[$propertyName]);
+		foreach ($this->entityPropertyCollection->getEntityProperties() as $entityProperty) {
+			$propertyString = $entityProperty->toPropertyString();
+			
+			if (array_key_exists($propertyString, $this->valueHashes)) {
+				$valueHashCol->putValueHash($propertyString, $this->valueHashes[$propertyString]);
 				continue;
 			}
 			
-			if (array_key_exists($propertyName, $this->values)) {
-				$valueHashCol->putValueHash($propertyName, $entityProperty->createValueHash(
-						$values[$propertyName] = $this->values[$propertyName], $this->em));
+			if (array_key_exists($propertyString, $this->values)) {
+				$valueHashCol->putValueHash($propertyString, $entityProperty->createValueHash(
+						$values[$propertyString] = $this->values[$propertyString], $this->em));
 				continue;
 			}
 			
-			$valueHashCol->putValueHash($propertyName, $entityProperty->createValueHash(
-					$values[$propertyName] = $entityProperty->readValue($object), $this->em));
+			$valueHashCol->putValueHash($propertyString, $entityProperty->createValueHash(
+					$values[$propertyString] = $entityProperty->readValue($object), $this->em));
 		}
 		
 		return $valueHashCol;
@@ -531,24 +536,24 @@ class ValueHashColFactory {
 class ValueHashCol {
 	private $valueHashes = array();
 	
-	public function putValueHash($propertyName, ValueHash $valueHash) {
-		$this->valueHashes[$propertyName] = $valueHash;	
+	public function putValueHash($propertyString, ValueHash $valueHash) {
+		$this->valueHashes[$propertyString] = $valueHash;	
 	}
 	
 	public function getValueHashes() {
 		return $this->valueHashes;
 	}
 	
-	public function containsPropertyName($propertyName) {
-		return isset($this->valueHashes[$propertyName]);
+	public function containsPropertyString($propertyString) {
+		return isset($this->valueHashes[$propertyString]);
 	}
 	
-	public function getValueHash(string $propertyName) {
-		if (isset($this->valueHashes[$propertyName])) {
-			return $this->valueHashes[$propertyName];
+	public function getValueHash(string $propertyString) {
+		if (isset($this->valueHashes[$propertyString])) {
+			return $this->valueHashes[$propertyString];
 		}
 		
-		throw new \InvalidArgumentException('No ValueHash for property \'' . $propertyName . '\' available.');
+		throw new \InvalidArgumentException('No ValueHash for property \'' . $propertyString . '\' available.');
 	}
 	
 	public function getSize() {
@@ -561,12 +566,12 @@ class ValueHashCol {
 		}
 		
 		$otherValueHashCol = $otherValueHashCol->getValueHashes();
-		foreach ($this->valueHashes as $propertyName => $valueHash) {
-			if (!isset($otherValueHashCol[$propertyName])) {
-				throw new \InvalidArgumentException('No ValueHash for property \'' . $propertyName . '\' found.');
+		foreach ($this->valueHashes as $propertyString => $valueHash) {
+			if (!isset($otherValueHashCol[$propertyString])) {
+				throw new \InvalidArgumentException('No ValueHash for property \'' . $propertyString . '\' found.');
 			}
 			
-			if (!$valueHash->matches($otherValueHashCol[$propertyName])) {
+			if (!$valueHash->matches($otherValueHashCol[$propertyString])) {
 				return false;
 			}
 		}

@@ -49,7 +49,7 @@ class EntityModelFactory {
 	private $annotationSet;
 	private $entityModel;
 	private $nampingStrategy;
-	private $setupProcess;
+	private $currentsetupProcess;
 	/**
 	 * @param array $entityPropertyProviderClassNames
 	 */
@@ -105,7 +105,7 @@ class EntityModelFactory {
 	 * @return \n2n\persistence\orm\model\EntityModel
 	 */
 	public function create(\ReflectionClass $entityClass, EntityModel $superEntityModel = null) {
-		if ($this->setupProcess !== null) {
+		if ($this->currentsetupProcess !== null) {
 			throw new IllegalStateException('SetupProcess not finished.');
 		}
 		
@@ -116,10 +116,18 @@ class EntityModelFactory {
 					. $entityClass->getName());
 		}
 		
-		$this->entityModel = $entityModel = new EntityModel($entityClass, $superEntityModel); 
-		$this->setupProcess = new SetupProcess($this->entityModel, 
+		$this->entityModel = $entityModel = new EntityModel($entityClass, $superEntityModel);
+		
+		$this->currentsetupProcess = new SetupProcess($this->entityModel, 
 				new EntityPropertyAnalyzer($this->getEntityPropertyProviders()),
 				$this->onFinalizeQueue);
+		$this->setupProcesses[$entityClass->getName()] = $this->currentsetupProcess;
+		
+		if ($superEntityModel !== null) {
+			$superEntityClassName = $superEntityModel->getClass()->getName();
+			IllegalStateException::assertTrue(isset($this->setupProcesses[$superEntityClassName]));
+			$this->currentsetupProcess->inherit($this->setupProcesses[$superEntityClassName]);
+		}
 		
 		$this->nampingStrategy = $this->defaultNamingStrategy;
 		if (null !== ($annoNamingStrategy = $this->annotationSet->getClassAnnotation(
@@ -144,11 +152,11 @@ class EntityModelFactory {
 	}
 	
 	public function cleanUp(EntityModelManager $entityModelManager) {
-		if ($this->setupProcess === null) {
+		if ($this->currentsetupProcess === null) {
 			throw new IllegalStateException('No pending SetupProcess');
 		}
 				
-		$this->setupProcess = null;
+		$this->currentsetupProcess = null;
 		$this->annotationSet = null;
 		$this->entityModel = null;
 		$this->propertiesAnalyzer = null;
@@ -280,9 +288,9 @@ class EntityModelFactory {
 	 * 
 	 */
 	private function analyzeProperties() {
-		$classSetup = new ClassSetup($this->setupProcess, $this->entityModel->getClass(), 
+		$classSetup = new ClassSetup($this->currentsetupProcess, $this->entityModel->getClass(), 
 				$this->nampingStrategy);
-		$this->setupProcess->getEntityPropertyAnalyzer()->analyzeClass($classSetup);
+		$this->currentsetupProcess->getEntityPropertyAnalyzer()->analyzeClass($classSetup);
 			
 		foreach ($classSetup->getEntityProperties() as $property) {
 			$this->entityModel->addEntityProperty($property);
@@ -330,9 +338,9 @@ class EntityModelFactory {
 				$this->entityModel->setIdDef(new IdDef($idProperty, $generatedValue, $sequenceName));
 				return;
 			}
-			throw $this->setupProcess->createPropertyException('Invalid property type for id.', null, $annoIds);
+			throw $this->currentsetupProcess->createPropertyException('Invalid property type for id.', null, $annoIds);
 		} catch (UnknownEntityPropertyException $e) {
-			throw $this->setupProcess->createPropertyException('No id property defined.', $e, $annoIds);
+			throw $this->currentsetupProcess->createPropertyException('No id property defined.', $e, $annoIds);
 		}
 	}
 }
@@ -357,419 +365,4 @@ class OnFinalizeQueue {
 		}
 		$this->entityModelManager = null;
 	}
-}  
-
-
-// class EntityModelFactory2 {
-// 	const DEFAULT_ID_PROPERTY_NAME = 'id';
-// 	const DEFAULT_DISCRIMINATOR_COLUMN = 'discr';
-
-// 	private $entityModel;
-// 	private $class;
-// 	private $superEntityModel;
-// 	private $inheritanceType;
-// 	private $propertyAnnotations;
-// 	private $propertiesAnalyzer;
-// 	private $accessProxies;
-// 	private $columnAnnotations;
-
-// 	public function __construct(\ReflectionClass $class, EntityModel $superEntityModel = null) {
-// 		$this->class = $class;
-// 		$this->entityModel = new EntityModel($class, $superEntityModel);
-// 		$this->superEntityModel = $superEntityModel;
-// 		$this->propertiesAnalyzer = new PropertiesAnalyzer($this->class, true);
-// 		$this->propertiesAnalyzer->setSuperIgnored(true);
-// 	}
-	
-// 	public function build() {
-// 		$annotationSet = ReflectionContext::getAnnotationSet($this->class);
-// 		$this->analyzeClass($annotationSet);
-// 		$this->analyzeProperties($annotationSet);
-// 	}
-	
-// 	public function getEntityModel() {
-// 		return $this->entityModel;
-// 	}
-	
-// 	private function analyzeClass(AnnotationSet $annotationSet = null) {
-// 		$this->inheritanceType = null;
-// 		if (isset($this->superEntityModel)) {
-// 			$this->inheritanceType = $this->superEntityModel->getInheritanceType();
-// 			if (is_null($this->inheritanceType)) {
-// 				throw $this->createException(
-// 						SysTextUtils::get('n2n_error_persistence_orm_no_inheritance_strategy_defined_in_super_class',
-// 								array('entity' => $this->class->getName())));
-// 			}
-				
-// 			$this->entityModel->setInheritanceType($this->inheritanceType);
-// 			$this->entityModel->setDiscriminatorColumnName($this->superEntityModel->getDiscriminatorColumnName());
-// 		}
-
-// 		if (isset($annotationSet) && $inheritanceAnnotation = $annotationSet->getClassAnnotation(EntityAnnotations::INHERITANCE)) {
-// 			if (isset($this->superEntityModel)) {
-// 				throw $this->createAnnotationsException(
-// 						SysTextUtils::get('n2n_error_persistence_orm_inheritance_strategy_has_to_be_specified_in_super_class',
-// 								array('entity' => $this->entityModel->getClass()->getName())),
-// 						array($inheritanceAnnotation));
-// 			}
-				
-// 			$this->inheritanceType = $inheritanceAnnotation->getStrategy();
-// 			$this->entityModel->setInheritanceType($this->inheritanceType);
-				
-// 			if ($inheritanceAnnotation->getStrategy() == InheritanceType::SINGLE_TABLE) {
-// 				$discriminatorColumnName = $inheritanceAnnotation->getDiscriminatorColumn();
-// 				if (is_null($discriminatorColumnName)) {
-// 					$discriminatorColumnName = self::DEFAULT_DISCRIMINATOR_COLUMN;
-// 				}
-// 				$this->entityModel->setDiscriminatorColumnName($discriminatorColumnName);
-// 			}
-// 		}
-	
-// 		if ($this->inheritanceType == InheritanceType::SINGLE_TABLE && !$this->class->isAbstract()) {
-// 			if (isset($annotationSet) && $discrValueAnnotation = $annotationSet->getClassAnnotation(EntityAnnotations::DISCRIMINATOR_VALUE)) {
-// 				$this->entityModel->setDiscriminatorValue($discrValueAnnotation->getValue());
-// 			} else {
-// 				throw $this->createException(SysTextUtils::get('n2n_error_persistence_orm_inheritance_no_discriminator_value_defined',
-// 						array('entity' => $this->class->getName())));
-// 			}
-// 		}
-	
-// 		if ($this->inheritanceType == InheritanceType::SINGLE_TABLE && isset($this->superEntityModel)) {
-// 			$this->entityModel->setTableName($this->superEntityModel->getTableName());
-// 		} else if (isset($annotationSet) && $annotationSet->hasClassAnnotation(EntityAnnotations::TABLE)) {
-// 			$this->entityModel->setTableName($annotationSet->getClassAnnotation(EntityAnnotations::TABLE)->getName());
-// 		} else {
-// 			$this->entityModel->setTableName(StringUtils::hyphenated(mb_substr($this->class->getName(),
-// 					mb_strlen($this->class->getNamespaceName()) + 1)));
-// 		}
-// 	}
-
-// 	private function analyzeProperties(AnnotationSet $annotationSet = null) {
-// 		$this->accessProxies = array();
-// 		$this->columnAnnotations = array();
-// 		$this->properties = array();
-// 		$this->propertyAnnotations = array();
-
-// 		if (isset($annotationSet) && $annotationSet->hasClassAnnotation(EntityAnnotations::PROPERTIES)) {
-// 			$managedPropertiesAnnotation = $annotationSet->getClassAnnotation(EntityAnnotations::PROPERTIES);
-			
-// 			try {
-// 				foreach ((array) $managedPropertiesAnnotation->getNames() as $propertyName) {
-// 					$this->accessProxies[$propertyName] = $this->propertiesAnalyzer->analyzeProperty($propertyName);
-// 				}
-// 			} catch (ReflectionException $e) {
-// 				throw $this->createAnnotationsException(null, array($managedPropertiesAnnotation), $e);
-// 			}
-// 		} else {
-// 			try {
-// 				$this->accessProxies = $this->propertiesAnalyzer->analyzeProperties(true);
-// 			} catch (ReflectionException $e) {
-// 				throw $this->createException(null, $e);
-// 			}
-// 		}
-
-// 		if (isset($annotationSet)) {
-// 			foreach ($annotationSet->getPropertyAnnotationsByName(EntityAnnotations::COLUMN) as $columnAnnotation) {
-// 				$this->columnAnnotations[$columnAnnotation->getPropertyName()] = $columnAnnotation;
-// 			}
-// 		}
-
-// 		$this->analyzeId($annotationSet);
-
-// 		if (isset($annotationSet)) {
-// 			$this->analyzeDateTimeAnnotations($annotationSet);
-// 			$this->analyzeFileAnnotations($annotationSet);
-// 			$this->analyzeRelationAnnotations($annotationSet);
-// 		}
-
-// 		$this->analyzeRemainingColumnAnnotations();
-// 		$this->analyzeRemainingAccessProxies();
-// 	}
-
-// 	private function getAccessProxy($propertyName, Annotation $annotation = null) {
-// 		if (isset($this->superEntityModel) && $this->superEntityModel->containsPropertyName($propertyName)) {
-// 			throw $this->createException(SysTextUtils::get('n2n_error_persistence_orm_property_already_defined_in_super_class',
-// 					array('super_class' => $this->entityModel->getClass()->getName(),
-// 							'property' => $propertyName)));
-// 		}
-
-// 		if (isset($this->accessProxies[$propertyName])) {
-// 			$accessProxy = $this->accessProxies[$propertyName];
-// 			$accessProxy->setForcePropertyAccess(true);
-// 			unset($this->accessProxies[$propertyName]);
-// 			return $accessProxy;
-// 		}
-
-// 		$accessProxy = $this->propertiesAnalyzer->analyzeProperty($propertyName);
-// 		$accessProxy->setForcePropertyAccess(true);
-// 		return $accessProxy;
-// 	}
-
-// 	private function analyzeId(AnnotationSet $annotationSet = null) {
-// 		$propertyName = self::DEFAULT_ID_PROPERTY_NAME;
-// 		$generatedValue = $this->inheritanceType != InheritanceType::TABLE_PER_CLASS;
-// 		$sequenceName = null;
-// 		$idAnnotation = null;
-
-// 		if (isset($annotationSet)) {
-// 			$idAnnotations = $annotationSet->getPropertyAnnotationsByName(EntityAnnotations::ID);
-// 			if (sizeof($idAnnotations) > 1) {
-// 				throw $this->createAnnotationsException(
-// 						SysTextUtils::get('n2n_error_persistence_orm_does_not_support_entities_with_multiple_ids',
-// 								array('class' => $this->class->getName()),
-// 								$idAnnotation));
-// 			} else if (isset($this->superEntityModel)) {
-// 				if (!sizeof($idAnnotations)) return;
-
-// 				throw $this->createAnnotationsException(
-// 						SysTextUtils::get('n2n_error_persistence_orm_id_already_defined_in_super_class',
-// 								array('class' => $this->class->getName(), 'super_class' => $this->superEntityModel->getClass()->getName()),
-// 								$idAnnotation));
-// 			}
-				
-// 			$idAnnotation = ArrayUtils::current($idAnnotations);
-// 			if (isset($idAnnotation)) {
-// 				$propertyName = $idAnnotation->getPropertyName();
-// 				$generatedValue = $idAnnotation->isGeneratedValue();
-// 				if ($generatedValue && $this->inheritanceType == InheritanceType::TABLE_PER_CLASS) {
-// 					throw $this->createAnnotationsException(
-// 							SysTextUtils::get('n2n_error_persistence_orm_generated_value_not_available_with_inheritance_type',
-// 									array('class' => $this->class->getName(), 'inheritance_type' => $this->inheritanceType)),
-// 							$idAnnotation);
-// 				}
-// 				$sequenceName = $idAnnotation->getSequenceName();
-// 			}
-// 		}
-
-// 		if (isset($this->superEntityModel)) {
-// 			return;
-// 		}
-
-// 		$accessProxy = null;
-// 		try {
-// 			$accessProxy = $this->getAccessProxy($propertyName, $idAnnotation);
-// 		} catch (ReflectionException $e) {
-// 			throw $this->createNestedInitializationException($e, $idAnnotation,
-// 					SysTextUtils::get('n2n_error_persistence_orm_could_not_initialize_an_id_property_for_entity',
-// 							array('class' => $this->class->getName(), 'reason' => $e->getMessage())));
-// 		}
-	
-// 		$idProperty = new IdProperty($this->entityModel, $accessProxy,
-// 				$this->checkForColumn($accessProxy->getPropertyName()), $generatedValue, $sequenceName);
-// 		$this->entityModel->setIdProperty($idProperty);
-// 		$this->addProperty($idProperty, $idAnnotation);
-// 	}
-
-// 	private function analyzeDateTimeAnnotations(AnnotationSet $annotationSet) {
-// 		foreach ($annotationSet->getPropertyAnnotationsByName(EntityAnnotations::DATETIME) as $annotation) {
-// 			$this->addProperty(new DateTimeProperty($this->entityModel,
-// 					$this->getAccessProxy($annotation->getPropertyName(), $annotation),
-// 					$this->checkForColumn($annotation->getPropertyName())));
-// 		}
-// 	}
-
-// 	private function analyzeN2nLocaleAnnotations(AnnotationSet $annotationSet) {
-// 		foreach ($annotationSet->getPropertyAnnotationsByName(EntityAnnotations::LOCALE) as $annotation) {
-// 			$this->addProperty(new N2nLocaleProperty($this->entityModel,
-// 					$this->getAccessProxy($annotation->getPropertyName(), $annotation),
-// 					$this->checkForColumn($annotation->getPropertyName())));
-// 		}
-// 	}
-
-// 	private function analyzeFileAnnotations(AnnotationSet $annotationSet) {
-// 		foreach ($annotationSet->getPropertyAnnotationsByName(EntityAnnotations::FILE) as $annotation) {
-// 			$this->addProperty(new FileProperty($this->entityModel,
-// 					$this->getAccessProxy($annotation->getPropertyName(), $annotation),
-// 					$this->checkForColumn($annotation->getPropertyName()), $annotation));
-// 		}
-// 	}
-	
-// 	private function analyzeRelationAnnotations(AnnotationSet $annotationSet) {
-// 		$joinColumnAnnotations = $annotationSet->getPropertyAnnotationsByName(EntityAnnotations::JOIN_COLUMN);
-// 		$joinTableAnnotations = $annotationSet->getPropertyAnnotationsByName(EntityAnnotations::JOIN_TABLE);
-		
-// 		foreach ($annotationSet->getPropertyAnnotationsByName(EntityAnnotations::MANY_TO_ONE) as $annotation) {
-// 			$propertyName = $annotation->getPropertyName();
-// 			$joinColumnAnno = isset($joinColumnAnnotations[$propertyName]) ? $joinColumnAnnotations[$propertyName] : null;
-// 			$joinTableAnno = isset($joinTableAnnotations[$propertyName]) ? $joinTableAnnotations[$propertyName] : null;
-			
-// 			$this->addProperty(new ManyToOneEntityProperty($this->entityModel,
-// 					$this->getAccessProxy($propertyName, $annotation), 
-// 					$this->createToOneRelation($annotation, $joinColumnAnno, $joinTableAnno)));
-// 		}
-
-// 		foreach ($annotationSet->getPropertyAnnotationsByName(EntityAnnotations::ONE_TO_ONE) as $annotation) {
-// 			$propertyName = $annotation->getPropertyName();
-// 			$joinColumnAnno = isset($joinColumnAnnotations[$propertyName]) ? $joinColumnAnnotations[$propertyName] : null;
-// 			$joinTableAnno = isset($joinTableAnnotations[$propertyName]) ? $joinTableAnnotations[$propertyName] : null;
-			
-// 			$this->addProperty(new OneToOneProperty($this->entityModel,
-// 					$this->getAccessProxy($propertyName, $annotation), 
-// 					$this->createToOneRelation($annotation, $joinColumnAnno, $joinTableAnno)));
-// 		}
-
-// 		foreach ($annotationSet->getPropertyAnnotationsByName(EntityAnnotations::MANY_TO_MANY) as $annotation) {
-// 			$propertyName = $annotation->getPropertyName();
-// 			$joinTableAnno = isset($joinTableAnnotations[$propertyName]) ? $joinTableAnnotations[$propertyName] : null;
-			
-// 			$this->addProperty(new ManyToManyProperty($this->entityModel,
-// 					$this->getAccessProxy($propertyName, $annotation), 
-// 					$this->createToManyRelation($annotation, $joinTableAnno)));
-// 		}
-
-// 		foreach ($annotationSet->getPropertyAnnotationsByName(EntityAnnotations::ONE_TO_MANY) as $annotation) {
-// 			$propertyName = $annotation->getPropertyName();
-// 			$joinTableAnno = isset($joinTableAnnotations[$propertyName]) ? $joinTableAnnotations[$propertyName] : null;
-			
-// 			$this->addProperty(new OneToManyProperty($this->entityModel,
-// 					$this->getAccessProxy($propertyName, $annotation), 
-// 					$this->createToManyRelation($annotation, $joinTableAnno)));
-// 		}
-// 	}
-	
-
-	
-// 	private function createToManyRelation(ToMany $toManyAnno, JoinTable $joinTableAnno = null) {
-// 		if (!is_null($toManyAnno->getMappedBy())) {
-// 			return new PropertyMappedToManyRelation($this->entityModel, $toManyAnno);
-// 		}
-				
-// 		return new JoinTableToManyRelation($this->entityModel, $toManyAnno, $joinTableAnno);
-// 	}
-
-// 	private function analyzeRemainingAccessProxies() {
-// 		foreach ($this->accessProxies as $accessProxy) {
-// 			$accessProxy = $this->getAccessProxy($accessProxy->getPropertyName());
-// 			$setterMethod = null;
-// 			$constraints = $this->propertiesAnalyzer->getSetterConstraints($accessProxy->getPropertyName(), $setterMethod);
-	
-// 			$entityProperty = null;
-// 			if (DateTimeProperty::areConstraintsTypical($constraints)) {
-// 				$entityProperty = new DateTimeProperty($this->entityModel, $accessProxy, $this->checkForColumn($accessProxy->getPropertyName()));
-// 			} else if (N2nLocaleProperty::areConstraintsTypical($constraints)) {
-// 				$entityProperty = new N2nLocaleProperty($this->entityModel, $accessProxy, $this->checkForColumn($accessProxy->getPropertyName()));
-// 			} else if (FileProperty::areConstraintsTypical($constraints)) {
-// 				$entityProperty = new FileProperty($this->entityModel, $accessProxy, $this->checkForColumn($accessProxy->getPropertyName()));
-// 			} else {
-// 				$entityProperty = new ScalarEntityProperty($this->entityModel, $accessProxy, $this->checkForColumn($accessProxy->getPropertyName()));
-// // 				throw new OrmErrorException(
-// // 						SysTextUtils::get('n2n_error_persistence_orm_could_not_auto_recognize_entity_property_due_to_an_unknown_setter_method_parameter_type',
-// // 								array('class' => $this->class->getName(), 'property' => $accessProxy->getPropertyName())),
-// // 						0, E_USER_ERROR, $setterMethod->getFileName(), $setterMethod->getStartLine());
-// 			}
-				
-// 			$this->addProperty($entityProperty);
-// 		}
-
-// 		$this->accessProxies = array();
-// 	}
-
-// 	private function analyzeRemainingColumnAnnotations() {
-// 		foreach ($this->columnAnnotations as $columnAnnotation) {
-// 			$this->addProperty(new ScalarEntityProperty($this->entityModel, $this->getAccessProxy($columnAnnotation->getPropertyName(), $columnAnnotation),
-// 					$columnAnnotation->getName()));
-// 			$this->propertiesAnalyzer->analyzeProperty($columnAnnotation->getPropertyName());
-// 		}
-// 	}
-
-// 	private function checkForColumn($propertyName) {
-// 		if (isset($this->columnAnnotations[$propertyName])) {
-// 			$columnName = $this->columnAnnotations[$propertyName]->getName();
-// 			unset($this->columnAnnotations[$propertyName]);
-// 			return $columnName;
-// 		}
-
-// 		return StringUtils::hyphenated($propertyName);
-// 	}
-
-// 	private function addProperty(EntityProperty $property, PropertyAnnotation $propertyAnnotation = null) {
-// 		if (isset($propertyAnnotation) && isset($this->propertyAnnotations[$property->getName()])) {
-// 			throw $this->createAnnotationsException(
-// 					SysTextUtils::get('n2n_error_persistence_orm_incompatible_anno_for_entity_property',
-// 							array('class' => $this->class->getName(), 'property' => $property->getName())),
-// 					array($this->propertyAnnotations[$property->getName()], $propertyAnnotation));
-// 		}
-
-// 		if (isset($this->propertyAnnotations[$property->getName()])) {
-// 			throw new OrmErrorException(
-// 					SysTextUtils::get('n2n_error_persistence_orm_property_was_already_initialized',
-// 							array('class' => $property->getDelcaringClass()->getName(), 'property' => $property->getName())),
-// 					0, E_USER_ERROR, $property->getDelcaringClass()->getFileName());
-// 		}
-
-// 		$this->propertyAnnotations[$property->getName()] = $propertyAnnotation;
-// 		$this->entityModel->putProperty($property);
-// 	}
-
-// 	private function createNestedInitializationException(\Exception $previous, PropertyAnnotation $annotation = null, $message = null) {
-// 		if (is_null($message)) {
-// 			$message = SysTextUtils::get('n2n_error_persistence_orm_could_not_initialize_entity_properties',
-// 					array('class' => $this->class->getName(), 'reason' => $previous->getMessage()));
-// 		}
-
-// 		if ($previous instanceof InvalidPropertyAccessMethodException) {
-// 			$method = $previous->getMethod();
-// 			if (isset($method)) {
-// 				$e = new OrmErrorException($message, 0, E_USER_ERROR, $method->getFileName(), $method->getStartLine(), null, null, $previous);
-// 				if (isset($annotation)) {
-// 					$e->addAdditionalError($annotation->getFileName(), $annotation->getLine(), null, null,
-// 							SysTextUtils::get('n2n_error_persistence_orm_exception_was_caused_by_annotation'));
-// 				}
-// 				return $e;
-// 			}
-// 		}
-
-// 		if (isset($annotation)) {
-// 			return new OrmErrorException($message, 0, E_USER_ERROR, $annotation->getFileName(), $annotation->getLine(), null, null, $previous);
-// 		}
-
-// 		return new OrmErrorException($message, 0, E_USER_ERROR, $this->class->getFileName(), $this->class->getStartLine(),
-// 				$this->class->getStartLine(), $this->class->getEndLine(), $previous);
-// 	}
-
-// 	private function buildDefaultExceptionMessage(\Exception $previous = null) {
-// 		return SysTextUtils::get('n2n_error_persistence_orm_configuration_error_in_entity_class',
-// 				array('reason' => isset($previous) ? $previous->getMessage() : null));
-// 	}
-
-// 	private function createAnnotationsException($message, array $annotations, \Exception $previous = null) {
-// 		if (null === $message) {
-// 			$message = $this->builDefaultExceptionMessage($previous);
-// 		}
-// 		$annotation = array_pop($annotations);
-
-// 		$e = new OrmErrorException($message, null, E_USER_ERROR, $annotation->getFileName(), $annotation->getLine(), null, null, $previous);
-// 		foreach ($annotations as $annotation) {
-// 			$e->addAdditionalError($annotation->getFileName(), $annotation->getLine());
-// 		}
-// 		return $e;
-// 	}
-
-// 	private function createException($message, \Exception $previous = null) {
-// 		if (null === $message) {
-// 			$message = $this->builDefaultExceptionMessage($previous);
-// 		}
-// 		return new OrmErrorException($message, 0, E_USER_ERROR,$this->class->getFileName(), $this->class->getStartLine());
-// 	}
-	
-// 	private function builDefaultExceptionMessage(\Exception $previous) {
-// 		return SysTextUtils::get('n2n_error_persistence_orm_entity_model_could_no_be_created',
-// 				array('reason' => $previous->getMessage()));
-// 	}
-	
-// 	const AUTO_ID_COLUMN_SUFFIX = '_id';
-// 	const AUTO_INTERMEDIATE_TABLE_SEPARATOR = '_';
-	
-// 	public static function buildJoinTableName(EntityModel $entityModel, $propertyName) {
-// 		return $entityModel->getTableName() . self::AUTO_INTERMEDIATE_TABLE_SEPARATOR
-// 				. StringUtils::hyphenated($propertyName);
-// 	}
-	
-// 	public static function buildJunctionJoinColumnName(EntityModel $entityModel) {
-// 		return StringUtils::hyphenated($entityModel->getClass()->getShortName()) . self::AUTO_ID_COLUMN_SUFFIX;
-// 	}
-	
-// 	public static function buildJoinColumnNameFromPropertyName($propertyName) {
-// 		return StringUtils::hyphenated($propertyName) . self::AUTO_ID_COLUMN_SUFFIX;
-// 	}
-// }
+} 
