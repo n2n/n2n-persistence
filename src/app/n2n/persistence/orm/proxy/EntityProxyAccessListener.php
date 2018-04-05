@@ -62,7 +62,7 @@ class EntityProxyAccessListener {
 							. EntityInfo::buildEntityString($this->entityModel, $this->id));
 		}
 		
-		$this->em->getLoadingQueue()->mapValues($entity, $this->id, $values, array());
+		$this->em->getLoadingQueue()->mapValues($entity, $this->id, $values);
 		$this->em->getLoadingQueue()->finalizeLoading($this);
 // 		$persistenceContext = $this->em->getPersistenceContext();
 // 		$persistenceContext->mapValues($entity, $values);

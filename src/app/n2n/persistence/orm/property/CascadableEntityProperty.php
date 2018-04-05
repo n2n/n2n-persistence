@@ -27,7 +27,7 @@ use n2n\persistence\orm\store\ValueHash;
 
 interface CascadableEntityProperty extends EntityProperty {
 	
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null);
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash);
 	/**
 	 * @param mixed $value
 	 * @param int $cascadeType

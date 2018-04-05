@@ -26,9 +26,10 @@ use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\property\CascadableEntityProperty;
 use n2n\persistence\orm\store\ValueHashCol;
+use n2n\persistence\orm\store\ValueHash;
 
 class PersistSupplyJob extends SupplyJobAdapter {
-	private $valueHashCol = array();
+	private $valueHashCol = null;
 	private $prepared = false;
 
 	public function __construct(PersistAction $persistAction, ValueHashCol $oldValueHashCol = null) {
@@ -51,17 +52,27 @@ class PersistSupplyJob extends SupplyJobAdapter {
 		return false;
 	}
 
-	public function setValueHashCol(ValueHashCol $valueHashCol) {
-		$this->valueHashCol = $valueHashCol->getValueHashes();
+	/**
+	 * @param ValueHashCol|null $valueHashCol
+	 */
+	public function setValueHashCol(?ValueHashCol $valueHashCol) {
+		$this->valueHashCol = $valueHashCol;
 	}
 
+	/**
+	 * @return \n2n\persistence\orm\store\ValueHashCol|null
+	 */
 	public function getValueHashCol() {
 		return $this->valueHashCol;
 	}
 	
-	private function getValueHash($propertyName) {
-		IllegalStateException::assertTrue(array_key_exists($propertyName, $this->valueHashCol));
-		return $this->valueHashCol[$propertyName];
+	/**
+	 * @param string $propertyString
+	 * @return ValueHash
+	 */
+	private function getValueHash($propertyString) {
+		IllegalStateException::assertTrue($this->valueHashCol !== null);
+		return $this->valueHashCol->getValueHash($propertyString);
 	}
 
 	public function prepare() {
@@ -132,8 +143,7 @@ class PersistSupplyJob extends SupplyJobAdapter {
 		$this->entityAction->executeAtEnd(function () use ($that) {
 			$em = $that->getActionQueue()->getEntityManager();
 			$this->entityAction->getActionQueue()->getEntityManager()->getPersistenceContext()
-					->updateValueHashes($that->entityAction->getEntityObj(),
-							$that->values, $that->valueHashCol, $em);
+					->updateValueHashes($that->entityAction->getEntityObj(), $that->valueHashCol);
 		});
 	}
 }

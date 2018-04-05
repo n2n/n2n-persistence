@@ -118,7 +118,7 @@ class EntityObjSelection implements Selection {
 				$values[$key] = $valueBuilder->buildValue();
 			}
 			
-			$this->em->getLoadingQueue()->mapValues($entityObj, $id, $values, array());
+			$this->em->getLoadingQueue()->mapValues($entityObj, $id, $values);
 // 			$persistenceContext = $this->em->getPersistenceContext();
 // 			$persistenceContext->mapValues($entity, $values);
 // 			$persistenceContext->updateValueHashes($entity, $values, array(), $this->em);

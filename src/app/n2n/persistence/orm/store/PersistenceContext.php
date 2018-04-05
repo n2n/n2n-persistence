@@ -424,30 +424,29 @@ class PersistenceContext {
 	}
 	
 	/**
-	 * @param object $entity
-	 * @param array $values
-	 * @param ValueHash[] $valueHashes
+	 * @param object $entityObj
+	 * @param ValueHashCol $valueHashCol See {@see ValueHashColFactory}
 	 * @param EntityManager $em
 	 */
-	public function updateValueHashes($entityObj, array $values, array $valueHashes, EntityManager $em) {
+	public function updateValueHashes($entityObj,  ValueHashCol $valueHashCol) {
 		$this->validateEntityObjManaged($entityObj);
 	
-		$entityModel = $this->getEntityModelByEntityObj($entityObj);
+// 		$entityModel = $this->getEntityModelByEntityObj($entityObj);
 		
-		$hashFactory = new ValueHashColFactory($entityModel, $em);
-		$hashFactory->setValues($values);
-		$hashFactory->setValueHashes($valueHashes);
+// 		$hashFactory = new ValueHashColFactory($entityModel, $em);
+// 		$hashFactory->setValues($values);
+// 		$hashFactory->setValueHashes($valueHashes);
 		
-		$this->entityValueHashCols[spl_object_hash($entityObj)] = $hashFactory->create($entityObj);
+		$this->entityValueHashCols[spl_object_hash($entityObj)] = $valueHashCol;
 	}
 	
 	/**
-	 * @param object $entity
+	 * @param object $entityObj
 	 * @throws IllegalStateException
 	 * @return ValueHashCol
 	 */
-	public function getValueHashColByEntityObj($entity) {
-		$objectHash = spl_object_hash($entity);
+	public function getValueHashColByEntityObj($entityObj) {
+		$objectHash = spl_object_hash($entityObj);
 		
 		if (isset($this->entityValueHashCols[$objectHash])) {
 			return $this->entityValueHashCols[$objectHash];
