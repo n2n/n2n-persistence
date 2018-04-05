@@ -37,7 +37,7 @@ class LoadingQueue {
 		$this->actionQueue = $actionQueue;
 	}
 	
-	public function mapValues($entity, $id, array $values, array $valueHashes) {
+	public function mapValues($entity, $id, array $values) {
 		$this->persistenceContext->mapValues($entity, $values);
 		
 		if (empty($this->loadingContainerStack)) {
@@ -46,7 +46,7 @@ class LoadingQueue {
 
 		$objHash = spl_object_hash($entity);
 		
-		$this->valueHashJobs[$objHash] = array('entity' => $entity, 'values' => $values, 'valueHashes' => $valueHashes);		
+		$this->valueHashJobs[$objHash] = array('entityObj' => $entity, 'values' => $values);		
 		
 		$this->postLoadEvents[$objHash] = new LifecycleEvent(LifecycleEvent::POST_LOAD, $entity, 
 				$this->persistenceContext->getEntityModelByEntityObj($entity), $id); 
@@ -69,8 +69,13 @@ class LoadingQueue {
 		
 		foreach ($this->valueHashJobs as $entityObjHash => $valueHashJob) {
 			unset($this->valueHashJobs[$entityObjHash]);
-			$this->persistenceContext->updateValueHashes($valueHashJob['entity'], $valueHashJob['values'], 
-					$valueHashJob['valueHashes'], $this->actionQueue->getEntityManager());
+			
+			$entityObj = $valueHashJob['entityObj'];
+			
+			$hashFactory = new ValueHashColFactory($em, $em->getPersistenceContext()->getEntityModelByEntityObj($entityObj));
+			$hashFactory->setValues($values);
+			
+			$this->persistenceContext->updateValueHashes($entityObj, $hashFactory->create($entityObj));
 		}
 			
 		foreach ($this->postLoadEvents as $entityObjHash => $postLoadEvent) {

@@ -61,7 +61,7 @@ class RefreshOperation implements CascadeOperation {
 					. $entityInfo->toEntityString());
 		}
 		
-		$this->em->getLoadingQueue()->mapValues($entity, $entityInfo->getId(), $values, array());
+		$this->em->getLoadingQueue()->mapValues($entity, $entityInfo->getId(), $values);
 		$this->em->getLoadingQueue()->finalizeLoading($this);
 		
 // 		$persistenceContext->mapValues($entity, $values);
