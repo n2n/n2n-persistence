@@ -27,6 +27,7 @@ use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\property\CascadableEntityProperty;
 use n2n\persistence\orm\store\ValueHashCol;
 use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\store\ValueHashColFactory;
 
 class PersistSupplyJob extends SupplyJobAdapter {
 	private $valueHashCol = null;
@@ -87,12 +88,13 @@ class PersistSupplyJob extends SupplyJobAdapter {
 
 			$propertyString = $entityProperty->toPropertyString();
 			
+			
 			$oldValueHash = null;
 			if (!$new) {
 				$oldValueHash = $this->getOldValueHash($propertyString);
 				if ($oldValueHash->matches($this->getValueHash($propertyString))) continue;
 			}
-			
+		
 			$entityProperty->prepareSupplyJob($this, $this->values[$propertyString], $oldValueHash);
 		}
 	}
@@ -123,7 +125,7 @@ class PersistSupplyJob extends SupplyJobAdapter {
 			if ($idPropertyString === $propertyString && ($idDef->isGenerated() || !$this->entityAction->isNew())) {
 				continue;
 			}
-				
+
 			$oldValueHash = null;
 			$valueHash = $this->getValueHash($propertyString);
 			if (!$this->entityAction->isNew()) {
@@ -142,8 +144,16 @@ class PersistSupplyJob extends SupplyJobAdapter {
 		$that = $this;
 		$this->entityAction->executeAtEnd(function () use ($that) {
 			$em = $that->getActionQueue()->getEntityManager();
-			$this->entityAction->getActionQueue()->getEntityManager()->getPersistenceContext()
+			$entityModel = $this->entityAction->getEntityModel();
+			
+			if ($this->entityAction->isNew() && $entityModel->getIdDef()->isGenerated()) {
+				$idEntityProperty = $this->entityAction->getEntityModel()->getIdDef()->getEntityProperty();
+				ValueHashColFactory::updateId($idEntityProperty, $this->entityAction->getId(), $that->valueHashCol, $em);
+			}
+			
+			$em->getPersistenceContext()
 					->updateValueHashes($that->entityAction->getEntityObj(), $that->valueHashCol);
+			
 		});
 	}
 }
