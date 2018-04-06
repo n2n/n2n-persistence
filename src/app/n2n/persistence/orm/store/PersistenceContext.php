@@ -36,6 +36,7 @@ use n2n\persistence\orm\proxy\CanNotCreateEntityProxyClassException;
 use n2n\reflection\ObjectCreationFailedException;
 use n2n\persistence\orm\EntityCreationFailedException;
 use n2n\persistence\orm\proxy\EntityProxy;
+use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 
 class PersistenceContext {
 	private $entityProxyManager;
@@ -528,9 +529,13 @@ class ValueHashColFactory {
 		
 		return $valueHashCol;
 	}
+	
+	static function updateId(ScalarEntityProperty $idEntityProperty, $idValue, ValueHashCol $valueHashCol, 
+			EntityManager $em) {
+		$valueHashCol->putValueHash($idEntityProperty->toPropertyString(), 
+				$idEntityProperty->createValueHash($idValue, $em));
+	}
 }
-
-
 
 class ValueHashCol {
 	private $valueHashes = array();
