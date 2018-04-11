@@ -57,10 +57,14 @@ class Comparison {
 	}
 	
 	public function groupStart() {
-		if	(empty($this->currentOperatorParts)) {
-			$this->leftItemExpression .= Nql::GROUP_START;
+		if ($this->inTest) {
+			$this->testExpression .= Nql::GROUP_START;
 		} else {
-			$this->rightItemExpression .= Nql::GROUP_START;
+			if	(empty($this->currentOperatorParts)) {
+				$this->leftItemExpression .= Nql::GROUP_START;
+			} else {
+				$this->rightItemExpression .= Nql::GROUP_START;
+			}
 		}
 		
 		$this->groupStack[] = NQL::GROUP_START;
