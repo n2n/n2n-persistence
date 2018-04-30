@@ -186,11 +186,13 @@ class EntityProxyManager {
 	}
 
 	private function buildTypeStr(\ReflectionType $type) {
+		$prefix = $type->allowsNull() ? '?' : '';
+		
 		if ($type->isBuiltin()) {
-			return (string) $type;
+			return $prefix . $type;
 		}
 	
-		return '\\' . $type;
+		return $prefix . '\\' . $type;
 	}
 	
 	private function buildDefaultConstStr($defaultConstName) {
