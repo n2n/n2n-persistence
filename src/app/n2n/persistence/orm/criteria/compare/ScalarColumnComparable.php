@@ -30,21 +30,29 @@ use n2n\persistence\meta\data\QueryPartGroup;
 
 class ScalarColumnComparable extends ColumnComparableAdapter {
 	private $queryState;
+	private $expectedType;
 	
-	public function __construct(QueryItem $comparableQueryItem, QueryState $queryState) {
+	/**
+	 * @param QueryItem $comparableQueryItem
+	 * @param QueryState $queryState
+	 * @param string|TypeConstraint $expectedType
+	 */
+	public function __construct(QueryItem $comparableQueryItem, QueryState $queryState, 
+			$expectedType = 'scalar') {
 		parent::__construct(CriteriaComparator::getOperators(false), 
 				TypeConstraint::createSimple('scalar', true), $comparableQueryItem);
 		
 		$this->queryState = $queryState;
+		$this->expectedType = $expectedType;
 	}
 	
 	public function buildCounterpartQueryItemFromValue($operator, $value) {
 		if ($operator != CriteriaComparator::OPERATOR_IN && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
-			ArgUtils::valType($value, 'scalar', true);
+			ArgUtils::valType($value, $this->expectedType, true);
 			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue($value));
 		} 
 		
-		ArgUtils::valArray($value, 'scalar');
+		ArgUtils::valArray($value, $this->expectedType);
 		
 		$queryPartGroup = new QueryPartGroup();
 		foreach ($value as $fieldValue) {
@@ -53,15 +61,4 @@ class ScalarColumnComparable extends ColumnComparableAdapter {
 		}
 		return $queryPartGroup;
 	}
-	
-// 	public function buildCounterpartPlaceholder($operator, $value) {
-		
-// 	}
-	
-// 	public function parseComparableValue($operator, $value) {
-// 		
-		
-// 		return $value;
-// 	}
-	
 }
