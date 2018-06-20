@@ -19,43 +19,12 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\query\select;
+namespace n2n\persistence\orm\annotation;
 
-use n2n\persistence\meta\data\QueryItem;
-use n2n\persistence\PdoStatement;
-use n2n\reflection\ArgUtils;
+use n2n\reflection\annotation\PropertyAnnotation;
+use n2n\reflection\annotation\PropertyAnnotationTrait;
+use n2n\reflection\annotation\AnnotationTrait;
 
-class SimpleSelection implements Selection {
-	private $queryItem;
-	private $type;
-	private $value;
-
-	public function __construct(QueryItem $queryItem, string $type = null) {
-		$this->queryItem = $queryItem;
-		ArgUtils::valEnum($type, ['bool'], null, true);
-		$this->type = $type;
-	}
-	
-	public function getSelectQueryItems() {
-		return array($this->queryItem);
-	}
-
-	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
-		$stmt->shareBindColumn($columnAliases[0], $this->value);
-	}
-
-	public function createValueBuilder() {
-		$value = null; 
-		if ($this->value !== null) {
-			switch ($this->type) {
-				case 'bool';
-					$value = (bool) $this->value;
-					break;
-				default:
-					$value = $this->value;
-			}
-		}
-		
-		return new EagerValueBuilder($value);
-	}
+class AnnoBool implements PropertyAnnotation {
+	use PropertyAnnotationTrait, AnnotationTrait;
 }
