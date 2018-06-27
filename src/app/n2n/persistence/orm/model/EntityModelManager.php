@@ -96,11 +96,12 @@ class EntityModelManager {
 				} catch (ModelInitializationException $e) {
 					throw new OrmConfigurationException('Invalid entity registered: ' . $class->getName(), 0, $e);
 				}
+				
 				$this->entityModelFactory->cleanUp($this);
+				
+				$this->initSubEntityModels($entityModel->getSupremeEntityModel());
 			}
 		}
-		
-		$this->initSubEntityModels($entityModel);
 		
 		return $entityModel;
 	}
