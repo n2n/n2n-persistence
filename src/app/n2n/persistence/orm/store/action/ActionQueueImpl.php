@@ -46,6 +46,8 @@ class ActionQueueImpl implements ActionQueue {
 	private $entityListeners = array();
 	private $lifecylceListeners = array();
 	
+	const MAGIC_ENTITY_OBJ_PARAM = 'entityObj';
+	
 	public function __construct(EntityManager $em, MagicContext $magicContext = null) {
 		$this->em = $em;
 		$this->magicContext = $magicContext;
@@ -234,17 +236,21 @@ class ActionQueueImpl implements ActionQueue {
 			return false;
 		}
 		
-		$entity = $event->getEntityObj();
+		$entityObj = $event->getEntityObj();
 		$methodInvoked = false;
 		
 		$methodInvoker = new MagicMethodInvoker($this->magicContext);
 		$methodInvoker->setClassParamObject('n2n\persistence\orm\model\EntityModel', $entityModel);
-		$methodInvoker->setClassParamObject($entityModel->getClass()->getName(), $entity);
+		$paramClass = $entityModel->getClass();
+		do {
+			$methodInvoker->setClassParamObject($paramClass->getName(), $entityObj);
+		} while (false !== ($paramClass = $paramClass->getParentClass()));
+		$methodInvoker->setParamValue(self::MAGIC_ENTITY_OBJ_PARAM, $entityObj);
 		$methodInvoker->setClassParamObject('n2n\persistence\orm\EntityManager', $this->em);
 		
 		foreach ($methods as $method) {
 			$method->setAccessible(true);
-			$methodInvoker->invoke($entity, $method);
+			$methodInvoker->invoke($entityObj, $method);
 			$methodInvoked = true;
 		}
 		
