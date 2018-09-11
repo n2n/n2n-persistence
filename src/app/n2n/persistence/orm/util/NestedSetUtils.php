@@ -31,7 +31,7 @@ use n2n\persistence\orm\criteria\JoinType;
 use n2n\persistence\orm\criteria\item\CrIt;
 use n2n\persistence\orm\OrmUtils;
 use n2n\util\ex\IllegalStateException;
-use rocket\ei\util\model\UnknownEntryException;
+use n2n\persistence\orm\OrmException;
 
 class NestedSetUtils {
 	const DEFAULT_LEFT_PROPERTY_NAME = 'lft';
@@ -1052,3 +1052,7 @@ class NestedSetUtils {
 // 				$ds->__get($this->rootFkField)));
 // 	}
 // }
+
+class UnknownEntryException extends OrmException {
+	
+}
