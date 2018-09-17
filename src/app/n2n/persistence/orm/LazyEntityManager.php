@@ -316,6 +316,8 @@ class LazyEntityManager implements EntityManager {
 			$this->pdo->unregisterListener($this->pdoListener);		
 		}
 		
+		$this->clear();
+		
 		$this->closed = true;
 		$this->pdo = null;
 		$this->persistenceContext = null;

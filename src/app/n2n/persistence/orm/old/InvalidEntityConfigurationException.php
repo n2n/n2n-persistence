@@ -19,8 +19,8 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence;
+// namespace n2n\persistence;
 
-class InvalidEntityConfigurationException {
+// class InvalidEntityConfigurationException {
 	
-}
+// }

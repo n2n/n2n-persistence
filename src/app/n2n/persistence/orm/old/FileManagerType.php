@@ -19,15 +19,15 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm;
+// namespace n2n\persistence\orm;
 
-use n2n\io\managed\FileManager;
+// use n2n\io\managed\FileManager;
 
-class FileManagerType {
-	const TYPE_PUBLIC = FileManager::COMMON_PUBLIC;
-	const TYPE_PRIVATE = FileManager::COMMON_PRIVATE;
+// class FileManagerType {
+// 	const TYPE_PUBLIC = FileManager::COMMON_PUBLIC;
+// 	const TYPE_PRIVATE = FileManager::COMMON_PRIVATE;
 	
-	public static function getValues() {
-		return array(self::TYPE_PUBLIC, self::TYPE_PRIVATE);
-	}
-}
+// 	public static function getValues() {
+// 		return array(self::TYPE_PUBLIC, self::TYPE_PRIVATE);
+// 	}
+// }
