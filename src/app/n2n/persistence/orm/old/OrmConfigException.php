@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm;
+// namespace n2n\persistence\orm;
 
-class OrmConfigException extends OrmException {
-}
+// class OrmConfigException extends OrmException {
+// }
