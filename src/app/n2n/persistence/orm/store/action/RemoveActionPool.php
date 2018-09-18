@@ -33,11 +33,18 @@ class RemoveActionPool {
 	private $actionQueue;
 	private $removeActions = array();
 	private $unsuppliedRemoveActions = array();
-	private $frozen = false;
 	private $removeSupplyJobs = array();
+	private $frozen = false;
 	
 	public function __construct(ActionQueue $actionQueue) {
 		$this->actionQueue = $actionQueue;
+	}
+	
+	public function clear() {
+		$this->frozen = false;
+		$this->removeActions = array();
+		$this->unsuppliedRemoveActions = array();
+		$this->removeSupplyJobs = array();
 	}
 
 	public function containsAction($entity) {
@@ -190,12 +197,5 @@ class RemoveActionPool {
 		$supplyJob->prepare();
 		
 		return $supplyJob;
-	}
-	
-	public function clear() {
-		$this->frozen = false;
-		$this->supplyRemoveOperation = null;
-		$this->removeActions = array();	
-		$this->removeSupplyJobs = array();		
 	}
 }

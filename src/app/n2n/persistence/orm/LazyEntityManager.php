@@ -51,6 +51,7 @@ class LazyEntityManager implements EntityManager {
 	private $entityModelManager;
 	private $persistenceContext;
 	private $actionQueue;
+	private $loadingQueue;
 	private $nqlParser;
 	/**
 	 * @param string $dataSourceName
@@ -322,7 +323,9 @@ class LazyEntityManager implements EntityManager {
 		$this->pdo = null;
 		$this->persistenceContext = null;
 		$this->actionQueue = null;
+		$this->loadingQueue = null;
 		$this->entityModelManager = null;
+		$this->nqlParser = null;
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\EntityManager::contains()
