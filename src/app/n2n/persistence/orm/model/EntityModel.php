@@ -130,14 +130,15 @@ class EntityModel implements EntityPropertyCollection {
 	public function getDiscriminatorValue() {
 		return $this->discriminatorValue;
 	}
+	
 	/**
-	 * 
 	 * @param IdDef $idDef
 	 */
 	public function setIdDef(IdDef $idDef) {
 		$this->ensureNoSuperEntity();
 		$this->idDef = $idDef;
 	}
+	
 	/**
 	 * @return IdDef
 	 */
@@ -150,7 +151,7 @@ class EntityModel implements EntityPropertyCollection {
 	/**
 	 * @return \ReflectionClass
 	 */
-	public function getClass() {
+	public function getClass(): \ReflectionClass {
 		return $this->class;
 	}
 	
