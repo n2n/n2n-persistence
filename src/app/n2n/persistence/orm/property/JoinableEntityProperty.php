@@ -26,6 +26,12 @@ use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\query\from\JoinedTreePoint;
 
 interface JoinableEntityProperty extends EntityProperty {
+	
+	/**
+	 * @return string[]
+	 */
+	public function getAvailableJoinTypes(): array;
+	
 	/**
 	 * @param QueryState $queryState
 	 * @param TreePointMeta $queryPoint
