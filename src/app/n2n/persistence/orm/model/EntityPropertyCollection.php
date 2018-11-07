@@ -38,4 +38,6 @@ interface EntityPropertyCollection {
 	 * @throws UnknownEntityPropertyException
 	 */
 	public function getEntityPropertyByName($name);
+	
+	public function getClass(): \ReflectionClass;
 }
