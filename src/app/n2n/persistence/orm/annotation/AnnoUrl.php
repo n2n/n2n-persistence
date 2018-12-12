@@ -25,6 +25,6 @@ use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
 
-class AnnoN2nLocale implements PropertyAnnotation {
+class AnnoUrl implements PropertyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
 }
