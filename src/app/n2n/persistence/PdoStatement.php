@@ -49,7 +49,11 @@ class PdoStatement extends \PDOStatement {
 	 */
 	public function bindValue($parameter, $value, $dataType = PDO::PARAM_STR ) {
 		$this->boundValues[$parameter] = $value;
-		return parent::bindValue($parameter, $value, $dataType);
+		if ($dataType !== null) {
+			return parent::bindValue($parameter, $value, $dataType);
+		} else {
+			return parent::bindValue($parameter, $value);
+		}
 	}
 	
 	public function autoBindValue($parameter, $value) {
