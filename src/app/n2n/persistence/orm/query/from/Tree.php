@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm\query\from;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\data\JoinType;
 use n2n\persistence\orm\OrmException;
 use n2n\persistence\orm\query\QueryState;
@@ -30,7 +30,7 @@ use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\query\QueryModel;
-use n2n\reflection\ReflectionUtils;
+use n2n\util\type\TypeUtils;
 
 class Tree implements QueryPointResolver {
 	private $queryState;
@@ -46,7 +46,7 @@ class Tree implements QueryPointResolver {
 
 	private function validateAlias($alias) {
 		if (!is_scalar($alias) || !mb_strlen($alias)) {
-			throw new \InvalidArgumentException('Invalid criteria alias type: ' . ReflectionUtils::getTypeInfo($alias));
+			throw new \InvalidArgumentException('Invalid criteria alias type: ' . TypeUtils::getTypeInfo($alias));
 		}
 
 		if (isset($this->namedTreePoint[$alias])) {

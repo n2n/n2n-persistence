@@ -23,7 +23,7 @@ namespace n2n\persistence\orm\query\from;
 
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\criteria\JoinType;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\persistence\orm\query\QueryState;

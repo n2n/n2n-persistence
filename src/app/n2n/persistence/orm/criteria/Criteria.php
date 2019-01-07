@@ -36,11 +36,11 @@ use n2n\persistence\meta\data\QueryColumn;
 use n2n\persistence\orm\query\QueryItemSelect;
 use n2n\persistence\meta\data\JoinType;
 use n2n\persistence\orm\query\Query;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\data\OrderDirection;
 use n2n\persistence\orm\criteria\compare\ComparatorCriteria;
-use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\criteria\compare\SelectColumnComparable;
+use n2n\util\type\TypeUtils;
 
 class Criteria {
 	const ORDER_DIRECTION_ASC = OrderDirection::ASC;
@@ -82,7 +82,7 @@ class Criteria {
 	
 	private function validateAlias($alias) {
 		if (!is_scalar($alias)) {
-			throw new CriteriaConflictException('Invalid criteria alias type: ' . ReflectionUtils::getTypeInfo($alias));
+			throw new CriteriaConflictException('Invalid criteria alias type: ' . TypeUtils::getTypeInfo($alias));
 		}
 		
 		if (0 == mb_strlen($alias)) {

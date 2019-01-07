@@ -21,7 +21,6 @@
  */
 namespace n2n\persistence\orm\criteria\item;
 
-use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryPoint;
@@ -35,6 +34,7 @@ use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\meta\data\QueryItem;
+use n2n\util\type\TypeUtils;
 
 class CriteriaConstant implements CriteriaItem {
 	private $value;
@@ -56,7 +56,7 @@ class CriteriaConstant implements CriteriaItem {
 	}
 	
 	public function __toString(): string {
-		return '<' . ReflectionUtils::getTypeInfo($this->getValue()) . '>';
+		return '<' . TypeUtils::getTypeInfo($this->getValue()) . '>';
 	}
 }
 

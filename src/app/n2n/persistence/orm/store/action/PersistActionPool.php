@@ -23,7 +23,7 @@ namespace n2n\persistence\orm\store\action;
 
 use n2n\persistence\orm\store\EntityInfo;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\util\ex\IllegalStateException;

@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm\criteria\compare;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\data\QueryItem;
 use n2n\reflection\property\TypeConstraint;
 use n2n\persistence\orm\query\QueryState;

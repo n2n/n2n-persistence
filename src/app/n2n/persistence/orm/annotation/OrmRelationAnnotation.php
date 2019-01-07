@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm\annotation;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;

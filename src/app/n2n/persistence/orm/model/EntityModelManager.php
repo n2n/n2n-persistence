@@ -27,7 +27,7 @@ use n2n\reflection\ReflectionContext;
 use n2n\persistence\orm\OrmErrorException;
 use n2n\web\dispatch\model\ModelInitializationException;
 use n2n\persistence\orm\annotation\AnnoMappedSuperclass;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\reflection\ReflectionUtils;
 
 /**

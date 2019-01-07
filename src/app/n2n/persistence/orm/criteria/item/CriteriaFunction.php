@@ -22,7 +22,7 @@
 namespace n2n\persistence\orm\criteria\item;
 
 use n2n\persistence\meta\data\QueryItemSequence;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\data\QueryFunction;
 use n2n\persistence\orm\criteria\compare\ScalarColumnComparable;
 use n2n\persistence\orm\query\QueryState;

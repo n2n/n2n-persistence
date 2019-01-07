@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\structure\IndexType;
 use n2n\persistence\meta\structure\Table;
 use n2n\persistence\meta\structure\Index;

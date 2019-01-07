@@ -25,7 +25,7 @@ use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\util\ex\IllegalStateException;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\LifecycleEvent;
 use n2n\persistence\orm\store\action\supply\RemoveSupplyJob;
 

@@ -34,8 +34,8 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\property\IdDef;
 use n2n\persistence\orm\InheritanceType;
-use n2n\reflection\ArgUtils;
-use n2n\reflection\ReflectionUtils;
+use n2n\util\type\ArgUtils;
+use n2n\util\type\TypeUtils;
 
 class EntityModel implements EntityPropertyCollection {	
 	private $class;
@@ -242,9 +242,9 @@ class EntityModel implements EntityPropertyCollection {
 		$superEntityProperty = $this->getEntityPropertyByName($name);
 		
 		throw new UnknownEntityPropertyException('Unkown entity property ' 
-				. ReflectionUtils::prettyClassPropName($this->class, $name)
+				. TypeUtils::prettyClassPropName($this->class, $name)
 				. '. Requested entity property is defined in super class: ' 
-				. ReflectionUtils::prettyClassPropName($superEntityProperty->getEntityModel()->getClass(), $name));
+				. TypeUtils::prettyClassPropName($superEntityProperty->getEntityModel()->getClass(), $name));
 	}	
 	
 	public function getLevelEntityProperties(): array {

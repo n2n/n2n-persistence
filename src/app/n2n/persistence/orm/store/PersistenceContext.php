@@ -27,7 +27,7 @@ use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\proxy\EntityProxyManager;
 use n2n\persistence\orm\model\EntityModelManager;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\proxy\LazyInitialisationException;
 use n2n\persistence\orm\proxy\EntityProxyAccessListener;
 use n2n\persistence\orm\EntityManager;

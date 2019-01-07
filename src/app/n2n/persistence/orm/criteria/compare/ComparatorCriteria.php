@@ -31,7 +31,7 @@ use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryPoint;
 use n2n\persistence\orm\query\QueryModel;
 use n2n\persistence\meta\data\QueryItem;
-use n2n\reflection\CastUtils;
+use n2n\util\type\CastUtils;
 use n2n\persistence\orm\query\select\Selection;
 
 class ComparatorCriteria extends Criteria implements CriteriaItem {

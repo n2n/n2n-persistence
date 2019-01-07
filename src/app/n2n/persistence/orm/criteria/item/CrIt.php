@@ -23,7 +23,7 @@ namespace n2n\persistence\orm\criteria\item;
 
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\property\EntityProperty;
-use n2n\reflection\ReflectionUtils;
+use n2n\util\type\TypeUtils;
 
 class CrIt {
 	/**
@@ -78,7 +78,7 @@ class CrIt {
 			return $item;
 		}
 			
-		throw new \InvalidArgumentException('Invalid property expression: ' . ReflectionUtils::prettyValue($arg));
+		throw new \InvalidArgumentException('Invalid property expression: ' . TypeUtils::prettyValue($arg));
 	}
 	/**
 	 * @param string $functionName
@@ -140,7 +140,7 @@ class CrIt {
 		}
 		
 		throw new \InvalidArgumentException('Invalid property or function expression: ' 
-				. ReflectionUtils::prettyValue($expression));
+				. TypeUtils::prettyValue($expression));
 	}
 	
 	/**
@@ -166,7 +166,7 @@ class CrIt {
 		}
 	
 		throw new \InvalidArgumentException('Invalid CriteriaItem expression: '
-				. ReflectionUtils::prettyValue($expression));
+				. TypeUtils::prettyValue($expression));
 	}
 	
 // 	public static function testEpressionForConstant($expression) {
