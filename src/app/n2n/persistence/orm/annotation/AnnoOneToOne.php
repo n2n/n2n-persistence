@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm\annotation;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 
 class AnnoOneToOne extends MappableOrmRelationAnnotation {
 	private $orphanRemoval = false;

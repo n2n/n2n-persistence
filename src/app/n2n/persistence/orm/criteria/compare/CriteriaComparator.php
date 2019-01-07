@@ -23,7 +23,7 @@ namespace n2n\persistence\orm\criteria\compare;
 
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\criteria\item\CrIt;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\criteria\Criteria;

@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\meta\data;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 
 class QueryConstant implements QueryItem {
 	protected $value = null;

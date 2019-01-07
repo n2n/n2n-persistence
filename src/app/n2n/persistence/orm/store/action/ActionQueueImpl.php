@@ -25,7 +25,7 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\LifecycleEvent;
 use n2n\reflection\magic\MagicMethodInvoker;
 use n2n\persistence\orm\LifecycleListener;
-use n2n\reflection\magic\MagicContext;
+use n2n\util\magic\MagicContext;
 use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\LifecycleUtils;
 use n2n\util\ex\IllegalStateException;

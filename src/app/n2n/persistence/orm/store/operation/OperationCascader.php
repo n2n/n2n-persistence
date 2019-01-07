@@ -25,7 +25,7 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\property\CascadableEntityProperty;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\CascadeType;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\property\EntityProperty;
 

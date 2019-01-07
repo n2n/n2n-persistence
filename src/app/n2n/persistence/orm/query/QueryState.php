@@ -25,7 +25,7 @@ use n2n\persistence\orm\store\PersistenceContext;
 use n2n\persistence\Pdo;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\EntityManager;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\util\StringUtils;
 
 class QueryState {

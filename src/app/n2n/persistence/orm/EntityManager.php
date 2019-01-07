@@ -42,7 +42,7 @@ interface EntityManager {
 	 */
 	public function getEntityModelManager();
 	/**
-	 * @return \n2n\reflection\magic\MagicContext 
+	 * @return \n2n\util\magic\MagicContext 
 	 */
 	public function getMagicContext();
 	

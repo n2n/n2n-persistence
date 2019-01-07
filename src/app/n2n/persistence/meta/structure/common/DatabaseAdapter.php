@@ -26,8 +26,8 @@ use n2n\persistence\meta\structure\MetaEntity;
 use n2n\persistence\meta\structure\UnknownMetaEntityException;
 use n2n\persistence\Pdo;
 use n2n\persistence\meta\Database;
-use n2n\reflection\CastUtils;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\CastUtils;
+use n2n\util\type\ArgUtils;
 
 abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 

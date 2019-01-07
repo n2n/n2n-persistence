@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm\query\from;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\data\JoinType;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;

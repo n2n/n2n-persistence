@@ -25,7 +25,7 @@ use n2n\persistence\meta\data\QueryItem;
 use n2n\persistence\orm\CorruptedDataException;
 use n2n\persistence\PdoStatement;
 use n2n\persistence\orm\query\select\EagerValueBuilder;
-use n2n\reflection\ReflectionUtils;
+use n2n\util\type\TypeUtils;
 
 class SingleTableDiscriminatorSelection implements DiscriminatorSelection {
 	private $discriminatorColumn;
@@ -47,7 +47,7 @@ class SingleTableDiscriminatorSelection implements DiscriminatorSelection {
 			return $this->discriminatedEntityModels[$this->value];
 		}
 
-		throw new CorruptedDataException('Unknown discriminator value \'' . ReflectionUtils::buildScalar($this->value)
+		throw new CorruptedDataException('Unknown discriminator value \'' . TypeUtils::buildScalar($this->value)
 			. '\'. Following allowed: ' . implode(', ', array_keys($this->discriminatedEntityModels)));
 	}
 	/* (non-PHPdoc)

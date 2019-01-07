@@ -22,7 +22,7 @@
 namespace n2n\persistence\orm\store\operation;
 
 use n2n\persistence\orm\store\action\ActionQueue;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\model\EntityModel;

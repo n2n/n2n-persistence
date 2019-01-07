@@ -23,7 +23,7 @@ namespace n2n\persistence\meta\data\common;
 
 use n2n\persistence\meta\data\JoinType;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 
 use n2n\persistence\meta\data\QueryComparator;
 

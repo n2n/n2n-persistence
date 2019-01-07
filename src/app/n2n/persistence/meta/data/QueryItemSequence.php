@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\meta\data;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 
 class QueryItemSequence implements QueryItem {
 	const OPERATOR_SEQ = ',';
