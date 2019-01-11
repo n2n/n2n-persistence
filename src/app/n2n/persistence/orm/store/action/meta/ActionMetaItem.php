@@ -87,7 +87,11 @@ class ActionMetaItem {
 	
 	public function bindRawValues(PdoStatement $pdoStatement) {
 		foreach ($this->rawValues as $columnName => $rawValue) {
-			$pdoStatement->bindValue($columnName, $rawValue, $this->dataTypes[$columnName]);
+			if (isset($this->dataTypes[$columnName])) {
+				$pdoStatement->bindValue($columnName, $rawValue, $this->dataTypes[$columnName]);
+			} else {
+				$pdoStatement->autoBindValue($columnName, $rawValue);
+			}
 		}
 	}
 }
