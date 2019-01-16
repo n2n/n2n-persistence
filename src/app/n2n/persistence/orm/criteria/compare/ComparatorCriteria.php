@@ -26,7 +26,7 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\persistence\orm\criteria\Criteria;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
-use n2n\reflection\property\TypeConstraint;
+use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryPoint;
 use n2n\persistence\orm\query\QueryModel;

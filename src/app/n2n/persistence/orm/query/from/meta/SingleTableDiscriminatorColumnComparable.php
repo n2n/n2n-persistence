@@ -29,7 +29,7 @@ use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\util\ex\NotYetImplementedException;
 use n2n\persistence\meta\data\QueryPartGroup;
 use n2n\persistence\meta\data\QueryItem;
-use n2n\reflection\property\TypeConstraint;
+use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\criteria\compare\ColumnComparableAdapter;
 
