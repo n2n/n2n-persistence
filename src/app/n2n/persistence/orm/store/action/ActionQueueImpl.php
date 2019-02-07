@@ -190,6 +190,7 @@ class ActionQueueImpl implements ActionQueue {
 	public function clear() {
 		$this->removeActionPool->clear();
 		$this->persistActionPool->clear();
+		$this->actionJobs = [];
 	}
 		
 	public function announceLifecycleEvent(LifecycleEvent $event) {

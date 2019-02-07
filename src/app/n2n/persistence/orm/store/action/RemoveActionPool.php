@@ -41,6 +41,10 @@ class RemoveActionPool {
 	}
 	
 	public function clear() {
+		foreach ($this->removeActions as $action) {
+			$this->actionQueue->remove($action);
+		}
+		
 		$this->frozen = false;
 		$this->removeActions = array();
 		$this->unsuppliedRemoveActions = array();
