@@ -29,7 +29,7 @@ interface ColumnComparable {
 	 */
 	public function getAvailableOperators();
 	/**
-	 * @return \n2n\reflection\property\TypeConstraint 
+	 * @return \n2n\util\type\TypeConstraint 
 	 */
 	public function getTypeConstraint($operator);
 	/**

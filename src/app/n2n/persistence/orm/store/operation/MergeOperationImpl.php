@@ -26,7 +26,7 @@ use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\model\EntityModel;
-use n2n\reflection\property\ValueIncompatibleWithConstraintsException;
+use n2n\util\type\ValueIncompatibleWithConstraintsException;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\store\PersistenceOperationException;
 

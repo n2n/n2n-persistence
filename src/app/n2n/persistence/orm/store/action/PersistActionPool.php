@@ -236,6 +236,10 @@ class PersistActionPool {
 	}
 	
 	public function clear() {
+		foreach ($this->persistActions as $action) {
+			$this->actionQueue->remove($action);
+		}
+		
 		$this->frozen = false;
 		$this->persistActions = array();
 		$this->unsuppliedPersistActions = array();

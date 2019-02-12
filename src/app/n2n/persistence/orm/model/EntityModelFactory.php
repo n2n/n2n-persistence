@@ -306,7 +306,6 @@ class EntityModelFactory {
 					. $this->entityModel->getClass()->getName(), $annoIds);
 		} 
 		
-		$accessProxy = null;
 		$propertyName = self::DEFAULT_ID_PROPERTY_NAME;
 		$generatedValue = $this->entityModel->getInheritanceType() != InheritanceType::TABLE_PER_CLASS;
 		$sequenceName = null;

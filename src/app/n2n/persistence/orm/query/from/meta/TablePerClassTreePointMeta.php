@@ -59,8 +59,6 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 	}
 
 	private function registerEntityModel(EntityModel $entityModel) {
-		$className = $entityModel->getClass()->getName();
-		
 		$this->discriminatedEntityModels[] = $entityModel;
 		$this->discriminatedColumnAliases[$entityModel->getClass()->getName()] = array();
 	}
