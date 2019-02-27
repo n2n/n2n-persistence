@@ -62,6 +62,10 @@ class ExpressionParser {
 			return $parser->getCriteria();
 		}
 		
+		if (NqlUtils::isConst($expression)) {
+			return new CriteriaConstant($expression);
+		}
+		
 		return CrIt::pf($expression);
 	}
 	

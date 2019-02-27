@@ -38,6 +38,10 @@ class NqlUtils {
 		return in_array(mb_strtoupper($str), CriteriaFunction::getNames());
 	}
 	
+	public static function isConst($str) {
+		return Nql::isKeywordTrue($str) || Nql::isKeywordFalse($str) || Nql::isKeywordNull($str) || is_numeric($str);
+	}
+	
 	public static function isCriteria($str) {
 		return StringUtils::pregMatch('/^\s*' . Nql::KEYWORD_SELECT . '\s+/', $str) > 0 
 				|| StringUtils::pregMatch('/^\s*' . Nql::KEYWORD_FROM . '\s+/', $str) > 0;

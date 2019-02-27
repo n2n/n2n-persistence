@@ -45,7 +45,7 @@ class QueryItemSequence implements QueryItem {
 	public function add($operator, QueryItem $queryItem) {
 		ArgUtils::valEnum($operator, self::getOperators());
 		$sequenceItem = new QueryItemSequenceItem($queryItem);
-		$this->lastSequenceItem->setSequenceOperator(new SequenceOperator($operator, $sequenceItem));
+		$this->lastSequenceItem->setSquenceOperator(new SequenceOperator($operator, $sequenceItem));
 		$this->lastSequenceItem = $sequenceItem;
 	}
 	
