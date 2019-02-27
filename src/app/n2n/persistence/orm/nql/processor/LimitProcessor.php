@@ -32,6 +32,8 @@ class LimitProcessor extends KeywordProcesserAdapter {
 	
 	public function processChar($char) {
 		if ($char == Nql::EXPRESSION_SEPERATOR) {
+			$this->processCurrentToken();
+			$this->currentToken = '';
 			if (null === $this->limit) {
 				throw $this->createNqlParseException('No Limit given.');
 			}
@@ -46,6 +48,7 @@ class LimitProcessor extends KeywordProcesserAdapter {
 		}
 		
 		$this->processCurrentToken();
+		$this->currentToken = '';
 	}
 	
 	public function processCurrentToken() {
@@ -71,6 +74,7 @@ class LimitProcessor extends KeywordProcesserAdapter {
 				$this->num = $this->parsingState->getParam($this->currentToken);
 				return;
 			} 
+			
 			$this->num = $this->currentToken;
 			return;
 		}
