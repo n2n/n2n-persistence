@@ -24,19 +24,22 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
-use n2n\util\type\ArgUtils;
 
 class AnnoColumn implements PropertyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
 	
 	private $name;
 
-	public function __construct($name) {
-		ArgUtils::valType($name, 'scalar');
+	public function __construct(string $name = null, bool $nullable = true, int $length = null, 
+			int $percision = null, int $scale = null) {
 		$this->name = $name;
 	}
 	
 	public function getName() {
 		return $this->name;
+	}
+	
+	public function isNullable() {
+		return $this->nullable;
 	}
 }
