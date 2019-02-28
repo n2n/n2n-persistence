@@ -22,7 +22,7 @@
 namespace n2n\persistence\meta\data;
 
 class SequenceOperator {
-	private $opterator;
+	private $operator;
 	private $nextItem;
 	/**
 	 * @param string $operator

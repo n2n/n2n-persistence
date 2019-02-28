@@ -49,6 +49,8 @@ class Nql {
 	const KEYWORD_NULL = 'NULL';
 	const KEYWORD_IS = 'IS';
 	const KEYWORD_CONTAINS = CriteriaComparator::OPERATOR_CONTAINS;
+	const KEYWORD_TRUE = 'TRUE';
+	const KEYWORD_FALSE = 'FALSE';
 	
 	public static function getNoticeableKeyWords() {
 		return array(self::KEYWORD_SELECT, self::KEYWORD_FROM, self::KEYWORD_WHERE, 
@@ -61,6 +63,14 @@ class Nql {
 	
 	public static function isKeywordNull($token) {
 		return self::compare($token, Nql::KEYWORD_NULL);
+	}
+	
+	public static function isKeywordTrue($token) {
+		return self::compare($token, Nql::KEYWORD_TRUE);
+	}
+	
+	public static function isKeywordFalse($token) {
+		return self::compare($token, Nql::KEYWORD_FALSE);
 	}
 	
 	public static function isKeywordIs($token) {

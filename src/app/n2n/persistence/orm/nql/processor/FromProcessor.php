@@ -84,6 +84,10 @@ class FromProcessor extends KeywordProcesserAdapter {
 	}
 	
 	private function doFrom() {
+		if (null === $this->alias) {
+			throw $this->createNqlParseException('Alias expected');
+		}
+		
 		if (null !== $this->fromCriteria) {
 			$this->criteria->fromCriteria($this->fromCriteria, $this->alias);
 			$this->reset();
