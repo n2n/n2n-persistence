@@ -31,7 +31,7 @@ class AnnoOneToOne extends MappableOrmRelationAnnotation {
 		parent::__construct($targetEntityClass, $mappedBy, $cascadeType, $fetchType);
 		
 		if ($orphanRemoval !== null) {
-			ArgUtils::valType($orphanRemoval, 'boolean');
+			ArgUtils::valType($orphanRemoval, 'bool');
 			$this->orphanRemoval = $orphanRemoval;
 		}
 	}

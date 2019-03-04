@@ -24,6 +24,7 @@ namespace n2n\persistence\orm\query\select;
 use n2n\persistence\meta\data\QueryItem;
 use n2n\persistence\PdoStatement;
 use n2n\util\type\ArgUtils;
+use n2n\util\type\TypeName;
 
 class SimpleSelection implements Selection {
 	private $queryItem;
@@ -32,7 +33,7 @@ class SimpleSelection implements Selection {
 
 	public function __construct(QueryItem $queryItem, string $type = null) {
 		$this->queryItem = $queryItem;
-		ArgUtils::valEnum($type, ['bool'], null, true);
+		ArgUtils::valEnum($type, [TypeName::BOOL, TypeName::INT], null, true);
 		$this->type = $type;
 	}
 	
@@ -48,8 +49,11 @@ class SimpleSelection implements Selection {
 		$value = null; 
 		if ($this->value !== null) {
 			switch ($this->type) {
-				case 'bool';
+				case TypeName::BOOL;
 					$value = (bool) $this->value;
+					break;
+				case TypeName::INT:
+					$value = (int) $this->value;
 					break;
 				default:
 					$value = $this->value;
