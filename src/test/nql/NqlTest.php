@@ -189,7 +189,7 @@ class NqlTest extends TestCase {
 			$this->assertTrue($e instanceof NqlParseException);
 		}
 		
-		$result = $this->assertNql('SELECT b.id AS "what are you", b.id AS "hahaha" FROM BlogArticle b', [], true);
+		$result = $this->assertNql('SELECT b.id AS "what are you" , b.id AS "hahaha" FROM BlogArticle b ORDER BY b.id DESC , b.id DESC', [], true);
 		$this->assertTrue(is_array($result));
 		$this->assertTrue(isset(reset($result)['what are you']));
 	}

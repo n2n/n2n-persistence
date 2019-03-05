@@ -71,6 +71,7 @@ class SelectProcessor extends KeywordProcesserAdapter {
 	}
 	
 	private function processCurrentToken() {
+		if (empty($this->currentToken)) return;
 		
 		if ($this->firstToken) {
 			if (mb_strtoupper($this->currentToken) == Nql::KEYWORD_SELECT) {
@@ -142,9 +143,7 @@ class SelectProcessor extends KeywordProcesserAdapter {
 	public function finalize() {
 		parent::finalize();
 		
-		if (!empty($this->currentToken)) {
-			$this->processCurrentToken();
-		}
+		$this->processCurrentToken();
 	
 		$this->doSelect();
 	}
