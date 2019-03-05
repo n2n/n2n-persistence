@@ -25,6 +25,7 @@ use n2n\persistence\orm\nql\Nql;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\util\StringUtils;
+use n2n\persistence\orm\nql\NqlUtils;
 
 class SelectProcessor extends KeywordProcesserAdapter {
 	
@@ -80,7 +81,7 @@ class SelectProcessor extends KeywordProcesserAdapter {
 		
 		if ($this->expectAlias) {
 			$this->expectAlias = false;
-			$this->alias = $this->currentToken;
+			$this->alias = NqlUtils::removeQuotationMarks($this->currentToken);
 			return;
 		}
 		

@@ -10,11 +10,16 @@ use nql\bo\Member;
 use n2n\persistence\meta\structure\Size;
 use n2n\persistence\meta\structure\IndexType;
 use n2n\persistence\orm\nql\NqlParseException;
+use n2n\persistence\meta\data\QueryColumn;
+use n2n\persistence\meta\data\QueryConstant;
 
 class NqlTest extends TestCase {
 
 	private $em;
+	private $pdo;
+	private $metaData;
 	private $dataBase;
+	private $dialect;
 	private $metaEntityFactory;
 	
 	public function __construct($name = null, array $data = [], $dataName = '') {
@@ -23,13 +28,17 @@ class NqlTest extends TestCase {
 	}
 	
 	private function _init(EntityManager $em, N2nContext $n2nContext) {
+		$this->metaData = $em->getPdo()->getMetaData();
 		$this->dataBase = $em->getPdo()->getMetaData()->getDatabase();
+		$this->dialect = $this->metaData->getDialect();
 		$this->metaEntityFactory = $this->dataBase->createMetaEntityFactory();
 		$this->em = $em;
+		$this->pdo = $em->getPdo();
 		$this->prepareDatabase();
 	}
 	
 	private function prepareDatabase() {
+		$stmts = [];
 		if (!$this->dataBase->containsMetaEntityName('nql_buddy')) {
 			$table = $this->metaEntityFactory->createTable('nql_buddy');
 			
@@ -49,15 +58,25 @@ class NqlTest extends TestCase {
 			$columnFactory->createStringColumn('author', '255');
 		}
 		
-		if (!$this->dataBase->containsMetaEntityName('nql_blog_article')) {
-			$table = $this->metaEntityFactory->createTable('nql_blog_article');
-			
-			$columnFactory = $table->createColumnFactory();
-			$id = $columnFactory->createIntegerColumn('id', Size::INTEGER);
-			$table->createIndex(IndexType::PRIMARY, array('id'));
-			$columnFactory->createStringColumn('title', '255');
-			$columnFactory->createIntegerColumn('latest_comment_id', Size::INTEGER);
+		if ($this->dataBase->containsMetaEntityName('nql_blog_article')) {
+			$this->dataBase->removeMetaEntityByName('nql_blog_article');
 		}
+		
+		$table = $this->metaEntityFactory->createTable('nql_blog_article');
+		
+		$columnFactory = $table->createColumnFactory();
+		$id = $columnFactory->createIntegerColumn('id', Size::INTEGER);
+		$table->createIndex(IndexType::PRIMARY, array('id'));
+		$columnFactory->createStringColumn('title', '255');
+		$columnFactory->createIntegerColumn('latest_comment_id', Size::INTEGER);
+		$this->dialect->applyIdentifierGeneratorToColumn($this->pdo, $id, '');
+		
+		$insertBuilder = $this->metaData->createInsertStatementBuilder();
+		$insertBuilder->setTable('nql_blog_article');
+		$insertBuilder->addColumn(new QueryColumn('title'), new QueryConstant('holeradio'));
+		$insertBuilder->toSqlString();
+		
+		$stmts[] = $this->pdo->prepare($insertBuilder->toSqlString());
 		
 		if (!$this->dataBase->containsMetaEntityName('nql_article')) {
 			$table = $this->metaEntityFactory->createTable('nql_article');
@@ -97,6 +116,9 @@ class NqlTest extends TestCase {
 		}
 		
 		$this->dataBase->flush();
+		foreach ($stmts as $stmt) {
+			$stmt->execute();
+		}
 	}
 	
 	public function testOne() {
@@ -166,6 +188,10 @@ class NqlTest extends TestCase {
 		} catch (\Throwable $e) {
 			$this->assertTrue($e instanceof NqlParseException);
 		}
+		
+		$result = $this->assertNql('SELECT b.id AS "what are you", b.id AS "hahaha" FROM BlogArticle b', [], true);
+		$this->assertTrue(is_array($result));
+		$this->assertTrue(isset(reset($result)['what are you']));
 	}
 	
 	private function assertNql($nql, array $params = array(), $execute = false) {
@@ -173,7 +199,9 @@ class NqlTest extends TestCase {
 		$this->assertTrue($this->em->createNqlCriteria($nql, $params) instanceof Criteria);
 		
 		if ($execute) {
-			$this->assertTrue(is_array($criteria->toQuery()->fetchArray()));
+			$result = $criteria->toQuery()->fetchArray();
+			$this->assertTrue(is_array($result));
+			return $result;
 		}
 	}
 	
