@@ -33,7 +33,7 @@ class SimpleSelection implements Selection {
 
 	public function __construct(QueryItem $queryItem, string $type = null) {
 		$this->queryItem = $queryItem;
-		ArgUtils::valEnum($type, [TypeName::BOOL, TypeName::INT], null, true);
+		ArgUtils::valEnum($type, [TypeName::BOOL, TypeName::INT, TypeName::FLOAT, TypeName::STRING], null, true);
 		$this->type = $type;
 	}
 	
@@ -54,6 +54,12 @@ class SimpleSelection implements Selection {
 					break;
 				case TypeName::INT:
 					$value = (int) $this->value;
+					break;
+				case TypeName::FLOAT:
+					$value = (float) $this->value;
+					break;
+				case TypeName::STRING:
+					$value = (string) $this->value;
 					break;
 				default:
 					$value = $this->value;
