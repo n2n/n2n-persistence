@@ -39,7 +39,7 @@ class MetaData {
 	
 	public function getMetaManager() {
 		if (null === $this->metaManager) {
-			$this->metaManager = $this->dialect->createMetaManager($this->dbh);
+			$this->metaManager = $this->getDialect()->createMetaManager($this->dbh);
 		}
 		
 		return $this->metaManager;
@@ -48,13 +48,13 @@ class MetaData {
 	/**
 	 * @return \n2n\persistence\meta\Database
 	 */
-// 	public function getDatabase() {
-// 		if (null === $this->database) {
-// 			$this->database = $this->getMetaManager()->createDatabase();
-// 		}
+	public function getDatabase() {
+		if (null === $this->database) {
+			$this->database = $this->getMetaManager()->createDatabase();
+		}
 		
-// 		return $this->database;
-// 	}
+		return $this->database;
+	}
 	
 	/**
 	 * @return \n2n\persistence\meta\data\SelectStatementBuilder

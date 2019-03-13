@@ -35,16 +35,16 @@ class ChangeRequestQueue {
 	 * @param Pdo $dbh
 	 */
 	public function persist(Pdo $dbh) {
-		$dbh->beginTransaction();
-		try {
+//		$dbh->beginTransaction();
+// 		try {
 			foreach ($this->changeRequests as $changeRequest) {
 				$changeRequest->execute($dbh);
 			}
-		} catch (\Throwable $e) {
-			$dbh->rollBack();
-			throw $e;
-		}
-		$dbh->commit();
+// 		} catch (\Throwable $e) {
+// 			$dbh->rollBack();
+// 			throw $e;
+// 		}
+// 		$dbh->commit();
 		$this->initialize();
 	}
 	

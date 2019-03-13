@@ -125,4 +125,8 @@ class CommonIndex implements Index {
 		
 		return true;
 	}
+	
+	public function __toString() {
+		return $this->type . ': ' . $this->getName();
+	}
 }

@@ -30,6 +30,7 @@ use n2n\persistence\meta\MetaRuntimeException;
 use n2n\util\type\CastUtils;
 use n2n\persistence\meta\structure\DuplicateMetaElementException;
 use n2n\util\type\ArgUtils;
+use n2n\persistence\meta\structure\UnknownIndexException;
 
 abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnChangeListener {
 
@@ -102,20 +103,19 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 	 * @return Index
 	 */
 	public function getPrimaryKey(): ?Index {
-		if (null === $this->primaryKey) {
-			// if the table is not persistent so far, it is possible that it doesn't have a Primary Key
-			foreach ($this->getIndexes() as $index) {
-				if ($index->getType() == IndexType::PRIMARY) {
-					if (null === $this->primaryKey) {
-						$this->primaryKey = $index;
-					} else {
-						throw new MetaRuntimeException('Duplicate primary key in table "' . $this->getName() . '"');
-					}
+		// if the table is not persistent so far, it is possible that it doesn't have a Primary Key
+		$primaryKey = null;
+		foreach ($this->getIndexes() as $index) {
+			if ($index->getType() == IndexType::PRIMARY) {
+				if (null === $this->primaryKey) {
+					$primaryKey = $index;
+				} else {
+					throw new MetaRuntimeException('Duplicate primary key in table "' . $this->getName() . '"');
 				}
 			}
 		}
 		
-		return $this->primaryKey;
+		return $primaryKey;
 	}
 
 	/**
@@ -127,13 +127,32 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 	}
 
 	public function setIndexes(array $indexes) {
+		$this->indexes = [];
+		foreach ($indexes as $index) {
+			$this->addIndex($index);
+		}
+	}
+	
+	public function addIndex(Index $index) {
+		if ($this->containsIndexName($index->getName())) {
+			throw new DuplicateMetaElementException('Duplicate index ' . $index->getName() . ' on table "' . $this->getName() .'"'); 
+		}
+		
+		if ($index->getType() === IndexType::PRIMARY) {
+			foreach ($this->indexes as $aIndex) {
+				if ($aIndex->getType() !== IndexType::PRIMARY) continue; 
+				
+				throw new DuplicateMetaElementException('Duplicate primary index ' . $index->getName() . ' on table "' . $this->getName() .'"'); 
+			}
+		}
+		
+		$this->indexes[] = $index;
 		$this->triggerChangeListeners();
-		$this->indexes = $indexes;
 	}
 
 	public function removeIndexByName(string $name) {
 		foreach ($this->indexes as $key => $index) {
-			if ($index->getName() != $name) continue;
+			if ($index->getName() !== $name) continue;
 			
 			unset($this->indexes[$key]);
 			$this->triggerChangeListeners();
@@ -232,8 +251,7 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 			}
 			$newIndex = new ForeignIndex($this, $name, $columns, $refTable, $refColumns);
 		}
-			
-		$this->indexes[] = $newIndex;
+		$this->addIndex($newIndex);
 		return $newIndex;
 	}
 	
@@ -242,7 +260,7 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 			if ($index->getName() == $name) return $index;
 		}
 		
-		throw new UnknownColumnException('Index "' . $index->getName() 
+		throw new UnknownIndexException('Index "' . $index->getName() 
 				. '" does not exist in Table "' . $this->getName() . '"');
 	}
 	
