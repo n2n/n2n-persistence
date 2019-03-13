@@ -36,7 +36,6 @@ use n2n\persistence\orm\proxy\CanNotCreateEntityProxyClassException;
 use n2n\reflection\ObjectCreationFailedException;
 use n2n\persistence\orm\EntityCreationFailedException;
 use n2n\persistence\orm\proxy\EntityProxy;
-use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\persistence\orm\property\BasicEntityProperty;
 
 class PersistenceContext {
