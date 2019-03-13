@@ -28,4 +28,12 @@ interface MetaEntityChangeListener {
 	 * @param MetaEntity $metaEntity
 	 */
 	public function onMetaEntityChange(MetaEntity $metaEntity);
+	
+	/**
+	 * The new name is already set on the meta entity
+	 * 
+	 * @param string $orginalName
+	 * @param MetaEntity $metaEntity
+	 */
+	public function onMetaEntityNameChange(string $orginalName, MetaEntity $metaEntity);
 }

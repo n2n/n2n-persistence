@@ -21,22 +21,27 @@
  */
 namespace n2n\persistence\meta\structure;
 
+use n2n\persistence\meta\Database;
+
 interface MetaEntityFactory {
+	
 	/**
-	 * @return \n2n\persistence\meta\Database
+	 * @return Database
 	 */
-	public function getDatabase();
+	public function getDatabase(): Database;
+	
 	/**
 	 * Creates a new table and applies it to the current database.
 	 * @param string $name
-	 * @return \n2n\persistence\meta\structure\Table
+	 * @return Table
 	 */
-	public function createTable($name);
+	public function createTable(string $name): Table;
+	
 	/**
 	 * Creates a new view and applies it to the current database.
 	 * @param string $name
 	 * @param string $query
-	 * @return \n2n\persistence\meta\structure\View
+	 * @return View
 	 */
-	public function createView($name, $query);
+	public function createView(string $name, string $query): View;
 }

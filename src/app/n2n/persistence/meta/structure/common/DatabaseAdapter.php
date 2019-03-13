@@ -142,6 +142,10 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 		$this->triggerOnMetaEntityAlter($metaEntity);
 	}
 
+	public function onMetaEntityNameChange(string $orginalName, MetaEntity $metaEntity) {
+		$this->triggerOnMetaEntityNameChange($orginalName, $metaEntity);
+	}
+
 	private function removeMetaEntity(MetaEntity $metaEntity) {
 		if (!$this->containsMetaEntityName($metaEntity->getName())) return;
 		
@@ -177,6 +181,12 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 	protected function triggerOnMetaEntityDrop(MetaEntity $metaEntity) {
 		foreach($this->changeListeners as $changeListener) {
 			$changeListener->onMetaEntityDrop($metaEntity);
+		}
+	}
+	
+	protected function triggerOnMetaEntityNameChange(string $originalName, MetaEntity $metaEntity) {
+		foreach($this->changeListeners as $changeListener) {
+			$changeListener->onMetaEntityNameChange($originalName, $metaEntity);
 		}
 	}
 }

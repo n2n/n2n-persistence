@@ -56,7 +56,17 @@ abstract class MetaEntityAdapter implements MetaEntity {
 	}
 	
 	public function setName(string $name) {
+		$originalName = null;
+		
+		if ($this->name !== $name) {
+			$originalName = $this->name;
+		}
+		
 		$this->name = $name;
+		
+		if (null !== $originalName) {
+			$this->triggerNameChangeListeners($originalName);
+		}
 	}
 	/** 
 	 * @return \n2n\persistence\meta\Database
@@ -88,6 +98,12 @@ abstract class MetaEntityAdapter implements MetaEntity {
 	protected function triggerChangeListeners() {
 		foreach($this->changeListeners as $changeListener) {
 			$changeListener->onMetaEntityChange($this);
+		}
+	}
+	
+	protected function triggerNameChangeListeners(string $originalName) {
+		foreach($this->changeListeners as $changeListener) {
+			$changeListener->onMetaEntityNameChange($originalName, $this);
 		}
 	}
 	

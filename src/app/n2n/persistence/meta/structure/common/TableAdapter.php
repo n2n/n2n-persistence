@@ -281,7 +281,7 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 		if (!$name) {
 			for ($i = 1; $i <= PHP_INT_MAX; $i++) {
 				$name = $this->getName() . '_index_' . $i;
-				if (array_key_exists($name, $this->indexes)) {
+				if ($this->containsIndexName($name)) {
 					continue;
 				}
 				break;

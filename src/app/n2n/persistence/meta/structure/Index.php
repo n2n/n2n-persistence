@@ -46,18 +46,29 @@ interface Index {
 	 * @return Column
 	 * @throws UnknownColumnException
 	 */
-	public function getColumnByName($name): Column;
+	public function getColumnByName(string $name): Column;
 	
 	/**
 	 * @return bool
 	 */
-	public function containsColumnName($name): bool;
+	public function containsColumnName(string $name): bool;
 	
 	/**
 	 * Reference columns for foreign key indexes 
 	 *  @return Column[]
 	 */
 	public function getRefColumns(): array;
+	
+	/**
+	 * @return Column
+	 * @throws UnknownColumnException
+	 */
+	public function getRefColumnByName(string $name): Column;
+	
+	/**
+	 * @return bool
+	 */
+	public function containsRefColumnName(string $name): bool;
 	
 	/**
 	 * Reference table for foreign key indexex

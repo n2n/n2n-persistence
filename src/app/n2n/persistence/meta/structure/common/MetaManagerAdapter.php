@@ -28,7 +28,6 @@ use n2n\persistence\meta\Database;
 
 abstract class MetaManagerAdapter implements MetaManager, DatabaseChangeListener {
 	protected $dbh;
-	private $database;
 	private $metaEntityBuilder;
 	private $changeRequestQueue;
 	
@@ -47,12 +46,10 @@ abstract class MetaManagerAdapter implements MetaManager, DatabaseChangeListener
 	 * @return Database
 	 */
 	public function createDatabase(): Database {
-		if (null === $this->database) {
-			$this->database = $this->buildDatabase();
-			$this->database->registerChangeListener($this);
-		}
+		$database = $this->buildDatabase();
+		$database->registerChangeListener($this);
 		
-		return $this->database;
+		return $database;
 	}
 	
 	/**
@@ -76,6 +73,14 @@ abstract class MetaManagerAdapter implements MetaManager, DatabaseChangeListener
 		$this->addChangeRequest($this->createDropMetaEntityRequest($metaEntity));
 	}
 	
+	/**
+	 * @param MetaEntity $metaEntity
+	 */
+	public function onMetaEntityNameChange(string $orignalName, MetaEntity $metaEntity) {
+		$this->addChangeRequest($this->createRenameMetaEntityRequest(
+				$metaEntity, $orignalName, $metaEntity->getName()));
+	}
+	
 	private function addChangeRequest(ChangeRequest $changeRequest) {
 		$ignore = false;
 		foreach ($this->changeRequestQueue->getAll() as $aChangeRequest) {
@@ -95,5 +100,6 @@ abstract class MetaManagerAdapter implements MetaManager, DatabaseChangeListener
 	protected abstract function createCreateMetaEntityRequest(MetaEntity $metaEntity);
 	protected abstract function createAlterMetaEntityRequest(MetaEntity $metaEntity);
 	protected abstract function createDropMetaEntityRequest(MetaEntity $metaEntity);
+	protected abstract function createRenameMetaEntityRequest(MetaEntity $metaEntity, string $oldName, string $newName);
 	protected abstract function buildDatabase(): DatabaseAdapter;
 }

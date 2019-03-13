@@ -21,29 +21,5 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\MetaEntity;
-
-interface DatabaseChangeListener {
-	/**
-	 * @param MetaEntity $metaEntity
-	 */
-	public function onMetaEntityCreate(MetaEntity $metaEntity);
-	
-	/**
-	 * @param MetaEntity $metaEntity
-	 */
-	public function onMetaEntityAlter(MetaEntity $metaEntity);
-	
-	/**
-	 * @param MetaEntity $metaEntity
-	 */
-	public function onMetaEntityDrop(MetaEntity $metaEntity);
-	
-	/**
-	 * The new name is already set on the meta entity
-	 *
-	 * @param string $orginalName
-	 * @param MetaEntity $metaEntity
-	 */
-	public function onMetaEntityNameChange(string $orginalName, MetaEntity $metaEntity);
+interface RenameMetaEntityRequest extends ChangeRequest {
 }

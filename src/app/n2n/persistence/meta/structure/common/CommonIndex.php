@@ -79,7 +79,7 @@ class CommonIndex implements Index {
 	 * @see \n2n\persistence\meta\structure\Index::getColumnByName()
 	 * @return Column
 	 */
-	public function getColumnByName($name): Column {
+	public function getColumnByName(string $name): Column {
 		foreach ($this->columns as $column) {
 			if ($column->getName() == $name) return $column;
 		}
@@ -88,7 +88,7 @@ class CommonIndex implements Index {
 				. '" does not exist in index "' . $this->name . '" for table "' . $this->table->getName() . '"');
 	}
 	
-	public function containsColumnName($name): bool {
+	public function containsColumnName(string $name): bool {
 		try {
 			$this->getColumnByName($name);
 			return true;
@@ -115,6 +115,24 @@ class CommonIndex implements Index {
 	
 	public function getRefTable(): ?Table {
 		return null;
+	}
+	
+	public function getRefColumnByName(string $name): Column {
+		foreach ($this->getRefColumns() as $refColumn) {
+			if ($refColumn->getName() == $name) return $refColumn;
+		}
+		
+		throw new UnknownColumnException('Ref Column with name "'  . $name
+				. '" does not exist in index "' . $this->name . '" for table "' . $this->table->getName() . '"');
+	}
+		
+	public function containsRefColumnName(string $name): bool {
+		try {
+			$this->getRefColumnByName($name);
+			return true;
+		} catch (UnknownColumnException $e) {
+			return false;
+		}
 	}
 	
 	public function equals(Index $index): bool {

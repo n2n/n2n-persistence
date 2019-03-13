@@ -23,27 +23,22 @@ namespace n2n\persistence\meta\structure\common;
 
 use n2n\persistence\meta\structure\MetaEntity;
 
-interface DatabaseChangeListener {
-	/**
-	 * @param MetaEntity $metaEntity
-	 */
-	public function onMetaEntityCreate(MetaEntity $metaEntity);
+abstract class RenameMetaEntityRequestAdapter extends ChangeRequestAdapter implements RenameMetaEntityRequest {
 	
-	/**
-	 * @param MetaEntity $metaEntity
-	 */
-	public function onMetaEntityAlter(MetaEntity $metaEntity);
+	protected $oldName;
+	protected $newName;
 	
-	/**
-	 * @param MetaEntity $metaEntity
-	 */
-	public function onMetaEntityDrop(MetaEntity $metaEntity);
+	public function __construct(MetaEntity $metaEntity, string $oldName, string $newName) {
+		parent::__construct($metaEntity);
+		$this->oldName = $oldName;
+		$this->newName = $newName;
+	}
 	
-	/**
-	 * The new name is already set on the meta entity
-	 *
-	 * @param string $orginalName
-	 * @param MetaEntity $metaEntity
-	 */
-	public function onMetaEntityNameChange(string $orginalName, MetaEntity $metaEntity);
+	public function neutralizesChangeRequest(ChangeRequest $newChangeRequest) {
+		return false;
+	}
+
+	public function isNeutralizedBy(ChangeRequest $newChangeRequest) {
+		return false;
+	}
 }
