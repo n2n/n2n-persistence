@@ -80,7 +80,8 @@ abstract class DateTimeColumnAdapter extends ColumnAdapter implements DateTimeCo
 	}
 
 	public function equalsType(Column $column, $ignoreNull = false) {
-		return parent::equalsType($column, $ignoreNull)
+		return parent::equalsType($column, $ignoreNull) 
+				&& $column instanceof DateTimeColumnAdapter
 				&& ($column->isDateAvailable() === $this->isDateAvailable())
 				&& ($column->isTimeAvailable() === $this->isTimeAvailable());
 	}

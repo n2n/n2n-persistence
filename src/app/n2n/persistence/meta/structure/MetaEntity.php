@@ -21,21 +21,32 @@
  */
 namespace n2n\persistence\meta\structure;
 
+use n2n\persistence\meta\Database;
+
 interface MetaEntity {
 	/**
 	 * @return string
 	 */
-	public function getName();
+	public function getName(): string;
+	
 	/**
 	 * @param string $name
 	 */
-	public function setName($name);
+	public function setName(string $name);
+	
 	/**
-	 * @return \n2n\persistence\meta\Database
+	 * @return Database
 	 */
-	public function getDatabase();
+	public function getDatabase(): Database;
+
 	/**
 	 * @return array
 	 */
-	public function getAttrs();
+	public function getAttrs(): array;
+	
+	/**
+	 * @param mixed $obj
+	 * @return bool
+	 */
+	public function equals($obj): bool;
 }

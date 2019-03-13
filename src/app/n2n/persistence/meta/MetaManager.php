@@ -19,11 +19,26 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\meta\structure;
+namespace n2n\persistence\meta;
 
-class IndexType {
-	const PRIMARY = 'primary';
-	const UNIQUE = 'unique';
-	const INDEX = 'index';
-	const FOREIGN = 'foreign';
+use n2n\persistence\Pdo;
+use n2n\persistence\meta\structure\Backuper;
+
+interface MetaManager {
+	/**
+	 * All changes of tables, views and columns which belong to this database are saved. 
+	 */
+	public function flush();
+	/**
+	 * 
+	 * @param array $metaEnties an array of MetaEntities or MetaEntity names.
+	 * @return Backuper
+	 */
+	public function createBackuper(array $metaEnties): Backuper;
+	
+	/**
+	 * @param Pdo $dbh
+	 * @return \n2n\persistence\meta\Database
+	 */
+	public function createDatabase(): Database;
 }

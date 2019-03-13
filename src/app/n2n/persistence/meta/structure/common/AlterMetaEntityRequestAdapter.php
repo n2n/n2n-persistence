@@ -19,11 +19,15 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\meta\structure;
+namespace n2n\persistence\meta\structure\common;
 
-class IndexType {
-	const PRIMARY = 'primary';
-	const UNIQUE = 'unique';
-	const INDEX = 'index';
-	const FOREIGN = 'foreign';
+abstract class AlterMetaEntityRequestAdapter extends ChangeRequestAdapter implements AlterMetaEntityRequest {
+	public function neutralizesChangeRequest(ChangeRequest $newChangeRequest) {
+		return $newChangeRequest instanceof AlterMetaEntityRequest && 
+				$newChangeRequest->getMetaEntity()->equals($this->getMetaEntity()); 
+	}
+
+	public function isNeutralizedBy(ChangeRequest $newChangeRequest) {
+		return false;
+	}
 }

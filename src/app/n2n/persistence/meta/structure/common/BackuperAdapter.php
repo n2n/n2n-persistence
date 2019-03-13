@@ -33,7 +33,7 @@ use n2n\persistence\meta\structure\Backuper;
 
 abstract class BackuperAdapter implements Backuper {
 /**
-	 * @var n2n\persistence\meta\Database
+	 * @var Database
 	 */
 	protected $database;
 
@@ -72,6 +72,10 @@ abstract class BackuperAdapter implements Backuper {
 		$this->metaEntities = $metaEntities;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\meta\structure\Backuper::getMetaEntities()
+	 */
 	public function getMetaEntities() {
 		return $this->metaEntities;
 	}

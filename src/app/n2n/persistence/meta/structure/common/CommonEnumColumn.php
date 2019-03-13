@@ -35,6 +35,7 @@ class CommonEnumColumn extends ColumnAdapter implements EnumColumn {
 
 	public function equalsType(Column $column, $ignoreNull = false) {
 		return parent::equalsType($column, $ignoreNull)
+				&& $column instanceof CommonEnumColumn
 				&& (count(array_diff($column->getValues(), $this->getValues())) == 0)
 				&& (count(array_diff($this->getValues(), $column->getValues())) == 0);
 	}

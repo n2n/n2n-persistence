@@ -36,7 +36,7 @@ abstract class ChangeRequestAdapter implements ChangeRequest {
 	/**
 	 * @return \n2n\persistence\meta\structure\MetaEntity
 	 */
-	public function getMetaEntity() {
+	public function getMetaEntity(): MetaEntity {
 		return $this->metaEntity;
 	}
 }

@@ -170,7 +170,7 @@ class Pdo extends \PDO {
 		}
 		
 		if ($this->transactionManager->hasOpenTransaction()) {
-			$this->transactionManager->getRootTransactions()->commit();
+			$this->transactionManager->getRootTransaction()->commit();
 		}
 	}
 	/**
@@ -184,7 +184,7 @@ class Pdo extends \PDO {
 		}
 		
 		if ($this->transactionManager->hasOpenTransaction()) {
-			$this->transactionManager->getRootTransactions()->rollBack();
+			$this->transactionManager->getRootTransaction()->rollBack();
 		}
 	}
 	

@@ -23,31 +23,55 @@ namespace n2n\persistence\meta\structure;
 
 interface Index {
 	/**
-	 * @return string one of {@link IndexType::PRIMARY}, {@link IndexType::UNIQUE}, {@link IndexType::INDEX} 
+	 * @return string one of {@link IndexType::PRIMARY}, {@link IndexType::UNIQUE}, {@link IndexType::INDEX}, {@link IndexType::FOREIGN} 
 	 */
-	public function getType();
+	public function getType(): string;
+	
 	/**
 	 * @return string
 	 */
-	public function getName();
+	public function getName(): string;
+	
 	/**
 	 * @return Table
 	 */
-	public function getTable();
+	public function getTable(): Table;
+	
 	/**
-	 * @return array
+	 * @return Column[]
 	 */
-	public function getColumns();
+	public function getColumns(): array;
+	
 	/**
 	 * @return Column
+	 * @throws UnknownColumnException
 	 */
-	public function getColumnByName($name);
+	public function getColumnByName($name): Column;
+	
 	/**
 	 * @return bool
 	 */
-	public function containsColumnName($name);
+	public function containsColumnName($name): bool;
+	
 	/**
-	 * @return array
+	 * Reference columns for foreign key indexes 
+	 *  @return Column[]
+	 */
+	public function getRefColumns(): array;
+	
+	/**
+	 * Reference table for foreign key indexex
+	 * @return Table|null
+	 */
+	public function getRefTable(): ?Table;
+	
+	/**
+	 * @return string []
 	 */
 	public function getAttrs();
+	
+	/**
+	 * @param Index $index
+	 */
+	public function equals(Index $index);
 }

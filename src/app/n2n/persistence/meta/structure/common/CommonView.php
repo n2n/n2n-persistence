@@ -21,10 +21,7 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\MetaEntity;
-
 use n2n\persistence\meta\structure\View;
-
 
 class CommonView extends MetaEntityAdapter implements View {
 	private $query;
@@ -43,7 +40,7 @@ class CommonView extends MetaEntityAdapter implements View {
 		$this->triggerChangeListeners();
 	}
 
-	public function equals(MetaEntity $metaEntity) {
-		return parent::equals($metaEntity) && ($this->getQuery() == $metaEntity->getQuery());
+	public function equals($obj): bool {
+		return parent::equals($obj) && $this->getQuery() == $obj->getQuery();
 	}
 }

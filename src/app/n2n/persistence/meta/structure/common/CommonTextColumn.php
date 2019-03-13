@@ -44,7 +44,8 @@ class CommonTextColumn extends ColumnAdapter implements TextColumn {
 	}
 	
 	public function equalsType(Column $column, $ignoreNull = false) {
-		return parent::equalsType($column) 
+		return parent::equalsType($column)
+				&& $column instanceof CommonTextColumn
 				&& $column->getSize() === $this->getSize()
 				&& $column->getCharset() === $this->getCharset();
 	}

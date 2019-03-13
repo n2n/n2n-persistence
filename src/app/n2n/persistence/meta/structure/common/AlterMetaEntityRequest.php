@@ -22,5 +22,4 @@
 namespace n2n\persistence\meta\structure\common;
 
 interface AlterMetaEntityRequest extends ChangeRequest {
-	
 }

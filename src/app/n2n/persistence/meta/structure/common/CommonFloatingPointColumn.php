@@ -94,9 +94,10 @@ class CommonFloatingPointColumn extends ColumnAdapter implements FloatingPointCo
 	
 	public function equalsType(Column $column, $ignoreNull = false) {
 		return parent::equalsType($column, $ignoreNull)
-				&& ($column->getSize() === $this->getSize())
-				&& ($column->getMinValue() === $this->getMinValue())
-				&& ($column->getMaxValue() === $this->getMaxValue());
+				&& $column instanceof CommonFloatingPointColumn
+				&& $column->getSize() === $this->getSize()
+				&& $column->getMinValue() === $this->getMinValue()
+				&& $column->getMaxValue() === $this->getMaxValue();
 	}
 	
 	

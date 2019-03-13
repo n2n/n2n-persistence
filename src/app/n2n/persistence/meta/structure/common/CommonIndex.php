@@ -26,6 +26,8 @@ use n2n\persistence\meta\structure\IndexType;
 use n2n\persistence\meta\structure\Table;
 use n2n\persistence\meta\structure\Index;
 use n2n\persistence\meta\structure\UnknownColumnException;
+use n2n\persistence\meta\structure\Column;
+use n2n\persistence\meta\structure\DuplicateMetaElementException;
 
 class CommonIndex implements Index {
 	
@@ -35,41 +37,58 @@ class CommonIndex implements Index {
 	 * @var \n2n\persistence\meta\structure\Table
 	 */
 	private $table;
-	private $columns;
-	private $attrs;
+	private $columns = [];
+	private $attrs = [];
 	
 	public function __construct(Table $table, $name, $type, array $columns) {
-		ArgUtils::valEnum($type, array(IndexType::PRIMARY, IndexType::INDEX, IndexType::UNIQUE));
+		ArgUtils::valEnum($type, array(IndexType::PRIMARY, IndexType::INDEX, IndexType::UNIQUE, IndexType::FOREIGN));
+		ArgUtils::valArray($columns, Column::class);
 		
 		$this->name = $name;
 		$this->table = $table;
 		$this->type = $type;
-		$this->columns = $columns;
+		
+		foreach ($columns as $column) {
+			$this->addColumn($column);
+		}
 	}
 	
-	public function getType() {
+	public function getType(): string {
 		return $this->type;
 	}
 	
-	public function getName() {
+	public function getName(): string {
 		return $this->name;
 	}
 	
-	public function getColumns() {
+	public function addColumn(Column $column) {
+		if ($this->containsColumnName($column->getName())) {
+			throw new DuplicateMetaElementException('Duplicate column with name ' . $column->getName() .' found in index ' 
+					. $this->name . ' on table ' . $this->table->getName());
+		}
+		
+		$this->columns[] = $column;
+	}
+	
+	public function getColumns(): array {
 		return $this->columns;
 	}
 	
-	public function getColumnByName($name) {
-		$columns = $this->getColumns();
-		if (isset($columns[$name])) {
-			return $columns[$name];
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\meta\structure\Index::getColumnByName()
+	 * @return Column
+	 */
+	public function getColumnByName($name): Column {
+		foreach ($this->columns as $column) {
+			if ($column->getName() == $name) return $column;
 		}
 		
 		throw new UnknownColumnException('Column with name "'  . $name 
 				. '" does not exist in index "' . $this->name . '" for table "' . $this->table->getName() . '"');
 	}
 	
-	public function containsColumnName($name) {
+	public function containsColumnName($name): bool {
 		try {
 			$this->getColumnByName($name);
 			return true;
@@ -78,25 +97,32 @@ class CommonIndex implements Index {
 		}
 	}
 	
-	public function setAttrs($attrs) {
+	public function setAttrs(array $attrs) {
 		$this->attrs = $attrs;
 	}
 	
-	public function getAttrs() {
+	public function getAttrs(): array {
 		return $this->attrs;
 	}
 	
-	public function getTable() {
+	public function getTable(): Table {
 		return $this->table;
 	}
 	
-	public function equals(Index $index) {
+	public function getRefColumns(): array {
+		return [];
+	}
+	
+	public function getRefTable(): ?Table {
+		return null;
+	}
+	
+	public function equals(Index $index): bool {
 		//Don't compare the name if it is a Primary, some DBMS have generated Primary-Key Names
 		if (($index->getType() !== $this->getType())
-				|| (($this->getType() != IndexType::PRIMARY ) 
+				|| (($this->getType() != IndexType::PRIMARY) 
 						&& ($index->getName() !== $this->getName()))) return false;
 		
 		return true;
 	}
-	
 }
