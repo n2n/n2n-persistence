@@ -21,9 +21,8 @@
  */
 namespace n2n\persistence\meta\structure;
 
-class IndexType {
-	const PRIMARY = 'primary';
-	const UNIQUE = 'unique';
-	const INDEX = 'index';
-	const FOREIGN = 'foreign';
+use n2n\core\N2nRuntimeException;
+
+class UnknownIndexException extends N2nRuntimeException {
+	
 }

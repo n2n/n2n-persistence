@@ -25,7 +25,7 @@ use n2n\persistence\meta\structure\Table;
 
 use n2n\persistence\meta\structure\Column;
 
-abstract class ColumnAdapter implements Column {
+abstract class ColumnAdapter implements Column, CommonColumn {
 	private $name;
 	
 	/**

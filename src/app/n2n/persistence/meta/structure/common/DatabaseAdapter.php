@@ -24,46 +24,76 @@ namespace n2n\persistence\meta\structure\common;
 use n2n\persistence\meta\structure\DuplicateMetaElementException;
 use n2n\persistence\meta\structure\MetaEntity;
 use n2n\persistence\meta\structure\UnknownMetaEntityException;
-use n2n\persistence\Pdo;
 use n2n\persistence\meta\Database;
 use n2n\util\type\CastUtils;
 use n2n\util\type\ArgUtils;
 
 abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 
+	private $name;
+	private $charset;
 	/**
-	 * @var \n2n\persistence\Pdo
+	 * @var MetaEntity []
 	 */
-	protected $dbh;
-
+	private $metaEntities = [];
+	private $attrs;
 	/**
-	 * @var \n2n\persistence\meta\structure\common\ChangeRequestQueue
+	 * @var DatabaseChangeListener [];
 	 */
-	private $changeRequestQueue;
-
-	private $metaEntities;
+	private $changeListeners = [];
 	
-	public function __construct(Pdo $dbh) {
-		$this->dbh = $dbh;
-		$this->changeRequestQueue = new ChangeRequestQueue();
+	public function __construct(string $name, string $charset, array $metaEntities, array $attrs) {
+		$this->name = $name;
+		$this->charset = $charset;
+		$this->attrs = $attrs;
+		
+		foreach ($metaEntities as $metaEntity) {
+			$this->addMetaEntity($metaEntity);
+		}
 	}
 
-	public function getMetaEntities() {
-		if (!isset($this->metaEntities)) {
-			$this->metaEntities = $this->getPersistedMetaEntities();
-		}
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\meta\Database::getName()
+	 */
+	public function getName(): string {
+		return $this->name;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\meta\Database::getCharset()
+	 */
+	public function getCharset(): string {
+		return $this->charset;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\meta\Database::getAttrs()
+	 */
+	public function getAttrs(): array {
+		return $this->attrs;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\meta\Database::getMetaEntities()
+	 */
+	public function getMetaEntities(): array {
 		return $this->metaEntities;
 	}
-
-	public function getMetaEntityByName($name) {
-		$metaEntities = $this->getMetaEntities();
-		if (!(isset($metaEntities[$name]))) {
-			throw new UnknownMetaEntityException('Metaentity "' . $name . '" does not exist in Database "' . '" ' . $this->getName());
+	
+	public function getMetaEntityByName($name): MetaEntity {
+		foreach ($this->metaEntities as $metaEntity) {
+			if ($metaEntity->getName() === $name) return $metaEntity;
 		}
-		return $metaEntities[$name];
+		
+		throw new UnknownMetaEntityException('Metaentity "' . $name . '" does not exist in Database "' 
+				. $this->getName() . '" ');
 	}
 
-	public function containsMetaEntityName($name) {
+	public function containsMetaEntityName(string $name): bool {
 		try {
 			$this->getMetaEntityByName($name);
 			return true;
@@ -76,7 +106,7 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 		//Find out the metaEntities which need to be deleted
 		foreach ($this->metaEntities as $metaEntity) {
 			if (!(in_array($metaEntity, $metaEntities))) {
-				$this->removeMetaEntity(persistedMetaEntity);
+				$this->removeMetaEntity($metaEntity);
 			}
 		}
 
@@ -88,67 +118,75 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 		}
 	}
 
-	public function removeMetaEntityByName($name) {
+	public function removeMetaEntityByName(string $name) {
 		$this->removeMetaEntity($this->getMetaEntityByName($name));
 	}
 
 	public function addMetaEntity(MetaEntity $metaEntity) {
-		CastUtils::assertTrue($metaEntity instanceof MetaEntityAdapter);
-		if (!($this->containsMetaEntityName($metaEntity->getName()))) {
-			$this->changeRequestQueue->add($this->createCreateMetaEntityRequest($metaEntity));
-			$metaEntity->registerChangeListener($this);
-			$metaEntity->setDatabase($this);
-			$this->metaEntities[$metaEntity->getName()] = $metaEntity;
-		} else {
+		if ($this->containsMetaEntityName($metaEntity->getName())) {
 			if (!($metaEntity->equals($this->getMetaEntityByName($metaEntity->getName())))) {
-				throw new DuplicateMetaElementException('Duplicate meta entity \"' . $metaEntity->getName() 
+				throw new DuplicateMetaElementException('Duplicate meta entity "' . $metaEntity->getName() 
 						. '" in Database "' . $this->getName() . '"');
 			}
+			return;
 		}
-	}
-
-	public function flush() {
-		$this->changeRequestQueue->persist($this->dbh);
+		
+		CastUtils::assertTrue($metaEntity instanceof MetaEntityAdapter);
+		$metaEntity->registerChangeListener($this);
+		$metaEntity->setDatabase($this);
+		$this->metaEntities[] = $metaEntity;
+		$this->triggerOnMetaEntityCreate($metaEntity);
 	}
 
 	public function onMetaEntityChange(MetaEntity $metaEntity) {
-		$changeRequests = $this->changeRequestQueue->getAll();
+		$this->triggerOnMetaEntityAlter($metaEntity);
+	}
 
-		//check if alter request already exists for this entity
-		foreach ($changeRequests as $changeRequest) {
-			if ((($changeRequest instanceof AlterMetaEntityRequest) ||
-				($changeRequest instanceof CreateMetaEntityRequest))
-			&& $changeRequest instanceof ChangeRequestAdapter
-			&& ($changeRequest->getMetaEntity() === $metaEntity)) {
-				return;
-			}
-		}
-
-		$this->changeRequestQueue->add($this->createAlterMetaEntityRequest($metaEntity));
+	public function onMetaEntityNameChange(string $orginalName, MetaEntity $metaEntity) {
+		$this->triggerOnMetaEntityNameChange($orginalName, $metaEntity);
 	}
 
 	private function removeMetaEntity(MetaEntity $metaEntity) {
+		if (!$this->containsMetaEntityName($metaEntity->getName())) return;
+		
 		ArgUtils::assertTrue($metaEntity instanceof MetaEntityAdapter);
-		//check if alter request already exists for this entity
-		foreach ($this->changeRequestQueue->getAll() as $changeRequest) {
-			if ((($changeRequest instanceof ChangeRequestAdapter))
-					&& ($changeRequest->getMetaEntity() === $metaEntity)) {
-				$this->changeRequestQueue->remove($changeRequest);
-				return;
-			}
-		}
-
-
-		$this->changeRequestQueue->add($this->createDropMetaEntityRequest($metaEntity));
-		$metaEntity->unregisterChangeListener($this);
-		unset($this->metaEntities[$metaEntity->getName()]);
+		$this->metaEntities = array_filter($this->metaEntities, function(MetaEntity $aMetaEntity) use ($metaEntity) {
+			return !$metaEntity->equals($aMetaEntity);
+		});
+		
+		$this->triggerOnMetaEntityDrop($metaEntity);
 	}
 	
-	/**
-	 * Get all of the persisted MetaEntities of the curren Database
-	 */
-	protected abstract function getPersistedMetaEntities();
-	public abstract function createCreateMetaEntityRequest(MetaEntity $metaEntity);
-	public abstract function createAlterMetaEntityRequest(MetaEntity $metaEntity);
-	public abstract function createDropMetaEntityRequest(MetaEntity $metaEntity);
+	
+	public function registerChangeListener(DatabaseChangeListener $changeListener) {
+		$this->changeListeners[spl_object_hash($changeListener)] = $changeListener;
+	}
+	
+	public function unregisterChangeListener(DatabaseChangeListener $changeListener) {
+		unset($this->changeListeners[spl_object_hash($changeListener)]);
+	}
+	
+	protected function triggerOnMetaEntityAlter(MetaEntity $metaEntity) {
+		foreach($this->changeListeners as $changeListener) {
+			$changeListener->onMetaEntityAlter($metaEntity);
+		}
+	}
+	
+	protected function triggerOnMetaEntityCreate(MetaEntity $metaEntity) {
+		foreach($this->changeListeners as $changeListener) {
+			$changeListener->onMetaEntityCreate($metaEntity);
+		}
+	}
+	
+	protected function triggerOnMetaEntityDrop(MetaEntity $metaEntity) {
+		foreach($this->changeListeners as $changeListener) {
+			$changeListener->onMetaEntityDrop($metaEntity);
+		}
+	}
+	
+	protected function triggerOnMetaEntityNameChange(string $originalName, MetaEntity $metaEntity) {
+		foreach($this->changeListeners as $changeListener) {
+			$changeListener->onMetaEntityNameChange($originalName, $metaEntity);
+		}
+	}
 }

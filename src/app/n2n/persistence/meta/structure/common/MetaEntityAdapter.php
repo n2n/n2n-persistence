@@ -21,13 +21,10 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\Table;
-
-use n2n\persistence\meta\structure\View;
-
 use n2n\persistence\meta\structure\MetaEntity;
 
 use n2n\persistence\meta\Database;
+use n2n\reflection\ReflectionUtils;
 
 abstract class MetaEntityAdapter implements MetaEntity {
 	private $name;
@@ -38,33 +35,43 @@ abstract class MetaEntityAdapter implements MetaEntity {
 	private $attrs;
 
 	/**
-	 * @var <MetaEntityChangeListener>
+	 * @var MetaEntityChangeListener []
 	 */
 	private $changeListeners;
 	
-	public function __construct($name) {
+	public function __construct(string $name) {
 		$this->name = $name;
+		
+		if ($name == 'comptusch') {
+			if (ReflectionUtils::atuschBreak(2)) {
+				//throw new e;	
+			}
+		}
 		$this->changeListeners = array();
 		$this->attrs = array();
 	}
 	
-	public function getName() {
+	public function getName(): string {
 		return $this->name;
 	}
 	
-	public function setName($name) {
-		if ($name === $this->name) return; 
-		$this->getDatabase()->removeMetaEntityByName($this->name);
-		if ($this instanceof View) {
-			$this->getDatabase()->createMetaEntityFactory()->createView($name, $this->getQuery());
-		} elseif ($this instanceof Table) {
-			$this->getDatabase()->addMetaEntity($this->copy($name));
+	public function setName(string $name) {
+		$originalName = null;
+		
+		if ($this->name !== $name) {
+			$originalName = $this->name;
+		}
+		
+		$this->name = $name;
+		
+		if (null !== $originalName) {
+			$this->triggerNameChangeListeners($originalName);
 		}
 	}
 	/** 
 	 * @return \n2n\persistence\meta\Database
 	 */
-	public function getDatabase() {
+	public function getDatabase(): Database {
 		return $this->database;
 	}
 	
@@ -72,7 +79,7 @@ abstract class MetaEntityAdapter implements MetaEntity {
 		$this->database = $database;
 	}
 	
-	public function getAttrs() {
+	public function getAttrs(): array {
 		return $this->attrs;
 	}
 	
@@ -88,14 +95,19 @@ abstract class MetaEntityAdapter implements MetaEntity {
 		unset($this->changeListeners[spl_object_hash($changeListener)]);
 	}
 	
-	public function equals(MetaEntity $metaEntity) {
-		return ($metaEntity->getName() === $this->getName())
-				&& (get_class($metaEntity) === get_class($this));
-	}
-	
 	protected function triggerChangeListeners() {
 		foreach($this->changeListeners as $changeListener) {
 			$changeListener->onMetaEntityChange($this);
 		}
+	}
+	
+	protected function triggerNameChangeListeners(string $originalName) {
+		foreach($this->changeListeners as $changeListener) {
+			$changeListener->onMetaEntityNameChange($originalName, $this);
+		}
+	}
+	
+	public function equals($obj): bool {
+		return get_class($obj) === get_class($this) && $obj->getName() === $this->name;
 	}
 }

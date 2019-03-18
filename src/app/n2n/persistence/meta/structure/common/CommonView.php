@@ -21,15 +21,12 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\MetaEntity;
-
 use n2n\persistence\meta\structure\View;
-
 
 class CommonView extends MetaEntityAdapter implements View {
 	private $query;
 
-	public function __construct($name, $query) {
+	public function __construct(string $name, string $query) {
 		parent::__construct($name);
 		$this->query = $query;
 	}
@@ -38,12 +35,12 @@ class CommonView extends MetaEntityAdapter implements View {
 		return $this->query;
 	}
 	
-	public function setQuery($query) {
+	public function setQuery(string $query) {
 		$this->query = $query;
 		$this->triggerChangeListeners();
 	}
 
-	public function equals(MetaEntity $metaEntity) {
-		return parent::equals($metaEntity) && ($this->getQuery() == $metaEntity->getQuery());
+	public function equals($obj): bool {
+		return parent::equals($obj) && $this->getQuery() == $obj->getQuery();
 	}
 }

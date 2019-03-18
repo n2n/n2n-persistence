@@ -37,7 +37,8 @@ class CommonBinaryColumn extends ColumnAdapter implements BinaryColumn {
 	}
 	
 	public function equalsType(Column $column, $ignoreNull = false) {
-		return parent::equalsType($column) && ($column->getSize() === $this->getSize());
+		return parent::equalsType($column) && $column instanceof CommonBinaryColumn 
+				&& $column->getSize() === $this->getSize();
 	}
 	
 	public function copy($newColumnName = null) {

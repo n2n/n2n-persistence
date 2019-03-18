@@ -64,8 +64,9 @@ class CommonIntegerColumn extends ColumnAdapter implements IntegerColumn {
 
 	public function equalsType(Column $column, $ignoreNull = false) {
 		return parent::equalsType($column, $ignoreNull)
-				&& ($column->getSize() === $this->getSize())	
-				&& ($column->isSigned() === $this->isSigned());
+				&& $column instanceof CommonIntegerColumn
+				&& $column->getSize() === $this->getSize()	
+				&& $column->isSigned() === $this->isSigned();
 		}
 
 	public function copy($newColumnName = null) {

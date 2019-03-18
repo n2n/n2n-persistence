@@ -27,7 +27,7 @@ interface ColumnFactory {
 	 * Returns current database
 	 * @return Table
 	 */
-	public function getTable();
+	public function getTable(): Table;
 	
 	/**
 	 * Creates a new IntegerColumn and applies it to the current table.
@@ -37,7 +37,7 @@ interface ColumnFactory {
 	 * @return IntegerColumn
 	 * @return IntegerColumn
 	 */
-	public function createIntegerColumn($name, $size, $signed = true);
+	public function createIntegerColumn(string $name, int $size, bool $signed = true): IntegerColumn;
 	
 	/**
 	 * Creates a new StringColumn and applies it to the current table.
@@ -46,7 +46,7 @@ interface ColumnFactory {
 	 * @param string $charset
 	 * @return StringColumn
 	 */
-	public function createStringColumn($name, $length, $charset = null);
+	public function createStringColumn(string $name, int $length, string $charset = null): StringColumn;
 	
 	/**
 	 * Creates a new TextColumn and applies it to the current table.
@@ -55,7 +55,7 @@ interface ColumnFactory {
 	 * @param string $charset
 	 * @return TextColumn
 	 */
-	public function createTextColumn($name, $size, $charset = null);
+	public function createTextColumn(string $name, int $size, string $charset = null): TextColumn;
 	
 	/**
 	 * Creates a new BinaryColumn and applies it to the current table.
@@ -63,7 +63,7 @@ interface ColumnFactory {
 	 * @param int $size
 	 * @return BinaryColumn
 	 */
-	public function createBinaryColumn($name, $size);
+	public function createBinaryColumn(string $name, int $size): BinaryColumn;
 	
 	/**
 	 * Creates a new DataTimeColumn and applies it to the current table.
@@ -72,7 +72,7 @@ interface ColumnFactory {
 	 * @param bool $timeAvailable
 	 * @return \n2n\persistence\meta\structure\DateTimeColumn
 	 */
-	public function createDateTimeColumn($name, $dateAvailable = true, $timeAvailable = true);
+	public function createDateTimeColumn(string $name, bool $dateAvailable = true, bool $timeAvailable = true): DateTimeColumn;
 	
 	/**
 	 * Creates a new EnumColumn and applies it to the current table.
@@ -80,7 +80,7 @@ interface ColumnFactory {
 	 * @param array $values
 	 * @return EnumColumn
 	 */
-	public function createEnumColumn($name, array $values);
+	public function createEnumColumn(string $name, array $values): EnumColumn;
 	
 	/**
 	 * Creates a new FixedPointColumn and applies it to the current table.
@@ -89,7 +89,7 @@ interface ColumnFactory {
 	 * @param int $numDecimalDigits
 	 * @return FixedPointColumn
 	 */
-	public function createFixedPointColumn($name, $numIntegerDigits, $numDecimalDigits);
+	public function createFixedPointColumn(string $name, int $numIntegerDigits, int $numDecimalDigits): FixedPointColumn;
 	
 	/**
 	 * Creates a new FloatingPointColumn and applies it to the current table.
@@ -97,5 +97,5 @@ interface ColumnFactory {
 	 * @param int $size
 	 * @return FloatingPointColumn
 	 */
-	public function createFloatingPointColumn($name, $size);
+	public function createFloatingPointColumn(string $name, int $size): FloatingPointColumn;
 }

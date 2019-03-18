@@ -44,9 +44,10 @@ class CommonFixedPointColumn extends ColumnAdapter implements FixedPointColumn {
 	}
 
 	public function equalsType(Column $column, $ignoreNull = false) {
-		return parent::equalsType($column) 
-				&& ($column->getNumIntegerDigits() === $this->getNumIntegerDigits())
-				&& ($column->getNumDecimalDigits() === $this->getNumDecimalDigits());
+		return parent::equalsType($column)
+				&& $column instanceof CommonFixedPointColumn
+				&& $column->getNumIntegerDigits() === $this->getNumIntegerDigits()
+				&& $column->getNumDecimalDigits() === $this->getNumDecimalDigits();
 	}
 	
 	public function copy($newColumnName = null) {

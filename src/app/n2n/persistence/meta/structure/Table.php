@@ -25,67 +25,91 @@ interface Table extends MetaEntity {
 	/**
 	 * @return Index[]
 	 */
-	public function getIndexes();
+	public function getIndexes(): array;
+	
 	/**
-	 * @return Index
+	 * @return Index|null
 	 */
-	public function getPrimaryKey();
+	public function getPrimaryKey(): ?Index;
+	
 	/**
-	 * @return array
+	 * @return Column[]
 	 */
-	public function getColumns();
+	public function getColumns(): array;
+	
 	/**
 	 * @param string $name
 	 * @return Column
 	 * @throws UnknownColumnException
 	 */
-	public function getColumnByName($name);
+	public function getColumnByName(string $name): Column;
+	
 	/**
 	 * 
 	 * @param array $columns
 	 */
 	public function setColumns(array $columns);
+	
 	/**
 	 * @param Column $column
 	 */
 	public function addColumn(Column $column);
+	
 	/**
 	 * @param string $name
 	 * @return bool
 	 */
-	public function containsColumnName($name);
+	public function containsColumnName(string $name): bool;
+	
 	/**
 	 * @param string $name
 	 */
-	public function removeColumnByName($name);
+	public function removeColumnByName(string $name);
 	
 	public function removeAllColumns();
+	
 	/**
 	 * @param string $name
 	 * @param string $type
 	 * @param array $columnNames
 	 * @return Index
 	 */
-	public function createIndex($type, array $columnNames, $name = null);
+	public function createIndex(string $type, array $columnNames, ?string $name = null,
+			?Table $refTable = null, ?array $refColumnNames = null);
+	
 	/**
 	 * @param string $name
-	 * @return string
+	 * @return Index
+	 * @throws UnknownIndexException
 	 */
-	public function removeIndexByName($name);
+	public function getIndexByName(string $name): Index;
+	
+	/**
+	 * @param string $name
+	 * @return bool
+	 */
+	public function containsIndexName(string $name): bool;
+	
+	/**
+	 * @param string $name
+	 */
+	public function removeIndexByName(string $name);
+	
 	/**
 	 * 
 	 */
 	public function removeAllIndexes();
+	
 	/**
 	 * Creates and returns a copy of the current table. The created table is 
 	 * not applied to any database.
 	 * @param string $newTableName Name of created table.
 	 * @return Table
 	 */
-	public function copy($newTableName = null);
+	public function copy(string $newTableName = null): Table;
+	
 	/**
 	 * @return ColumnFactory
 	 */
-	public function createColumnFactory();
-	
+	public function createColumnFactory(): ColumnFactory;
 }

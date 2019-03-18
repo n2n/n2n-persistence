@@ -19,11 +19,31 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\meta\structure;
+namespace n2n\persistence\meta\structure\common;
 
-class IndexType {
-	const PRIMARY = 'primary';
-	const UNIQUE = 'unique';
-	const INDEX = 'index';
-	const FOREIGN = 'foreign';
+use n2n\persistence\meta\structure\MetaEntity;
+
+interface DatabaseChangeListener {
+	/**
+	 * @param MetaEntity $metaEntity
+	 */
+	public function onMetaEntityCreate(MetaEntity $metaEntity);
+	
+	/**
+	 * @param MetaEntity $metaEntity
+	 */
+	public function onMetaEntityAlter(MetaEntity $metaEntity);
+	
+	/**
+	 * @param MetaEntity $metaEntity
+	 */
+	public function onMetaEntityDrop(MetaEntity $metaEntity);
+	
+	/**
+	 * The new name is already set on the meta entity
+	 *
+	 * @param string $orginalName
+	 * @param MetaEntity $metaEntity
+	 */
+	public function onMetaEntityNameChange(string $orginalName, MetaEntity $metaEntity);
 }

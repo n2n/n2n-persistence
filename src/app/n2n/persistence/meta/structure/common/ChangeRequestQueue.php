@@ -30,15 +30,24 @@ class ChangeRequestQueue {
 	public function __construct() {
 		$this->initialize();
 	}
+	
 	/**
 	 * @param Pdo $dbh
 	 */
 	public function persist(Pdo $dbh) {
-		foreach ($this->changeRequests as $changeRequest) {
-			$changeRequest->execute($dbh);
-		}
+//		$dbh->beginTransaction();
+// 		try {
+			foreach ($this->changeRequests as $changeRequest) {
+				$changeRequest->execute($dbh);
+			}
+// 		} catch (\Throwable $e) {
+// 			$dbh->rollBack();
+// 			throw $e;
+// 		}
+// 		$dbh->commit();
 		$this->initialize();
 	}
+	
 	/**
 	 * Add a changerequest to the changerequest Queue
 	 * @param ChangeRequest $changeRequest
@@ -50,9 +59,10 @@ class ChangeRequestQueue {
 	public function remove(ChangeRequest $changeRequest) {
 		unset($this->changeRequests[spl_object_hash($changeRequest)]);
 	}
+	
 	/**
 	 * Get All Pending Change Requests
-	 * @return array<ChangeRequest>
+	 * @return ChangeRequest []
 	 */
 	public function getAll() {
 		return $this->changeRequests;

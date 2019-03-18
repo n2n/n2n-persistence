@@ -19,11 +19,26 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\meta\structure;
+namespace n2n\persistence\meta\structure\common;
 
-class IndexType {
-	const PRIMARY = 'primary';
-	const UNIQUE = 'unique';
-	const INDEX = 'index';
-	const FOREIGN = 'foreign';
+use n2n\persistence\meta\structure\MetaEntity;
+
+abstract class RenameMetaEntityRequestAdapter extends ChangeRequestAdapter implements RenameMetaEntityRequest {
+	
+	protected $oldName;
+	protected $newName;
+	
+	public function __construct(MetaEntity $metaEntity, string $oldName, string $newName) {
+		parent::__construct($metaEntity);
+		$this->oldName = $oldName;
+		$this->newName = $newName;
+	}
+	
+	public function neutralizesChangeRequest(ChangeRequest $newChangeRequest) {
+		return false;
+	}
+
+	public function isNeutralizedBy(ChangeRequest $newChangeRequest) {
+		return false;
+	}
 }

@@ -26,6 +26,7 @@ use n2n\persistence\Pdo;
 class MetaData {
 	private $dbh;
 	private $dialect;
+	private $metaManager;
 	private $database;
 	
 	public function __construct(Pdo $dbh, Dialect $dialect) {
@@ -33,12 +34,25 @@ class MetaData {
 		$this->dialect = $dialect;
 	}
 	/**
+	 * @return \n2n\persistence\meta\MetaManager
+	 */
+	
+	public function getMetaManager() {
+		if (null === $this->metaManager) {
+			$this->metaManager = $this->getDialect()->createMetaManager($this->dbh);
+		}
+		
+		return $this->metaManager;
+	}
+	
+	/**
 	 * @return \n2n\persistence\meta\Database
 	 */
 	public function getDatabase() {
-		if (is_null($this->database)) {
-			$this->database = $this->dialect->createMetaDatabase($this->dbh);
+		if (null === $this->database) {
+			$this->database = $this->getMetaManager()->createDatabase();
 		}
+		
 		return $this->database;
 	}
 	

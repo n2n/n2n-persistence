@@ -22,8 +22,26 @@
 namespace n2n\persistence\meta\structure\common;
 
 use n2n\persistence\Pdo;
+use n2n\persistence\meta\structure\MetaEntity;
 
 interface ChangeRequest {
+	/**
+	 * @param Pdo $dbh
+	 */
 	public function execute(Pdo $dbh);
 	
+	/**
+	 * @param ChangeRequest $newChangeRequest
+	 */
+	public function neutralizesChangeRequest(ChangeRequest $newChangeRequest);
+	
+	/**
+	 * @param ChangeRequest $newChangeRequest
+	 */
+	public function isNeutralizedBy(ChangeRequest $newChangeRequest);
+	
+	/**
+	 * @return MetaEntity
+	 */
+	public function getMetaEntity(): MetaEntity;
 }

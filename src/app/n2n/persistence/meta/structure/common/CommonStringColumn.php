@@ -53,9 +53,10 @@ class CommonStringColumn extends ColumnAdapter implements StringColumn {
 	}
 
 	public function equalsType(Column $column, $ignoreNull = false) {
-		return parent::equalsType($column, $ignoreNull) 
-				&& ($column->getLength() === $this->getLength()) 
-				&& ($column->getCharset() === $this->getCharset());
+		return parent::equalsType($column, $ignoreNull)
+				&& $column instanceof CommonStringColumn
+				&& $column->getLength() === $this->getLength() 
+				&& $column->getCharset() === $this->getCharset();
 	}
 
 }

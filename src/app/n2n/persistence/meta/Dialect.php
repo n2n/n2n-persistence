@@ -25,6 +25,11 @@ use n2n\io\InputStream;
 use n2n\persistence\meta\structure\Column;
 use n2n\persistence\PersistenceUnitConfig;
 use n2n\persistence\Pdo;
+use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\persistence\meta\data\UpdateStatementBuilder;
+use n2n\persistence\meta\data\InsertStatementBuilder;
+use n2n\persistence\meta\data\DeleteStatementBuilder;
+use n2n\persistence\meta\data\Importer;
 
 interface Dialect {
 	const DEFAULT_ESCAPING_CHARACTER = '\\';
@@ -35,7 +40,7 @@ interface Dialect {
 	/**
 	 * @return string
 	 */
-	public function getName();
+	public function getName(): string;
 	/**
 	 * @param Pdo $dbh
 	 * @param PersistenceUnitConfig $data
@@ -43,65 +48,65 @@ interface Dialect {
 	public function initializeConnection(Pdo $dbh, PersistenceUnitConfig $data);
 	/**
 	 * @param Pdo $dbh
-	 * @return \n2n\persistence\meta\Database
+	 * @return MetaManager
 	 */
-	public function createMetaDatabase(Pdo $dbh);
+	public function createMetaManager(Pdo $dbh): MetaManager;
 	/**
 	 * @param string $str
 	 */
-	public function quoteField($str);
+	public function quoteField(string $str): string;
 	/**
 	 * Quotes the like wildcard chars
 	 * @param string $pattern
 	 */
-	public function escapeLikePattern($pattern);
+	public function escapeLikePattern(string $pattern): string;
 	/**
 	 * Returns the escape character used in {@link Dialect::escapeLikePattern()}. 
 	 * @return string
 	 */
-	public function getLikeEscapeCharacter();
+	public function getLikeEscapeCharacter(): string;
 	/**
 	 * @param Pdo $dbh
-	 * @return \n2n\persistence\meta\data\SelectStatementBuilder
+	 * @return SelectStatementBuilder
 	 */
-	public function createSelectStatementBuilder(Pdo $dbh);
+	public function createSelectStatementBuilder(Pdo $dbh): SelectStatementBuilder;
 	/**
 	 * @param Pdo $dbh
-	 * @return \n2n\persistence\meta\data\UpdateStatementBuilder
+	 * @return UpdateStatementBuilder
 	 */
-	public function createUpdateStatementBuilder(Pdo $dbh);
+	public function createUpdateStatementBuilder(Pdo $dbh): UpdateStatementBuilder;
 	/**
 	 * @param Pdo $dbh
-	 * @return \n2n\persistence\meta\data\InsertStatementBuilder
+	 * @return InsertStatementBuilder
 	 */
-	public function createInsertStatementBuilder(Pdo $dbh);
+	public function createInsertStatementBuilder(Pdo $dbh): InsertStatementBuilder;
 	/**
 	 * 
 	 * @param Pdo $dbh
-	 * @return \n2n\persistence\meta\data\DeleteStatementBuilder
+	 * @return DeleteStatementBuilder
 	 */
-	public function createDeleteStatementBuilder(Pdo $dbh);
+	public function createDeleteStatementBuilder(Pdo $dbh): DeleteStatementBuilder;
 	/**
 	 * @param Pdo $dbh
 	 * @param InputStream $inputStream
-	 * @return \n2n\persistence\meta\data\Importer
+	 * @return Importer
 	 */
-	public function createImporter(Pdo $dbh, InputStream $inputStream);
+	public function createImporter(Pdo $dbh, InputStream $inputStream): Importer;
 	/**
 	 * @return \n2n\persistence\meta\OrmDialectConfig
 	 */
-	public function getOrmDialectConfig();
+	public function getOrmDialectConfig(): OrmDialectConfig;
 	/**
 	 * @return bool
 	 */
-	public function isLastInsertIdSupported();
+	public function isLastInsertIdSupported(): bool;
 	/**
 	 * @param string $sequenceName
-	 * @return mixed
+	 * @return string|null
 	 */
-	public function generateSequenceValue(Pdo $dbh, $sequenceName);
+	public function generateSequenceValue(Pdo $dbh, string $sequenceName): ?string;
 	/**
 	 * @param Column $column
 	 */
-	public function applyIdentifierGeneratorToColumn(Pdo $dbh, Column $column, $sequenceName);
+	public function applyIdentifierGeneratorToColumn(Pdo $dbh, Column $column, string $sequenceName);
 }

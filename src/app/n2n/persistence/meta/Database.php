@@ -23,59 +23,59 @@ namespace n2n\persistence\meta;
 
 use n2n\persistence\meta\structure\MetaEntity;
 use n2n\persistence\meta\structure\UnknownMetaEntityException;
+use n2n\persistence\meta\structure\MetaEntityFactory;
 
 interface Database {
 	/**
 	 * @return string
 	 */
-	public function getName();
+	public function getName(): string;
+	
 	/**
 	 * @return string
 	 */
-	public function getCharset();
+	public function getCharset(): string;
+	
 	/**
-	 * @return \n2n\persistence\meta\structure\MetaEntity[]
+	 * @return MetaEntity[]
 	 */
-	public function getMetaEntities();
+	public function getMetaEntities(): array;
+	
 	/**
 	 * @param array $metaEntities
 	 */
 	public function setMetaEntities(array $metaEntities);
+	
 	/**
 	 * @param string $name
 	 * @return MetaEntity
 	 * @throws UnknownMetaEntityException
 	 */
-	public function getMetaEntityByName($name);
+	public function getMetaEntityByName(string $name): MetaEntity;
+	
 	/**
 	 * @param MetaEntity $metaEntity
 	 */
 	public function addMetaEntity(MetaEntity $metaEntity);
+	
 	/**
 	 * @param string $name
 	 */
-	public function removeMetaEntityByName($name);
+	public function removeMetaEntityByName(string $name);
+	
 	/**
 	 * @param string $name
 	 * @return bool
 	 */
-	public function containsMetaEntityName($name);
+	public function containsMetaEntityName(string $name): bool;
+	
 	/**
 	 * @return array
 	 */
-	public function getAttrs();
+	public function getAttrs(): array;
+	
 	/**
-	 * @return \n2n\persistence\meta\structure\MetaEntityFactory
+	 * @return MetaEntityFactory
 	 */
-	public function createMetaEntityFactory();
-	/**
-	 * All changes of tables, views and columns which belong to this database are saved. 
-	 */
-	public function flush();
-	/**
-	 * 
-	 * @param array $metaEnties an array of MetaEntities or MetaEntity names.
-	 * @return \n2n\persistence\meta\structure\Backuper
-	 */
-	public function createBackuper(array $metaEnties);
+	public function createMetaEntityFactory(): MetaEntityFactory;
 }
