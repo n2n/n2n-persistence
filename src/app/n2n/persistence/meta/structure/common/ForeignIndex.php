@@ -5,7 +5,7 @@ use n2n\persistence\meta\structure\Table;
 use n2n\persistence\meta\structure\IndexType;
 use n2n\persistence\meta\structure\Column;
 
-class ForeignIndex extends CommonIndex {
+class ForeignIndex extends IndexAdapter {
 	
 	private $refColumns = [];
 	private $refTable = null;
@@ -32,5 +32,20 @@ class ForeignIndex extends CommonIndex {
 		$refTable = $column->getTable();
 		
 		$this->refColumns[$column->getName()] = $column;
+	}
+	
+	public static function createFromColumnNames(Table $table, string $name, array $columnNames,
+			Table $refTable, array $refColumnNames) {
+		$columns = [];
+		foreach ($columnNames as $columnName) {
+			$columns[] = $table->getColumnByName($columnName);
+		}
+		
+		$refColumns = [];
+		foreach ($refColumnNames as $refColumnName) {
+			$refColumns[] = $refTable->getColumnByName($refColumnName);
+		}
+		
+		return new ForeignIndex($table, $name, $columns, $refTable, $refColumns);
 	}
 }

@@ -48,6 +48,7 @@ class CommonEnumColumn extends ColumnAdapter implements EnumColumn {
 		if (is_null($newColumnName)) {
 			$newColumnName = $this->getName();
 		}
+		
 		$newColumn = new self($newColumnName, $this->getValues());
 		$newColumn->applyCommonAttributes($this);
 		return $newColumn;
