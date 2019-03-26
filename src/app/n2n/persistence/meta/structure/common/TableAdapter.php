@@ -31,6 +31,7 @@ use n2n\util\type\CastUtils;
 use n2n\persistence\meta\structure\DuplicateMetaElementException;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\structure\UnknownIndexException;
+use n2n\persistence\meta\structure\UnavailableTypeException;
 
 abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnChangeListener {
 
@@ -223,14 +224,6 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 		$this->triggerChangeListeners();
 	}
 	
-	public function generateColumnsForNames(array $columnNames) {
-		$columns = array();
-		foreach ($columnNames as $columnName) {
-			$columns[$columnName] = $this->getColumnByName($columnName);
-		}
-		return $columns;
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\meta\structure\Table::createIndex()
@@ -238,18 +231,16 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 	public function createIndex(string $type, array $columnNames, ?string $name = null,
 			?Table $refTable = null, ?array $refColumnNames = null): Index {
 		$name = $name ?? $this->generateIndexKeyName($type);
-		$columns = $this->generateColumnsForNames($columnNames);
 		$this->triggerChangeListeners();
 		
 		if ($type !== IndexType::FOREIGN) {
 			ArgUtils::assertTrue(empty($refColumnNames) && null === $refTable);
-			$newIndex = new CommonIndex($this, $name, $type, $columns);
+			$newIndex = CommonIndex::createFromColumnNames($this, $name, $type, $columnNames);
 		} else {
-			$refColumns = [];
-			foreach ($refColumnNames as $refColumnName) {
-				$refColumns[] = $refTable->getColumnByName($refColumnName);
+			if (!$this->isForeignKeyAvailable()) {
+				throw new UnavailableTypeException('Foreign keys are not Supported.');
 			}
-			$newIndex = new ForeignIndex($this, $name, $columns, $refTable, $refColumns);
+			$newIndex = ForeignIndex::createFromColumnNames($this, $name, $columnNames, $refTable, $refColumnNames);
 		}
 		$this->addIndex($newIndex);
 		return $newIndex;
@@ -260,7 +251,7 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 			if ($index->getName() == $name) return $index;
 		}
 		
-		throw new UnknownIndexException('Index "' . $index->getName() 
+		throw new UnknownIndexException('Index "' . $name
 				. '" does not exist in Table "' . $this->getName() . '"');
 	}
 	
@@ -302,6 +293,10 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 			$column->unregisterChangeListener($this);
 			return;
 		}
+	}
+	
+	public function isForeignKeyAvailable() {
+		return true;
 	}
 	
 	public abstract function generatePrimaryKeyName();

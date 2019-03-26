@@ -78,6 +78,11 @@ interface Table extends MetaEntity {
 			?Table $refTable = null, ?array $refColumnNames = null);
 	
 	/**
+	 * @param Index [] $indexes
+	 */
+	public function setIndexes(array $indexes);
+	
+	/**
 	 * @param string $name
 	 * @return Index
 	 * @throws UnknownIndexException
