@@ -42,6 +42,26 @@ class NqlUtils {
 		return Nql::isKeywordTrue($str) || Nql::isKeywordFalse($str) || Nql::isKeywordNull($str) || is_numeric($str);
 	}
 	
+	public static function parseConst($str) {
+		if (Nql::isKeywordTrue($str)) {
+			return true;
+		}
+		
+		if (Nql::isKeywordFalse($str)) {
+			return false;
+		}
+		
+		if (Nql::isKeywordNull($str)) {
+			return null;
+		}
+		
+		if (is_numeric($str)) {
+			return $str;
+		}
+		
+		throw new \InvalidArgumentException($str . ' is not a Const');
+	}
+	
 	public static function isCriteria($str) {
 		return StringUtils::pregMatch('/^\s*' . Nql::KEYWORD_SELECT . '\s+/', $str) > 0 
 				|| StringUtils::pregMatch('/^\s*' . Nql::KEYWORD_FROM . '\s+/', $str) > 0;

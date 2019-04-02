@@ -115,7 +115,7 @@ class NqlTest extends TestCase {
 			$columnFactory->createStringColumn('name', 255);
 		}
 		
-		$this->dataBase->flush();
+		$this->metaData->getMetaManager()->flush();
 		foreach ($stmts as $stmt) {
 			$stmt->execute();
 		}
