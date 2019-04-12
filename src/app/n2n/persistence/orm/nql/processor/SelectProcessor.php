@@ -45,7 +45,7 @@ class SelectProcessor extends KeywordProcesserAdapter {
 	public function processChar($char) {
 		if ($this->inString) {
 			$this->currentToken .= $char;
-			if ($char === NQL::QUOTATION_MARK) {
+			if ($char === Nql::QUOTATION_MARK) {
 				$this->inString = false;
 			}
 			return;
@@ -53,7 +53,7 @@ class SelectProcessor extends KeywordProcesserAdapter {
 		
 		if (!StringUtils::isEmpty($char) && $char != Nql::EXPRESSION_SEPERATOR) {
 			$this->currentToken .= $char; 
-			if ($char === NQL::QUOTATION_MARK) {
+			if ($char === Nql::QUOTATION_MARK) {
 				$this->inString = true;
 			}
 			return;
@@ -82,7 +82,7 @@ class SelectProcessor extends KeywordProcesserAdapter {
 		
 		if ($this->expectAlias) {
 			$this->expectAlias = false;
-			$this->alias = NqlUtils::removeQuotationMarks($this->currentToken);
+			$this->alias = NqlUtils::removeLiteralIndicator(NqlUtils::removeQuotationMarks($this->currentToken));
 			return;
 		}
 		
