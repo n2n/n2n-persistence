@@ -192,6 +192,8 @@ class NqlTest extends TestCase {
 		$result = $this->assertNql('SELECT b.id AS "what are you" , b.id AS "hahaha" FROM BlogArticle b ORDER BY b.id DESC , b.id DESC', [], true);
 		$this->assertTrue(is_array($result));
 		$this->assertTrue(isset(reset($result)['what are you']));
+		
+		$result = $this->assertNql('SELECT b.id AS "what are you" , b.id AS "hahaha" FROM BlogArticle b WHERE b.title = \'title\' ORDER BY b.id DESC , b.id DESC', [], true);
 	}
 	
 	private function assertNql($nql, array $params = array(), $execute = false) {

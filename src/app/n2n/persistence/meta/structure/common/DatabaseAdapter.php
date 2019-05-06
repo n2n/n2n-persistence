@@ -84,7 +84,7 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 		return $this->metaEntities;
 	}
 	
-	public function getMetaEntityByName($name): MetaEntity {
+	public function getMetaEntityByName(string $name): MetaEntity {
 		foreach ($this->metaEntities as $metaEntity) {
 			if ($metaEntity->getName() === $name) return $metaEntity;
 		}

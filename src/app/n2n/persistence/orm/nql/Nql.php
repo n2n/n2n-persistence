@@ -22,12 +22,14 @@
 namespace n2n\persistence\orm\nql;
 
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
+use n2n\util\StringUtils;
 class Nql {
 	const GROUP_START = '(';
 	const GROUP_END = ')';
 	const EXPRESSION_SEPERATOR = ',';
 	const PLACHOLDER_PREFIX = ':';
 	const QUOTATION_MARK = '"';
+	const LITERAL_INDICATOR = '\'';
 
 	const KEYWORD_SELECT = 'SELECT';
 	const KEYWORD_FROM = 'FROM';
@@ -79,6 +81,11 @@ class Nql {
 	
 	public static function isKeywordContains($token) {
 		return self::compare($token, Nql::KEYWORD_CONTAINS);
+	}
+	
+	public static function isLiteral($token) {
+		return StringUtils::startsWith(self::LITERAL_INDICATOR, $token) 
+				&& StringUtils::endsWith(self::LITERAL_INDICATOR, $token);
 	}
 	
 	private static function compare($token, $keyword) {
