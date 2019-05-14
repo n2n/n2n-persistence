@@ -133,7 +133,7 @@ class ResultBuilder {
 				$resultRow[$alias] = $resultValueBuilder->buildValue();
 			}
 			
-			if (1 == count($resultRow)) {
+			if (1 == count($resultRow) && key($resultRow) === 0) {
 				$resultRows[] = current($resultRow);
 			} else {
 				$resultRows[] = $resultRow;
