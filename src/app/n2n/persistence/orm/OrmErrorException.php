@@ -42,7 +42,7 @@ class OrmErrorException extends FancyErrorException {
 		$tp = array_shift($tps);
 		$e = new OrmErrorException($message, $tp['fileName'], $tp['line'], null, null, $previous);
 		foreach ($tps as $tp) {
-			$e->addAdditionalError($tp['file'], $tp['line']);
+			$e->addAdditionalError($tp['fileName'], $tp['line']);
 		}
 		return $e;
 	}
