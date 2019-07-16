@@ -156,11 +156,14 @@ class ActionQueueImpl implements ActionQueue {
 		$this->flushing = true;
 		
 		$this->triggerAtStartClosures();
-		
+			
 		do {
-			$this->persistActionPool->prepareSupplyJobs();
-		} while ($this->removeActionPool->prepareSupplyJobs() || $this->triggerAtPrepareCycleEndClosures());
-
+			do {
+				$this->persistActionPool->prepareSupplyJobs();
+			} while ($this->removeActionPool->prepareSupplyJobs() || $this->triggerAtPrepareCycleEndClosures());
+		} while ($this->triggerPreFinilizeAttempt() 
+				&& ($this->persistActionPool->prepareSupplyJobs() || $this->removeActionPool->prepareSupplyJobs()));
+	
 		$this->persistActionPool->freeze();
 		$this->removeActionPool->freeze();
 		
@@ -275,6 +278,17 @@ class ActionQueueImpl implements ActionQueue {
 		}
 		
 		return $this->entityListeners[$className];
+	}
+	
+	private function triggerPreFinilizeAttempt() {
+		$triggered = false;
+		
+		foreach ($this->lifecylceListeners as $listener) {
+			$listener->onPreFinalized($this->em);
+			$triggered = true;
+		}
+		
+		return $triggered;
 	}
 	
 	public function registerLifecycleListener(LifecycleListener $listener) {

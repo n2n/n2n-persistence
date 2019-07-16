@@ -76,6 +76,10 @@ class RemoveActionPool {
 		IllegalStateException::assertTrue(!$this->frozen);
 				
 		$removeAction = $this->createRemoveAction($entity);
+		if ($removeAction === null) {
+			return null;
+		}
+		
 		$this->removeActions[$objHash] = $removeAction;
 		$this->unsuppliedRemoveActions[$objHash] = $removeAction;
 		$this->actionQueue->add($removeAction);

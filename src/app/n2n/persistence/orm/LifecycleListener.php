@@ -26,4 +26,9 @@ interface LifecycleListener {
 	 * @param LifecycleEvent $e
 	 */
 	public function onLifecycleEvent(LifecycleEvent $e, EntityManager $em);
+	
+	/**
+	 * @param EntityManager $em
+	 */
+	public function onPreFinalized(EntityManager $em);
 }
