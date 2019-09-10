@@ -209,7 +209,14 @@ class NestedSetUtils {
 				->andMatch(CrIt::p(self::NODE_ALIAS, $this->rightCriteriaProperty), ($includeSelf ? '>=' : '>'), $rgt);
 		$criteria->order(CrIt::p(self::NODE_ALIAS, $this->leftCriteriaProperty), $direction);
 		
-		return $criteria->toQuery()->fetchArray();
+		$result =  $criteria->toQuery()->fetchArray();
+		foreach ($result as $key => $resultEntry) {
+			if (count($resultEntry) > 1) return $result;
+			
+			$result[$key] = $resultEntry[self::RESULT_ENTITY_ALIAS];
+		}
+		
+		return $result;
 	}
 	
 	/**
