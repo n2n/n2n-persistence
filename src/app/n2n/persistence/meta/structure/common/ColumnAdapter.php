@@ -34,6 +34,7 @@ abstract class ColumnAdapter implements Column, CommonColumn {
 	private $table;
 	private $nullAllowed;
 	private $defaultValue;
+	private $defaultValueAvailable;
 	private $valueGenerated;
 	private $attrs;
 	private $indexes;
@@ -49,6 +50,7 @@ abstract class ColumnAdapter implements Column, CommonColumn {
 		$this->attrs = array();
 		$this->indexes = array();
 		$this->nullAllowed = true;
+		$this->defaultValueAvailable = false;
 		$this->valueGenerated = false;
 	}
 	
@@ -88,7 +90,17 @@ abstract class ColumnAdapter implements Column, CommonColumn {
 	
 	public function setDefaultValue($defaultValue) {
 		$this->triggerChangeListeners();
+		$this->defaultValueAvailable = true;
 		$this->defaultValue = $defaultValue;
+	}
+	
+	public function isDefaultValueAvailable() {
+		return $this->defaultValueAvailable;
+	}
+	
+	public function setDefaultValueAvailable($defaultValueAvailable) {
+		$this->triggerChangeListeners();
+		$this->defaultValueAvailable = (bool) $defaultValueAvailable;
 	}
 	
 	public function isValueGenerated() {
@@ -97,7 +109,7 @@ abstract class ColumnAdapter implements Column, CommonColumn {
 	
 	public function setValueGenerated($valueGenerated) {
 		$this->triggerChangeListeners();
-		$this->valueGenerated = $valueGenerated;
+		$this->valueGenerated = (bool) $valueGenerated;
 	}
 	
 	public function getAttrs() {
@@ -154,6 +166,7 @@ abstract class ColumnAdapter implements Column, CommonColumn {
 
 	protected function applyCommonAttributes(Column $fromColumn) {
 		$this->setDefaultValue($fromColumn->getDefaultValue());
+		$this->setDefaultValueAvailable($fromColumn->isDefaultValueAvailable());
 		$this->setNullAllowed($fromColumn->isNullAllowed());
 		$this->setAttrs($fromColumn->getAttrs());
 		$this->setValueGenerated($fromColumn->isValueGenerated());
