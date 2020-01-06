@@ -47,9 +47,18 @@ interface Column {
 	 */
 	public function getDefaultValue();
 	/**
+	 * if this method is called the default value is automatically available 
 	 * @param string $defaultValue
 	 */
 	public function setDefaultValue($defaultValue);
+	/**
+	 * @return bool
+	 */
+	public function isDefaultValueAvailable();
+	/**
+	 * @param bool $defaultValueAvailable
+	 */
+	public function setDefaultValueAvailable($defaultValueAvailable);
 	/**
 	 * @return bool
 	 */
