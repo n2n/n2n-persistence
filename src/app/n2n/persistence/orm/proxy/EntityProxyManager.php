@@ -189,10 +189,10 @@ class EntityProxyManager {
 		$prefix = $type->allowsNull() ? '?' : '';
 		
 		if ($type->isBuiltin()) {
-			return $prefix . $type;
+			return $prefix . $type->getName();
 		}
 	
-		return $prefix . '\\' . $type;
+		return $prefix . '\\' . $type->getName();
 	}
 	
 	private function buildDefaultConstStr($defaultConstName) {
