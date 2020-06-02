@@ -2,7 +2,12 @@
     "name": "n2n/n2n-persistence",
     "type": "library",
     "description": "Persitence library for n2n. Includes ORM and Meta API.",
-    "keywords": ["n2n","persistence","orm","db meta api"],
+    "keywords": [
+        "n2n",
+        "persistence",
+        "orm",
+        "db meta api"
+    ],
     "homepage": "http://n2n.rocks/",
     "license": "LGPL-3.0-or-later",
     "authors": [
@@ -14,9 +19,9 @@
     ],
     "require": {
         "php": ">=7.0",
-        "n2n/n2n-io": "7.2.x-dev",
-        "n2n/n2n-reflection": "7.2.x-dev",
-        "n2n/n2n-util": "7.2.x-dev"
+        "n2n/n2n-io": "^7.2.25",
+        "n2n/n2n-reflection": "^7.2.25",
+        "n2n/n2n-util": "^7.2.25"
     },
     "autoload": {
         "psr-4": {
