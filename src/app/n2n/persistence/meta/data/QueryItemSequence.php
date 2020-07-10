@@ -57,12 +57,12 @@ class QueryItemSequence implements QueryItem {
 		$sequenceItem->getQueryItem()->buildItem($itemBuilder);
 		$sequenceOperator = $sequenceItem->getSequenceOperator();
 		if (is_null($sequenceOperator)) return;
-		$itemBuilder->addOperator($sequenceOperator->getName());
+		$itemBuilder->addOperator($sequenceOperator->getOperator());
 		$this->buildSequenceItem($sequenceOperator->getNext(), $itemBuilder);
 	}
 	
 	public static function getOperators() {
-		return array(self::OPERATOR_ADD, 
+		return array(self::OPERATOR_SEQ, self::OPERATOR_ADD, 
 				self::OPERATOR_SUB, self::OPERATOR_MUL, self::OPERATOR_DIV);
 	}
 	

@@ -175,19 +175,21 @@ class CrIt {
 // 		}
 // 	}
 
-	
 	/**
 	 * @param string $expression
 	 * @return \n2n\persistence\orm\criteria\item\CriteriaFunction
 	 */
-	public static function testExpressionForFunction(string $expression) {	
+	public static function testExpressionForFunction(string $expression) {
+		$matches = null;
 		if (preg_match('/^(\w+)\((.+)?\)$/', $expression, $matches)) {
-			return new CriteriaFunction($matches[1], (isset($matches[2]) ?
-					array(self::pfc($matches[2])) : array()));
+			return new CriteriaFunction($matches[1], (isset($matches[2])
+					? array_map(function ($expr) { return self::pfc($expr); }, explode(',', $matches[2]))
+					: array()));
 		}
 		
 		return null;
 	}
+	
 	/**
 	 * @param string $expression
 	 * @return \n2n\persistence\orm\criteria\item\CriteriaProperty

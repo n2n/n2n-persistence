@@ -69,7 +69,9 @@ class QueryFunction implements QueryItem {
 	}
 	
 	public static function getNames() {
-		return array(self::COUNT, self::SUM, self::MAX, self::MIN, self::RAND, self::AVG);
+		return array(self::COUNT, self::SUM, self::MAX, self::MIN, self::RAND, self::AVG,
+				self::ABS, self::COALESCE, self::LOWER, self::LTRIM, self::NULLIF, self::REPLACE, 
+				self::ROUND, self::RTRIM, self::SOUNDEX, self::TRIM, self::UPPER);
 	}
 	
 	public function equals($obj) {
