@@ -185,6 +185,9 @@ class EntityModel implements EntityPropertyCollection {
 		return (bool) sizeof($this->subEntityModels);
 	}
 	
+	/**
+	 * @return EntityModel[]
+	 */
 	public function getSubEntityModels() {
 		return $this->subEntityModels;
 	}
