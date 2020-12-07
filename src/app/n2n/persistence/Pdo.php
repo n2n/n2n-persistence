@@ -121,10 +121,10 @@ class Pdo extends \PDO {
 		}
 	}
 
-	public function query($statement) {
+	public function query(string $statement, ?int $fetchMode = null, ...$fetchModeArgs) {
 		try {
 			$mtime = microtime(true);
-			$query = parent::query($statement);
+			$query = parent::query($statement, $fetchMode, $fetchModeArgs);
 			$this->logger->addQuery($statement, (microtime(true) - $mtime));
 			return $query;
 		} catch (\PDOException $e) {
