@@ -137,7 +137,13 @@ class ClassSetup {
 		return SetupProcess::createPropertyException($message, $causingE, $causingComponents);
 	}
 	
-	private function determineColumnName($propertyName, $overrideAllowed = true, array &$relatedComponents) {
+	/**
+	 * @param string $propertyName
+	 * @param bool $overrideAllowed
+	 * @param array $relatedComponents
+	 * @return string|null
+	 */
+	private function determineColumnName($propertyName, $overrideAllowed, array &$relatedComponents) {
 		foreach ($this->annoAttributeOverrides as $attributeOverrides) {
 			$map = $attributeOverrides->getPropertyColumnMap();
 			if (!isset($map[$propertyName]))  continue;
