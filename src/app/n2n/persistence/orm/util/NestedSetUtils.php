@@ -219,6 +219,25 @@ class NestedSetUtils {
 		return $result;
 	}
 	
+	public function fetchLevel($entityObj, Criteria $criteria = null) {
+		if ($criteria === null) {
+			$criteria = $this->em->createCriteria()->from($this->class, self::NODE_ALIAS);
+		}
+		
+		$result = $this->lookupLftRgt($entityObj);
+		if ($result === null) return array();
+		
+		$lft = $result['lft'];
+		$rgt = $result['rgt'];
+		
+		$criteria->select(CrIt::f('COUNT', CrIt::c('1')))
+				->where()
+				->match(CrIt::p(self::NODE_ALIAS, $this->leftCriteriaProperty), '<', $lft)
+				->andMatch(CrIt::p(self::NODE_ALIAS, $this->rightCriteriaProperty), '>', $rgt);
+		
+		return $criteria->toQuery()->fetchSingle();		
+	}
+	
 	/**
 	 * @param object $entity
 	 */
