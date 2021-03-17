@@ -31,13 +31,21 @@ class EntityProxyManager {
 	const PROXY_TRIGGER_ACCESS_METHOD = '_triggerOnAccess';
 	const PROXY_DUP_SUFFIX = '_';
 
-	private static $instance;
+	private static $instance = null;
 	
 	private $proxyClasses = array();
 	private $accessListenerPropertyNames = array();
 	private $accessListeners = array();
 	
-	public function __construct() {
+	private function __construct() {
+	}
+	
+	static function getInstance() {
+		if (self::$instance === null) {
+			self::$instance = new EntityProxyManager();
+		}
+		
+		return self::$instance;
 	}
 	/**
 	 * @param \ReflectionClass $class
