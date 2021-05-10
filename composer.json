@@ -22,9 +22,22 @@
 		"n2n/n2n-reflection": "^7.2.33",
 		"n2n/n2n-util" : "^7.2.33"
 	},
+	"require-dev" : {
+        "n2n/n2n": "^7.2.33",
+        "n2n/n2n-web": "^7.2.33",
+        "n2n/n2n-impl-persistence-orm": "^7.2.33",
+        "n2n/n2n-impl-persistence-meta": "^7.2.33", 
+        "n2n/n2n-impl-web-ui": "^7.2.33", 
+		"phpunit/phpunit" : "^9.5"
+	},
 	"autoload" : {
 		"psr-4" : {
 			"n2n\\persistence\\" : "src/app/n2n/persistence"
+		}
+	},
+	"autoload-dev" : {
+		"psr-4" : {
+			"n2n\\persistence\\" : "src/test/n2n/persistence"
 		}
 	}
 }
