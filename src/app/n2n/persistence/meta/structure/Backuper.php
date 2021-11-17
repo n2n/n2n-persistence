@@ -23,7 +23,7 @@ namespace n2n\persistence\meta\structure;
 
 use n2n\util\ex\IllegalStateException;
 
-use n2n\io\OutputStream;
+use n2n\util\io\stream\OutputStream;
 
 interface Backuper {
 	/**

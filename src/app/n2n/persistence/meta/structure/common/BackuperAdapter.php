@@ -23,7 +23,7 @@ namespace n2n\persistence\meta\structure\common;
 
 use n2n\core\N2N;
 
-use n2n\io\OutputStream;
+use n2n\util\io\stream\OutputStream;
 
 use n2n\persistence\Pdo;
 
@@ -54,7 +54,7 @@ abstract class BackuperAdapter implements Backuper {
 	protected $dialect;
 	
 	/**
-	 * @var n2n\io\OutputStream
+	 * @var n2n\util\io\stream\OutputStream
 	 */
 	private $outputStream;
 
