@@ -24,6 +24,7 @@ namespace n2n\persistence\orm\proxy;
 use n2n\util\ex\NotYetImplementedException;
 use n2n\reflection\ReflectionUtils;
 use n2n\util\StringUtils;
+use \InvalidArgumentException;
 
 class EntityProxyManager {
 	const PROXY_NAMESPACE_PREFIX = 'n2n\\persistence\\orm\\proxy\\entities';
@@ -32,19 +33,19 @@ class EntityProxyManager {
 	const PROXY_DUP_SUFFIX = '_';
 
 	private static $instance = null;
-	
+
 	private $proxyClasses = array();
 	private $accessListenerPropertyNames = array();
 	private $accessListeners = array();
-	
+
 	private function __construct() {
 	}
-	
+
 	static function getInstance() {
 		if (self::$instance === null) {
 			self::$instance = new EntityProxyManager();
 		}
-		
+
 		return self::$instance;
 	}
 	/**
@@ -64,12 +65,12 @@ class EntityProxyManager {
 		$property = $proxyClass->getProperty($this->accessListenerPropertyNames[$proxyClass->getName()]);
 		$property->setAccessible(true);
 		$property->setValue($proxy, $proxyAccessListener);
-		
+
 		$this->accessListeners[spl_object_hash($proxy)] = $proxyAccessListener;
-		
+
 		return $proxy;
 	}
-	
+
 	/**
 	 * @param EntityProxy $proxy
 	 * @throws \n2n\persistence\orm\EntityNotFoundException
@@ -79,11 +80,11 @@ class EntityProxyManager {
 		if (!isset($this->accessListeners[$objHash])) return;
 		$this->accessListeners[$objHash]->onAccess($proxy);
 	}
-	
+
 	public function isProxyInitialized(EntityProxy $proxy) {
 		return !isset($this->accessListeners[spl_object_hash($proxy)]);
 	}
-	
+
 	public function disposeProxyAccessListenerOf($entity) {
 		if (!($entity instanceof EntityProxy)) return;
 		$objHash = spl_object_hash($entity);
@@ -96,11 +97,11 @@ class EntityProxyManager {
 		if ($class->isAbstract()) {
 			throw new CanNotCreateEntityProxyClassException('Can not create proxy of abstract class ' . $class->getName() . '.');
 		}
-		
+
 		if (sizeof($class->getProperties(\ReflectionProperty::IS_PUBLIC))) {
 			throw new CanNotCreateEntityProxyClassException('Can not create proxy of class ' . $class->getName() . ' because it has public properties.');
 		}
-		
+
 		$proxyNamespaceName =  self::PROXY_NAMESPACE_PREFIX;
 		$namespaceName = $class->getNamespaceName();
 		if ($namespaceName) {
@@ -110,53 +111,55 @@ class EntityProxyManager {
 
 		$accessListenerPropertyName = self::PROXY_ACCESS_LISTENR_PROPERTY;
 		while ($class->hasProperty($accessListenerPropertyName)) {
-			$accessListenerPropertyName += self::PROXY_DUP_SUFFIX;
+			$accessListenerPropertyName .= self::PROXY_DUP_SUFFIX;
 		}
 		$this->accessListenerPropertyNames[$proxyNamespaceName . '\\' . $proxyClassName] = $accessListenerPropertyName;
 
 		$accessMethodName = self::PROXY_TRIGGER_ACCESS_METHOD;
 		while ($class->hasMethod($accessMethodName)) {
-			$accessMethodName += self::PROXY_DUP_SUFFIX;
+			$accessMethodName .= self::PROXY_DUP_SUFFIX;
 		}
 
 		$phpProxyStr = 'namespace ' . $proxyNamespaceName . ' { '
-		. 'class ' . $proxyClassName . ' extends \\' . $class->getName() . ' implements \n2n\persistence\orm\proxy\EntityProxy {'
-		. 'private $' . $accessListenerPropertyName . ';'
-		. 'private function ' . $accessMethodName . '() {'
-		. 'if (null === $this->' . $accessListenerPropertyName . ') return;'
-		. '$this->' . $accessListenerPropertyName . '->onAccess($this);'
-		. '$this->' . $accessListenerPropertyName . ' = null;'
-		. '}';
+				. 'class ' . $proxyClassName . ' extends \\' . $class->getName() . ' implements \n2n\persistence\orm\proxy\EntityProxy {'
+				. 'private $' . $accessListenerPropertyName . ';'
+				. 'private function ' . $accessMethodName . '() {'
+				. 'if (null === $this->' . $accessListenerPropertyName . ') return;'
+				. '$this->' . $accessListenerPropertyName . '->onAccess($this);'
+				. '$this->' . $accessListenerPropertyName . ' = null;'
+				. '}';
 
 		foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
 			if ($method->isStatic()) continue;
-				
+
 			$phpParameterStrs = array();
 			$phpParameterCallStrs = array();
-			foreach ($method->getParameters() as $parameter) {				
+			foreach ($method->getParameters() as $parameter) {
 				$phpParameterStrs[] = $this->buildPhpParamerStr($parameter);
 				$phpParameterCallStrs[] = $this->buildDollar($parameter, false) . $parameter->getName();
 			}
-				
+
 			$methodReturnTypeStr = '';
+			$isVoidReturn = false;
 			if (null !== ($returnType = $method->getReturnType())) {
-				$methodReturnTypeStr .= ': ' . $this->buildTypeStr($returnType);
+				$methodReturnTypeStr .= ': ' . $this->buildTypeStr($returnType, $isVoidReturn);
 			}
-			
-			$phpProxyStr .= "\r\n" . 'public function ' . $method->getName() . '(' . implode(', ', $phpParameterStrs) . ') ' 
+
+			$phpProxyStr .= "\r\n" . 'public function ' . $method->getName() . '(' . implode(', ', $phpParameterStrs) . ') '
 					. $methodReturnTypeStr . ' { '
 					. '$this->' . self::PROXY_TRIGGER_ACCESS_METHOD . '(); '
-					. 'return parent::' . $method->getName() . '(' . implode(', ', $phpParameterCallStrs) . '); '
+					. ( $isVoidReturn ? '' : 'return ') . 'parent::' . $method->getName() . '(' . implode(', ', $phpParameterCallStrs) . '); '
 					. '}';
 		}
 
 		$phpProxyStr .= '}'
-		. '}';
-		
+				. '}';
+		test($phpProxyStr);
+
 		if (false === eval($phpProxyStr)) {
 			die();
 		}
-		
+
 		return new \ReflectionClass($proxyNamespaceName . '\\' . $proxyClassName);
 	}
 
@@ -171,47 +174,66 @@ class EntityProxyManager {
 		$str .= '$';
 		return $str;
 	}
-	
+
 	private function buildPhpParamerStr(\ReflectionParameter $parameter) {
 		$phpParamStr = '';
-		
+
 		if (null !== ($type = $parameter->getType())) {
 			$phpParamStr .= $this->buildTypeStr($type) . ' ';
 		}
-		
+
 		$phpParamStr .= $this->buildDollar($parameter, true) . $parameter->getName();
-		
+
 		if ($parameter->isDefaultValueAvailable()) {
 			if ($parameter->isDefaultValueConstant()) {
-				
 				$phpParamStr .= ' = ' . $this->buildDefaultConstStr($parameter->getDefaultValueConstantName());
 			} else {
 				$phpParamStr .= ' = ' . $this->buildValueStr($parameter->getDefaultValue());
 			}
 		}
-		
+
 		return $phpParamStr;
 	}
 
-	private function buildTypeStr(\ReflectionType $type) {
-		$prefix = $type->allowsNull() ? '?' : '';
-		
-		if ($type->isBuiltin()) {
-			return $prefix . $type->getName();
+	private function buildTypeStr(\ReflectionType $type, &$isVoid = false) {
+		$typeStrs = [];
+
+		$isVoid = false;
+		if ($type instanceof \ReflectionNamedType) {
+			$typeStrs[] = $typeName = self::buildNamedTypeStr($type);
+			$isVoid = $typeName === 'void';
+		} else if ($type instanceof \ReflectionUnionType) {
+			foreach ($type->getTypes() as $iType) {
+				$typeStrs[] = self::buildNamedTypeStr($iType);
+			}
+		} else {
+			throw new InvalidArgumentException('ReflectionNamedType or ReflectionUnionType expected.');
 		}
-	
-		return $prefix . '\\' . $type->getName();
+
+		if ($type->allowsNull()) {
+			$typeStrs[] = 'null';
+		}
+
+		return implode('|', $typeStrs);
 	}
-	
+
+	private function buildNamedTypeStr(\ReflectionNamedType $namedType) {
+		if ($namedType->isBuiltin()) {
+			return $namedType->getName();
+		}
+
+		return '\\' . $namedType->getName();
+	}
+
 	private function buildDefaultConstStr($defaultConstName) {
 		if (StringUtils::startsWith('self::', $defaultConstName)) {
 			return $defaultConstName;
 		}
-		
+
 		return '\\' . $defaultConstName;
-		
+
 	}
-	
+
 	private function buildValueStr($value) {
 		if ($value === null) {
 			return 'null';
@@ -224,28 +246,28 @@ class EntityProxyManager {
 		} else if (is_array($value)) {
 			$fieldStrs = array();
 			foreach ($value as $key => $fieldValue) {
-				$fieldStrs[] = buildValueStr($key) . ' => ' . buildValueStr($fieldValue);
+				$fieldStrs[] = $this->buildValueStr($key) . ' => ' . $this->buildValueStr($fieldValue);
 			}
 			return 'array(' . implode(', ', $fieldStrs) . ')';
 		}
-	
+
 		throw new \InvalidArgumentException('Cannot print value str of type: ' . gettype($value));
 	}
-	
+
 	private function determineDefaultValue($defaultValue) {
 		if (is_null($defaultValue)) {
 			return 'null';
 		}
-		
+
 		if (is_numeric($defaultValue)) {
 			return $defaultValue;
 		}
-		
+
 		if (is_scalar($defaultValue)) {
 			// @todo \"
 			return '\'' . addslashes($defaultValue) . '\'';
 		}
-		
+
 		if (is_array($defaultValue)) {
 			$fields = array();
 			foreach ($defaultValue as $key => $value) {
@@ -253,7 +275,7 @@ class EntityProxyManager {
 			}
 			return implode(', ', $fields);
 		}
-		
+
 		throw new NotYetImplementedException();
 	}
 }
