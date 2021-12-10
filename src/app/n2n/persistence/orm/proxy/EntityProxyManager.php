@@ -154,7 +154,6 @@ class EntityProxyManager {
 
 		$phpProxyStr .= '}'
 				. '}';
-		test($phpProxyStr);
 
 		if (false === eval($phpProxyStr)) {
 			die();
