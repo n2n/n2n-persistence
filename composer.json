@@ -16,6 +16,8 @@
 			"homepage" : "http://www.von-burg.net"
 		}
 	],
+    "minimum-stability" : "dev",
+    "prefer-stable" : true,
 	"config" : {
 		"vendor-dir" : "src/vendor"
 	},
