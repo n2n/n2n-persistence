@@ -198,7 +198,7 @@ class PersistenceContext {
 	public function createManagedEntityObj(EntityModel $entityModel, $id) {
 		$entityObj = null;
 		try {
-			$entityObj = ReflectionUtils::createObject($entityModel->getClass(), true);
+			$entityObj = ReflectionUtils::createObject($entityModel->getClass(), false);
 		} catch (ObjectCreationFailedException $e) {
 			throw new EntityCreationFailedException('Could not create entity object for ' 
 					. EntityInfo::buildEntityString($entityModel, $id), 0, $e);
