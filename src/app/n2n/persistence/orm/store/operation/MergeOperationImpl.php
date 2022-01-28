@@ -87,7 +87,7 @@ class MergeOperationImpl implements MergeOperation {
 					if ($newEntity !== null) return $newEntity;
 				}
 				
-				$newEntity = ReflectionUtils::createObject($entityModel->getClass());
+				$newEntity = ReflectionUtils::createObject($entityModel->getClass(), false);
 				$this->actionQueue->getOrCreatePersistAction($newEntity, true);
 				return $newEntity;
 				
