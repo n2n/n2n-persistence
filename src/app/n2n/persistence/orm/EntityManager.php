@@ -83,14 +83,14 @@ interface EntityManager {
 	/**
 	 * @param \ReflectionClass $class
 	 * @param mixed $id
-	 * @return object
+	 * @return mixed
 	 */
 	public function find(\ReflectionClass $class, $id);
 	/**
 	 * Get an instance, whose state may be lazily fetched.
 	 * @param \ReflectionClass $class
 	 * @param mixed $id
-	 * @return object
+	 * @return mixed
 	 */
 	public function getReference(\ReflectionClass $class, $id);
 	/**
