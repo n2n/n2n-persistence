@@ -95,33 +95,33 @@ interface EntityManager {
 	public function getReference(\ReflectionClass $class, $id);
 	/**
 	 * Merge the state of the given entity into the current persistence context. 
-	 * @param object $entity
-	 * @return object the managed instance that the state was merged to 
+	 * @param mixed $entity
+	 * @return mixed the managed instance that the state was merged to 
 	 */
 	public function merge($entity);
 	/**
 	 * Make an instance managed and persistent.
-	 * @param object $entity
-	 * @return object
+	 * @param mixed $entity
+	 * @return mixed
 	 */
 	public function persist($entity);
 	/**
 	 * Refresh the state of the instance from the database, overwriting changes made to the entity, if any. 
-	 * @param object $entity
+	 * @param mixed $entity
 	 * @throws PersistenceOperationException
 	 * @throws EntityNotFoundException if the entity no longer exists in the database
 	 */
 	public function refresh($entity);
 	/**
 	 * Remove the entity instance. 
-	 * @param object $entity
+	 * @param mixed $entity
 	 */
 	public function remove($entity);
 	/**
 	 * Remove the given entity from the persistence context, causing a managed entity to become detached. Unflushed 
 	 * changes made to the entity if any (including removal of the entity), will not be synchronized to the database. 
 	 * Entities which previously referenced the detached entity will continue to reference it. 
-	 * @param object $entity
+	 * @param mixed $entity
 	 */
 	public function detach($entity);
 	/**
@@ -130,7 +130,7 @@ interface EntityManager {
 	public function flush();
 	/**
 	 * Check if the instance is a managed entity instance belonging to the current persistence context. 
-	 * @param object $entity
+	 * @param mixed $entity
 	 * @return boolean indicating if entity is in persistence context 
 	 */
 	public function contains($entity);
@@ -150,8 +150,8 @@ interface EntityManager {
 	public function isOpen();
 // 	/**
 // 	 * 
-// 	 * @param object $entity
-// 	 * @param object $newEntity
+// 	 * @param mixed $entity
+// 	 * @param mixed $newEntity
 // 	 */
 // 	public function swap($entity, $newEntity);	
 	
