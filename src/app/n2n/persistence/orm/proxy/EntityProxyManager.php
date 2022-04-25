@@ -36,9 +36,10 @@ class EntityProxyManager {
 
 	private $proxyClasses = array();
 	private $accessListenerPropertyNames = array();
-	private $accessListeners = array();
+	private \WeakMap $accessListeners;
 
 	private function __construct() {
+		$this->accessListeners = new \WeakMap();
 	}
 
 	static function getInstance() {
@@ -66,7 +67,7 @@ class EntityProxyManager {
 		$property->setAccessible(true);
 		$property->setValue($proxy, $proxyAccessListener);
 
-		$this->accessListeners[spl_object_hash($proxy)] = $proxyAccessListener;
+		$this->accessListeners[$proxy] = $proxyAccessListener;
 
 		return $proxy;
 	}
@@ -76,21 +77,20 @@ class EntityProxyManager {
 	 * @throws \n2n\persistence\orm\EntityNotFoundException
 	 */
 	public function initializeProxy(EntityProxy $proxy) {
-		$objHash = spl_object_hash($proxy);
-		if (!isset($this->accessListeners[$objHash])) return;
-		$this->accessListeners[$objHash]->onAccess($proxy);
+		if (!isset($this->accessListeners[$proxy])) return;
+		$this->accessListeners[$proxy]->onAccess($proxy);
+		// gets removed by disposeProxyAccessListenerOf, called by mapValues of PersistenceContext.
 	}
 
 	public function isProxyInitialized(EntityProxy $proxy) {
-		return !isset($this->accessListeners[spl_object_hash($proxy)]);
+		return !isset($this->accessListeners[$proxy]);
 	}
 
-	public function disposeProxyAccessListenerOf($entity) {
+	public function disposeProxyAccessListenerOf(object $entity) {
 		if (!($entity instanceof EntityProxy)) return;
-		$objHash = spl_object_hash($entity);
-		if (!isset($this->accessListeners[$objHash])) return;
-		$this->accessListeners[$objHash]->dispose();
-		unset($this->accessListeners[$objHash]);
+		if (!isset($this->accessListeners[$entity])) return;
+		$this->accessListeners[$entity]->dispose();
+		unset($this->accessListeners[$entity]);
 	}
 
 	private function createProxyClass(\ReflectionClass $class) {
