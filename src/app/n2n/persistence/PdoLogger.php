@@ -24,6 +24,8 @@ namespace n2n\persistence;
 class PdoLogger {
 	private $dsName;
 	private $log;
+	private bool $capturing = false;
+
 	/**
 	 *
 	 * @param string $dataSourceName
@@ -40,14 +42,20 @@ class PdoLogger {
 	public function getLog() {
 		return $this->log;
 	}
+
+	function setCapturing(bool $capturing) {
+		$this->capturing = $capturing;
+	}
+
 	/**
 	 *
 	 * @param string $sqlStr
 	 * @param number $time
 	 */
 	public function addQuery($sqlStr, $time = null) {
-		$this->log[] = array('sql' => $sqlStr, 'type' => 'query', 'time' => $time);
-// 		test(end($this->log));
+		if ($this->capturing) {
+			$this->log[] = array('sql' => $sqlStr, 'type' => 'query', 'time' => $time);
+		}
 	}
 	/**
 	 *
@@ -55,8 +63,9 @@ class PdoLogger {
 	 * @param number $time
 	 */
 	public function addExecution($sqlStr, $time = null) {
-		$this->log[] = array('sql' => $sqlStr, 'type' => 'execute', 'time' => $time);
-// 		test(end($this->log));
+		if ($this->capturing) {
+			$this->log[] = array('sql' => $sqlStr, 'type' => 'execute', 'time' => $time);
+		}
 	}
 	/**
 	 *
@@ -64,8 +73,9 @@ class PdoLogger {
 	 * @param number $time
 	 */
 	public function addPreparation($sqlStr, $time = null) {
-		$this->log[] = array('sql' => $sqlStr, 'type' => 'prepare', 'time' => $time);
-// 		test(end($this->log));
+		if ($this->capturing) {
+			$this->log[] = array('sql' => $sqlStr, 'type' => 'prepare', 'time' => $time);
+		}
 	}
 	/**
 	 *
@@ -74,32 +84,36 @@ class PdoLogger {
 	 * @param number $time
 	 */
 	public function addPreparedExecution($sqlStr, array $values = null, $time = null) {
-		$this->log[] = array('sql' => $sqlStr, 'values' => $values, 'type' => 'prepared-execute', 'time' => $time);
-// 		test(end($this->log));
+		if ($this->capturing) {
+			$this->log[] = array('sql' => $sqlStr, 'values' => $values, 'type' => 'prepared-execute', 'time' => $time);
+		}
 	}
 	/**
 	 *
 	 * @param number $time
 	 */
 	public function addTransactionBegin($time = null) {
-		$this->log[] = array('type' => 'begin transaction', 'time' => $time);
-// 		test(end($this->log));
+		if ($this->capturing) {
+			$this->log[] = array('type' => 'begin transaction', 'time' => $time);
+		}
 	}
 	/**
 	 *
 	 * @param number $time
 	 */
 	public function addTransactionRollBack($time = null) {
-		$this->log[] = array('type' => 'rollback', 'time' => $time);
-// 		test(end($this->log));
+		if ($this->capturing) {
+			$this->log[] = array('type' => 'rollback', 'time' => $time);
+		}
 	}
 	/**
 	 *
 	 * @param number $time
 	 */
 	public function addTransactionCommit($time = null) {
-		$this->log[] = array('type' => 'commit', 'time' => $time);
-// 		test(end($this->log));
+		if ($this->capturing) {
+			$this->log[] = array('type' => 'commit', 'time' => $time);
+		}
 	}
 	/**
 	 * @return array
