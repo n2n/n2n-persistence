@@ -25,6 +25,9 @@ use n2n\util\ex\NotYetImplementedException;
 use n2n\reflection\ReflectionUtils;
 use n2n\util\StringUtils;
 use \InvalidArgumentException;
+use ReflectionClass;
+use n2n\util\ex\IllegalStateException;
+use n2n\util\type\ArgUtils;
 
 class EntityProxyManager {
 	const PROXY_NAMESPACE_PREFIX = 'n2n\\persistence\\orm\\proxy\\entities';
@@ -36,12 +39,13 @@ class EntityProxyManager {
 
 	private $proxyClasses = array();
 	private $accessListenerPropertyNames = array();
-	private \WeakMap $accessListeners;
 
 	private function __construct() {
-		$this->accessListeners = new \WeakMap();
 	}
 
+	/**
+	 * @return EntityProxyManager
+	 */
 	static function getInstance() {
 		if (self::$instance === null) {
 			self::$instance = new EntityProxyManager();
@@ -50,12 +54,12 @@ class EntityProxyManager {
 		return self::$instance;
 	}
 	/**
-	 * @param \ReflectionClass $class
+	 * @param ReflectionClass $class
 	 * @param EntityProxyAccessListener $proxyAccessListener
 	 * @return object
 	 * @throws CanNotCreateEntityProxyClassException
 	 */
-	public function createProxy(\ReflectionClass $class, EntityProxyAccessListener $proxyAccessListener) {
+	public function createProxy(ReflectionClass $class, EntityProxyAccessListener $proxyAccessListener) {
 		$className = $class->getName();
 		if (!isset($this->proxyClasses[$className])) {
 			$this->proxyClasses[$className] = $this->createProxyClass($class);
@@ -63,13 +67,43 @@ class EntityProxyManager {
 
 		$proxyClass = $this->proxyClasses[$className];
 		$proxy = ReflectionUtils::createObject($proxyClass);
-		$property = $proxyClass->getProperty($this->accessListenerPropertyNames[$proxyClass->getName()]);
-		$property->setAccessible(true);
+		$property = $this->getAccessibleListenerProperty($proxyClass);
 		$property->setValue($proxy, $proxyAccessListener);
 
-		$this->accessListeners[$proxy] = $proxyAccessListener;
-
 		return $proxy;
+	}
+
+	private function getAccessibleListenerProperty(\ReflectionClass $proxyClass): \ReflectionProperty {
+		$proxyClassName = $proxyClass->getName();
+		IllegalStateException::assertTrue(isset($this->accessListenerPropertyNames[$proxyClassName]));
+
+		$property = $proxyClass->getProperty($this->accessListenerPropertyNames[$proxyClassName]);
+		$property->setAccessible(true);
+		return $property;
+	}
+
+	/**
+	 * @param object $entity
+	 * @return EntityProxyAccessListener|null
+	 */
+	private function retrieveAccessListener(object $entity, bool $unset): ?EntityProxyAccessListener {
+		if (!($entity instanceof EntityProxy)) {
+			return null;
+		}
+
+		$property = $this->getAccessibleListenerProperty(new ReflectionClass($entity));
+		$accessListener = $property->getValue($entity);
+
+		if ($unset) {
+			$property->setValue($entity,null);
+		}
+
+		if ($accessListener === null || $accessListener instanceof EntityProxyAccessListener) {
+			return $accessListener;
+		}
+
+		throw new IllegalStateException(get_class($entity) . '::' . $this->accessListenerPropertyNames[$className]
+				. ' corrupted.');
 	}
 
 	/**
@@ -77,23 +111,18 @@ class EntityProxyManager {
 	 * @throws \n2n\persistence\orm\EntityNotFoundException
 	 */
 	public function initializeProxy(EntityProxy $proxy) {
-		if (!isset($this->accessListeners[$proxy])) return;
-		$this->accessListeners[$proxy]->onAccess($proxy);
-		// gets removed by disposeProxyAccessListenerOf, called by mapValues of PersistenceContext.
+		$this->retrieveAccessListener($proxy, true)?->onAccess($proxy);
 	}
 
-	public function isProxyInitialized(EntityProxy $proxy) {
-		return !isset($this->accessListeners[$proxy]);
+	public function isProxyInitialized(EntityProxy $proxy): bool {
+		return null === $this->retrieveAccessListener($proxy, false);
 	}
 
-	public function disposeProxyAccessListenerOf(object $entity) {
-		if (!($entity instanceof EntityProxy)) return;
-		if (!isset($this->accessListeners[$entity])) return;
-		$this->accessListeners[$entity]->dispose();
-		unset($this->accessListeners[$entity]);
+	public function disposeProxyAccessListenerOf($entity) {
+		$this->retrieveAccessListener($entity, true)?->dispose();
 	}
 
-	private function createProxyClass(\ReflectionClass $class) {
+	private function createProxyClass(ReflectionClass $class) {
 		if ($class->isAbstract()) {
 			throw new CanNotCreateEntityProxyClassException('Can not create proxy of abstract class ' . $class->getName() . '.');
 		}
@@ -159,7 +188,7 @@ class EntityProxyManager {
 			die();
 		}
 
-		return new \ReflectionClass($proxyNamespaceName . '\\' . $proxyClassName);
+		return new ReflectionClass($proxyNamespaceName . '\\' . $proxyClassName);
 	}
 
 	private function buildDollar(\ReflectionParameter $parameter, bool $includeRef) {
