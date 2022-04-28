@@ -28,7 +28,6 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 	private $persistenceUnitName;
 	private $pdoPool;
 	
-	private $temc;
 	private $shared;
 	private $transactionalEm;
 	
@@ -78,6 +77,18 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 	 */
 	public function create() {
 		return new LazyEntityManager($this->persistenceUnitName, $this->pdoPool, false);
+	}
+
+	function clear(): void {
+		if ($this->shared !== null) {
+			$this->shared->close();
+			$this->shared = null;
+		}
+
+		if ($this->transactionalEm !== null) {
+			$this->transactionalEm->close();
+			$this->transactionalEm = null;
+		}
 	}
 }
 
