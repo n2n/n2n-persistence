@@ -43,7 +43,7 @@ class PdoStatement extends \PDOStatement {
 	 * (non-PHPdoc)
 	 * @see PDOStatement::bindValue()
 	 */
-	public function bindValue($parameter, $value, $dataType = null) {
+	public function bindValue($parameter, $value, $dataType = null): bool {
 		$this->boundValues[$parameter] = $value;
 		if ($dataType !== null) {
 			return parent::bindValue($parameter, $value, $dataType);
@@ -55,11 +55,11 @@ class PdoStatement extends \PDOStatement {
 	public function autoBindValue($parameter, $value) {
 		$dataType = null;
 		if (is_int($value)) {
-			$dataType = PDO::PARAM_INT;
+			$dataType = \PDO::PARAM_INT;
 		} else if (is_bool($value)) {
-			$dataType = PDO::PARAM_BOOL;
+			$dataType = \PDO::PARAM_BOOL;
 		} else {
-			$dataType = PDO::PARAM_STR;
+			$dataType = \PDO::PARAM_STR;
 		}
 		return $this->bindValue($parameter, $value, $dataType);
 	}
@@ -68,7 +68,7 @@ class PdoStatement extends \PDOStatement {
 	 * (non-PHPdoc)
 	 * @see PDOStatement::bindParam()
 	 */
-	public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = null, $driver_options = null) {
+	public function bindParam($parameter, &$variable, $data_type = \PDO::PARAM_STR, $length = null, $driver_options = null): bool {
 		$this->boundValues[$parameter] = $variable;
 		return parent::bindParam($parameter, $variable, $data_type, $length, $driver_options);
 	}
@@ -99,7 +99,7 @@ class PdoStatement extends \PDOStatement {
 	 * (non-PHPdoc)
 	 * @see PDOStatement::execute()
 	 */
-	public function execute($input_parameters = null) {
+	public function execute($input_parameters = null): bool {
 		if (is_array($input_parameters)) $this->boundValues = $input_parameters;
 		
 		try {
@@ -129,10 +129,10 @@ class PdoStatement extends \PDOStatement {
 	}
 	
 
-	public function fetch($fetch_style = null, $cursor_orientation = null, $cursor_offset = null) {
+	public function fetch(int $fetch_style = \PDO::FETCH_BOTH, int $cursor_orientation = \PDO::FETCH_ORI_NEXT, int $cursor_offset = 0): mixed {
 		$return = parent::fetch($fetch_style, $cursor_orientation, $cursor_offset);
 		
-		if ($fetch_style == PDO::FETCH_BOUND) {
+		if ($fetch_style == \PDO::FETCH_BOUND) {
 			$this->supplySharedBounds();
 		}
 		

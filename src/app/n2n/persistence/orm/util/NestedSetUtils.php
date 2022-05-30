@@ -910,7 +910,7 @@ class NestedSetUtils {
 // 		$stmt = $stmtBuilder->buildSelect($baseEntry, array($optionLabelField, $optionKeyField), $childrenOnly);
 
 // 		$options = array();
-// 		while ($row = $stmt->fetch(NN6Pdo::FETCH_ASSOC)) {
+// 		while ($row = $stmt->fetch(NN6\PDO::FETCH_ASSOC)) {
 // 			$options[$row[$optionKeyField]] = str_repeat('-', $row[$this->levelField]) . ' ' . $row[$optionLabelField];
 // 		}
 // 		return $options;
@@ -934,7 +934,7 @@ class NestedSetUtils {
 // 		$stmt = $stmtBuilder->buildSelect($baseEntry, array($optionLabelField, $optionKeyField), $childrenOnly);
 
 // 		$options = array();
-// 		while ($row = $stmt->fetch(NN6Pdo::FETCH_ASSOC)) {
+// 		while ($row = $stmt->fetch(NN6\PDO::FETCH_ASSOC)) {
 // 			$options[$row[$optionKeyField]] = str_repeat('-', $row[$this->levelField]) . ' ' . $row[$optionLabelField];
 // 		}
 // 		return $options;

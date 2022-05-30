@@ -27,7 +27,8 @@ use n2n\core\container\TransactionManager;
 use n2n\core\container\Transaction;
 use n2n\core\container\CommitFailedException;
 
-class Pdo extends \PDO {
+class Pdo {
+    private \PDO $pdo;
 	private $dataSourceName;
 	private $entityManager;
 	private $dialect;
@@ -38,7 +39,7 @@ class Pdo extends \PDO {
 	
 	public function __construct(PersistenceUnitConfig $persistenceUnitConfig, TransactionManager $transactionManager = null) {
 		try {
-			parent::__construct($persistenceUnitConfig->getDsnUri(), $persistenceUnitConfig->getUser(),
+			$this->pdo = new \PDO($persistenceUnitConfig->getDsnUri(), $persistenceUnitConfig->getUser(),
 					$persistenceUnitConfig->getPassword(), array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
 							\PDO::ATTR_STATEMENT_CLASS => array('n2n\persistence\PdoStatement', array())));
 		} catch (\PDOException $e) {
@@ -102,6 +103,11 @@ class Pdo extends \PDO {
 
 		return $this->dataSourceName == $dbh->getDataSourcename();
 	}
+
+    function inTransaction(): bool {
+        return $this->pdo->inTransaction();
+    }
+
 	/**
 	 *
 	 * @return PdoStatement
@@ -110,7 +116,7 @@ class Pdo extends \PDO {
 		try {
 			$mtime = microtime(true);
 				
-			$stmt = parent::prepare($statement, $driverOptions);
+			$stmt = $this->pdo->prepare($statement, $driverOptions);
 			
 			$this->logger->addPreparation($statement, (microtime(true) - $mtime));
 			$stmt->setLogger($this->logger);
@@ -124,7 +130,7 @@ class Pdo extends \PDO {
 	public function query(string $statement, ?int $fetchMode = null, ...$fetchModeArgs) {
 		try {
 			$mtime = microtime(true);
-			$query = parent::query($statement, $fetchMode, $fetchModeArgs);
+			$query = $this->pdo->query($statement, $fetchMode, $fetchModeArgs);
 			$this->logger->addQuery($statement, (microtime(true) - $mtime));
 			return $query;
 		} catch (\PDOException $e) {
@@ -138,7 +144,7 @@ class Pdo extends \PDO {
 	public function exec($statement) {
 		try {
 			$mtime = microtime(true);
-			$stmt = parent::exec($statement);
+			$stmt = $this->pdo->exec($statement);
 			$this->logger->addExecution($statement, (microtime(true) - $mtime));
 			return $stmt;
 		} catch (\PDOException $e) {
@@ -192,7 +198,7 @@ class Pdo extends \PDO {
 	private function performBeginTransaction(Transaction $transaction = null) {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_BEGIN, $transaction);
 		$mtime = microtime(true);
-		parent::beginTransaction();
+		$this->pdo->beginTransaction();
 		$this->logger->addTransactionBegin(microtime(true) - $mtime);
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_BEGAN, $transaction);
 	}
@@ -206,10 +212,10 @@ class Pdo extends \PDO {
 		$mtime = microtime(true);
 		
 		$preErr = error_get_last();
-		$result = @parent::commit();
+		$result = @$this->pdo->commit();
 		$postErr = error_get_last();
 		
-		// Problem: Warining: Error while sending QUERY packet. PID=223316 --> parent::commit() will return true but 
+		// Problem: Warining: Error while sending QUERY packet. PID=223316 --> $this->pdo->commit() will return true but
 		// triggers warning. 
 		// http://php.net/manual/de/pdo.transactions.php
 		if (!$result || $preErr !== $postErr) {
@@ -223,7 +229,7 @@ class Pdo extends \PDO {
 	private function performRollBack(Transaction $transaction = null) {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_ROLL_BACK, $transaction);
 		$mtime = microtime(true);
-		parent::rollBack();
+		$this->pdo->rollBack();
 		$this->logger->addTransactionRollBack(microtime(true) - $mtime);
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ROLLED_BACK, $transaction);
 	}

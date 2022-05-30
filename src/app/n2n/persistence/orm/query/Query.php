@@ -86,7 +86,7 @@ class Query {
 		$this->loadingQueue->registerLoading($this);
 		
 		$resultBuilder = new ResultBuilder($this->resultSelections, $this->hiddenSelections);
-		while ($this->stmt->fetch(Pdo::FETCH_BOUND)) {
+		while ($this->stmt->fetch(\PDO::FETCH_BOUND)) {
 			$resultBuilder->buildRow();
 		}
 		$result = $resultBuilder->buildResult();

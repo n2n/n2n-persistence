@@ -314,6 +314,6 @@ class Comparison {
 	
 	private function splitByOperator($string) {
 		return array_values(array_filter(preg_split(self::OPERATOR_SPLIT_PATTERN, 
-				$string, null, PREG_SPLIT_DELIM_CAPTURE)));
+				$string, -1, PREG_SPLIT_DELIM_CAPTURE)));
 	}
 }
