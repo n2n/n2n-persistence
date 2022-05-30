@@ -235,7 +235,7 @@ class Pdo {
 	}
 
 	function quote(string $string, int $type = \PDO::PARAM_STR): string {
-		return $this->pdo->quote($string);
+		return $this->pdo->quote($string, $type);
 	}
 
 	/**
