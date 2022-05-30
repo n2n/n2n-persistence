@@ -233,6 +233,11 @@ class Pdo {
 		$this->logger->addTransactionRollBack(microtime(true) - $mtime);
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ROLLED_BACK, $transaction);
 	}
+
+	function quote(string $string, int $type = \PDO::PARAM_STR): string {
+		return $this->pdo->quote($string);
+	}
+
 	/**
 	 *
 	 * @param string $field
