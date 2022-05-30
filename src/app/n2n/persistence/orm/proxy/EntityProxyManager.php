@@ -227,9 +227,11 @@ class EntityProxyManager {
 		$typeStrs = [];
 
 		$isVoid = false;
+		$isMixed = false;
 		if ($type instanceof \ReflectionNamedType) {
 			$typeStrs[] = $typeName = self::buildNamedTypeStr($type);
 			$isVoid = $typeName === 'void';
+			$isMixed = $typeName === 'mixed';
 		} else if ($type instanceof \ReflectionUnionType) {
 			foreach ($type->getTypes() as $iType) {
 				$typeStrs[] = self::buildNamedTypeStr($iType);
@@ -238,7 +240,7 @@ class EntityProxyManager {
 			throw new InvalidArgumentException('ReflectionNamedType or ReflectionUnionType expected.');
 		}
 
-		if ($type->allowsNull()) {
+		if (!$isMixed && $type->allowsNull()) {
 			$typeStrs[] = 'null';
 		}
 
