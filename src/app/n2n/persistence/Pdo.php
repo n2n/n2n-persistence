@@ -245,6 +245,10 @@ class Pdo {
 	public function quoteField($field) {
 		return $this->dialect->quoteField($field);
 	}
+
+	function lastInsertId(string $name = null) {
+		return $this->pdo->lastInsertId($name);
+	}
 // 	/**
 // 	 *
 // 	 */
