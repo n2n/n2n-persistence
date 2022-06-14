@@ -275,12 +275,8 @@ class ActionQueueImpl implements ActionQueue {
 	private function lookupEntityListener(object $entityObj, \ReflectionClass $entityListenerClass) {
 		$entityListenerClassName = $entityListenerClass->getName();
 
-		if (!isset($this->entityListenersMap[$entityObj])) {
-			$this->entityListenersMap[$entityObj] = [];
-		}
-
 		if (!isset($this->entityListenersMap[$entityObj][$entityListenerClassName])) {
-			$entityListeners = $this->entityListenersMap[$entityObj];
+			$entityListeners = $this->entityListenersMap[$entityObj] ?? [];
 			$entityListeners[$entityListenerClassName] = $this->magicContext->lookup($entityListenerClassName);
 			$this->entityListenersMap[$entityObj] = $entityListeners;
 		}
