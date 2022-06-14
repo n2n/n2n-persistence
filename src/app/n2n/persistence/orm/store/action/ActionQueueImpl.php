@@ -43,27 +43,26 @@ class ActionQueueImpl implements ActionQueue {
 	private $removeActionPool;
 	private $flushing = false;
 	private $bufferedEvents = array();
-	private $entityListeners = array();
 	private $lifecylceListeners = array();
-	
+
 	const MAGIC_ENTITY_OBJ_PARAM = 'entityObj';
-	
+
 	public function __construct(EntityManager $em, MagicContext $magicContext = null) {
 		$this->em = $em;
 		$this->magicContext = $magicContext;
 		$this->persistActionPool = new PersistActionPool($this);
 		$this->removeActionPool = new RemoveActionPool($this, $this->persistActionPool);
 	}
-	
+
 	public function getEntityManager() {
 		return $this->em;
 	}
-	
+
 	public function removeAction($entity) {
 		$this->persistActionPool->removeAction($entity);
 		$this->removeActionPool->removeAction($entity);
 	}
-	
+
 	public function containsPersistAction($entity) {
 		return $this->persistActionPool->containsAction($entity);
 	}
@@ -78,7 +77,7 @@ class ActionQueueImpl implements ActionQueue {
 	public function getPersistAction($entity) {
 		return $this->persistActionPool->getAction($entity);
 	}
-	
+
 	public function containsRemoveAction($entity) {
 		return $this->removeActionPool->containsAction($entity);
 	}
@@ -93,21 +92,21 @@ class ActionQueueImpl implements ActionQueue {
 	public function getRemoveAction($entity) {
 		return $this->removeActionPool->getAction($entity);
 	}
-	
+
 	public function add(Action $action) {
 		$this->actionJobs[spl_object_hash($action)] = $action;
 	}
-	
+
 	public function remove(Action $action) {
 		unset($this->actionJobs[spl_object_hash($action)]);
 	}
-						
+
 // 	public function announceLifecycleEvent(LifecycleEvent $event) {
 // 		foreach ($this->actionQueueListeners as $actionQueueListener) {
 // 			$actionQueueListener->onLifecycleEvent($event);
 // 		}
 // 	}
-	
+
 // 	protected function supplyMetaIdOnInit(ActionMeta $meta, Entity $object) {
 // 		$that = $this;
 // 		$this->initClosures[] = function() use ($that, $meta, $object) {
@@ -124,11 +123,11 @@ class ActionQueueImpl implements ActionQueue {
 	public function executeAtEnd(\Closure $closure) {
 		$this->atEndClosures[] = $closure;
 	}
-	
+
 	public function executeAtPrepareCycleEnd(\Closure $closure) {
 		$this->atPrepareCycleEndClosures[] = $closure;
 	}
-	
+
 	protected function triggerAtStartClosures() {
 		while (null !== ($closure = array_shift($this->atStartClosures))) {
 			$closure($this);
@@ -140,109 +139,109 @@ class ActionQueueImpl implements ActionQueue {
 			$closure($this);
 		}
 	}
-	
+
 	protected function triggerAtPrepareCycleEndClosures() {
 		if (empty($this->atPrepareCycleEndClosures)) return false;
-		
+
 		while (null !== ($closure = array_shift($this->atPrepareCycleEndClosures))) {
 			$closure($this);
 		}
-		
+
 		return true;
 	}
-	
+
 	public function flush() {
 		IllegalStateException::assertTrue(!$this->flushing);
 		$this->flushing = true;
-		
+
 		$this->triggerAtStartClosures();
-			
+
 		do {
 			do {
 				$this->persistActionPool->prepareSupplyJobs();
 			} while ($this->removeActionPool->prepareSupplyJobs() || $this->triggerAtPrepareCycleEndClosures());
-		} while ($this->triggerPreFinilizeAttempt() 
-				&& ($this->persistActionPool->prepareSupplyJobs() || $this->removeActionPool->prepareSupplyJobs()));
-	
+		} while ($this->triggerPreFinilizeAttempt()
+		&& ($this->persistActionPool->prepareSupplyJobs() || $this->removeActionPool->prepareSupplyJobs()));
+
 		$this->persistActionPool->freeze();
 		$this->removeActionPool->freeze();
-		
+
 		$this->persistActionPool->supply();
 		$this->removeActionPool->supply();
-				
+
 		while (null != ($job = array_shift($this->actionJobs))) {
 			$job->execute();
 		}
-		
+
 		$this->persistActionPool->clear();
 		$this->removeActionPool->clear();
-				
+
 		$this->triggerAtEndClosures();
-		
+
 		$this->flushing = false;
-		
+
 		while (null !== ($event = array_shift($this->bufferedEvents))) {
 			$this->triggerLifecycleEvent($event);
 		}
 	}
-	
+
 	public function commit() {
 		$this->em->getPersistenceContext()->detachNotManagedEntityObjs();
 	}
-	
+
 	public function clear() {
 		$this->removeActionPool->clear();
 		$this->persistActionPool->clear();
 		$this->actionJobs = [];
 	}
-		
+
 	public function announceLifecycleEvent(LifecycleEvent $event) {
 		switch ($event->getType()) {
 			case LifecycleEvent::PRE_PERSIST:
 			case LifecycleEvent::PRE_REMOVE:
 			case LifecycleEvent::PRE_UPDATE:
 				return $this->triggerLifecycleEvent($event);
-				
+
 			case LifecycleEvent::POST_LOAD:
 				$this->triggerLifecycleEvent($event);
 				if ($this->flushing) {
 					$this->persistActionPool->getOrCreateAction($event->getEntityObj(), false);
 				}
 				break;
-				
+
 			default:
 				IllegalStateException::assertTrue($this->flushing);
 				$this->bufferedEvents[] = $event;
 		}
-		
+
 		return false;
-	}		
+	}
 
 	private function triggerLifecycleEvent(LifecycleEvent $event) {
 		$triggered = $this->triggerLifecycleCallbacks($event);
-		
+
 		foreach ($this->lifecylceListeners as $listener) {
 			$listener->onLifecycleEvent($event, $this->em);
 			$triggered = true;
 		}
-		
+
 		return $triggered;
 	}
-	
+
 	private function triggerLifecycleCallbacks(LifecycleEvent $event) {
 		$eventType = $event->getType();
 		$entityModel = $event->getEntityModel();
-		
+
 		$methods = $entityModel->getLifecycleMethodsByEventType($eventType);
 		$entityListenerClasses = $entityModel->getEntityListenerClasses();
-		
+
 		if (empty($methods) && empty($entityListenerClasses)) {
 			return false;
 		}
-		
+
 		$entityObj = $event->getEntityObj();
 		$methodInvoked = false;
-		
+
 		$methodInvoker = new MagicMethodInvoker($this->magicContext);
 		$methodInvoker->setClassParamObject('n2n\persistence\orm\model\EntityModel', $entityModel);
 		$paramClass = $entityModel->getClass();
@@ -251,13 +250,13 @@ class ActionQueueImpl implements ActionQueue {
 		} while (false !== ($paramClass = $paramClass->getParentClass()));
 		$methodInvoker->setParamValue(self::MAGIC_ENTITY_OBJ_PARAM, $entityObj);
 		$methodInvoker->setClassParamObject('n2n\persistence\orm\EntityManager', $this->em);
-		
+
 		foreach ($methods as $method) {
 			$method->setAccessible(true);
 			$methodInvoker->invoke($entityObj, $method);
 			$methodInvoked = true;
 		}
-		
+
 		foreach ($entityListenerClasses as $entityListenerClass) {
 			$callbackMethod = LifecycleUtils::findEventMethod($entityListenerClass, $eventType);
 			if ($callbackMethod !== null) {
@@ -266,35 +265,29 @@ class ActionQueueImpl implements ActionQueue {
 				$methodInvoked = true;
 			}
 		}
-		
+
 		return $methodInvoked;
 	}
-	
+
 	private function lookupEntityListener(\ReflectionClass $entityListenerClass) {
-		$className = $entityListenerClass->getName();
-		if (!isset($this->entityListeners[$className])) {
-			$this->entityListeners[$className] = $entityListener = ReflectionUtils::createObject($entityListenerClass);
-			MagicUtils::init($entityListener, $this->magicContext);
-		}
-		
-		return $this->entityListeners[$className];
+		return $this->magicContext->lookup($entityListenerClass->getName());
 	}
-	
+
 	private function triggerPreFinilizeAttempt() {
 		$triggered = false;
-		
+
 		foreach ($this->lifecylceListeners as $listener) {
 			$listener->onPreFinalized($this->em);
 			$triggered = true;
 		}
-		
+
 		return $triggered;
 	}
-	
+
 	public function registerLifecycleListener(LifecycleListener $listener) {
 		$this->lifecylceListeners[spl_object_hash($listener)] = $listener;
 	}
-	
+
 	public function unregisterLifecycleListener(LifecycleListener $listener) {
 		unset($this->lifecylceListeners[spl_object_hash($listener)]);
 	}
