@@ -43,6 +43,7 @@ class ActionQueueImpl implements ActionQueue {
 	private $removeActionPool;
 	private $flushing = false;
 	private $bufferedEvents = array();
+	private \WeakMap $entityListenersMap;
 	private $lifecylceListeners = array();
 
 	const MAGIC_ENTITY_OBJ_PARAM = 'entityObj';
@@ -52,6 +53,7 @@ class ActionQueueImpl implements ActionQueue {
 		$this->magicContext = $magicContext;
 		$this->persistActionPool = new PersistActionPool($this);
 		$this->removeActionPool = new RemoveActionPool($this, $this->persistActionPool);
+		$this->entityListenersMap = new \WeakMap();
 	}
 
 	public function getEntityManager() {
@@ -193,6 +195,7 @@ class ActionQueueImpl implements ActionQueue {
 		$this->removeActionPool->clear();
 		$this->persistActionPool->clear();
 		$this->actionJobs = [];
+		$this->entityListenersMap = new \WeakMap();
 	}
 
 	public function announceLifecycleEvent(LifecycleEvent $event) {
@@ -243,13 +246,13 @@ class ActionQueueImpl implements ActionQueue {
 		$methodInvoked = false;
 
 		$methodInvoker = new MagicMethodInvoker($this->magicContext);
-		$methodInvoker->setClassParamObject('n2n\persistence\orm\model\EntityModel', $entityModel);
+		$methodInvoker->setClassParamObject(EntityModel::class, $entityModel);
 		$paramClass = $entityModel->getClass();
 		do {
 			$methodInvoker->setClassParamObject($paramClass->getName(), $entityObj);
 		} while (false !== ($paramClass = $paramClass->getParentClass()));
 		$methodInvoker->setParamValue(self::MAGIC_ENTITY_OBJ_PARAM, $entityObj);
-		$methodInvoker->setClassParamObject('n2n\persistence\orm\EntityManager', $this->em);
+		$methodInvoker->setClassParamObject(EntityManager::class, $this->em);
 
 		foreach ($methods as $method) {
 			$method->setAccessible(true);
@@ -261,7 +264,7 @@ class ActionQueueImpl implements ActionQueue {
 			$callbackMethod = LifecycleUtils::findEventMethod($entityListenerClass, $eventType);
 			if ($callbackMethod !== null) {
 				$callbackMethod->setAccessible(true);
-				$methodInvoker->invoke($this->lookupEntityListener($entityListenerClass), $callbackMethod);
+				$methodInvoker->invoke($this->lookupEntityListener($entityObj, $entityListenerClass), $callbackMethod);
 				$methodInvoked = true;
 			}
 		}
@@ -269,8 +272,20 @@ class ActionQueueImpl implements ActionQueue {
 		return $methodInvoked;
 	}
 
-	private function lookupEntityListener(\ReflectionClass $entityListenerClass) {
-		return $this->magicContext->lookup($entityListenerClass->getName());
+	private function lookupEntityListener(object $entityObj, \ReflectionClass $entityListenerClass) {
+		$entityListenerClassName = $entityListenerClass->getName();
+
+		if (!isset($this->entityListenersMap[$entityObj])) {
+			$this->entityListenersMap[$entityObj] = [];
+		}
+
+		if (!isset($this->entityListenersMap[$entityObj][$entityListenerClassName])) {
+			$entityListeners = $this->entityListenersMap[$entityObj];
+			$entityListeners[$entityListenerClassName] = $this->magicContext->lookup($entityListenerClassName);
+			$this->entityListenersMap[$entityObj] = $entityListeners;
+		}
+
+		return $this->entityListenersMap[$entityObj][$entityListenerClassName];
 	}
 
 	private function triggerPreFinilizeAttempt() {
