@@ -247,10 +247,15 @@ class ActionQueueImpl implements ActionQueue {
 
 		$methodInvoker = new MagicMethodInvoker($this->magicContext);
 		$methodInvoker->setClassParamObject(EntityModel::class, $entityModel);
+
 		$paramClass = $entityModel->getClass();
 		do {
 			$methodInvoker->setClassParamObject($paramClass->getName(), $entityObj);
+			foreach ($paramClass->getInterfaceNames() as $interfaceName) {
+				$methodInvoker->setClassParamObject($interfaceName, $entityObj);;
+			}
 		} while (false !== ($paramClass = $paramClass->getParentClass()));
+
 		$methodInvoker->setParamValue(self::MAGIC_ENTITY_OBJ_PARAM, $entityObj);
 		$methodInvoker->setClassParamObject(EntityManager::class, $this->em);
 
