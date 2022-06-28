@@ -41,7 +41,11 @@ class RemoveActionImpl extends EntityActionAdapter implements RemoveAction {
 		$this->meta = $meta;
 		$this->oldValueHashCol = $oldValueHashCol;
 	}
-	
+
+	function getPriority(): int {
+		return self::PRIORITY_REMOVE;
+	}
+
 	/**
 	 * @return \n2n\persistence\orm\store\ValueHashCol
 	 */

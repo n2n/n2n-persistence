@@ -32,6 +32,11 @@ class UninitializedPersistAction implements PersistAction {
 		$this->entityModel = $entityModel;
 		$this->id = $id;
 	}
+
+	function getPriority(): int {
+		return self::PRIORITY_DEFAULT;
+	}
+
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\store\action\EntityAction::getEntityModel()
 	 */
@@ -150,5 +155,5 @@ class UninitializedPersistAction implements PersistAction {
 	 */
 	public function setSupplied(bool $supplied) {
 		throw new UnsupportedOperationException();
-	}	
+	}
 }

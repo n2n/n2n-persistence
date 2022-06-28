@@ -30,6 +30,7 @@ use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\LifecycleUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\reflection\magic\MagicUtils;
+use n2n\persistence\orm\model\EntityModel;
 
 class ActionQueueImpl implements ActionQueue {
 	protected $em;
@@ -170,6 +171,8 @@ class ActionQueueImpl implements ActionQueue {
 
 		$this->persistActionPool->supply();
 		$this->removeActionPool->supply();
+
+		uasort($this->actionJobs, fn (Action $aj1, Action $aj2) => $aj1->getPriority() - $aj2->getPriority());
 
 		while (null != ($job = array_shift($this->actionJobs))) {
 			$job->execute();
