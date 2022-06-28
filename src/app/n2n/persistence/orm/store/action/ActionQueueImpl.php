@@ -30,6 +30,7 @@ use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\LifecycleUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\reflection\magic\MagicUtils;
+use n2n\persistence\orm\model\EntityModel;
 
 class ActionQueueImpl implements ActionQueue {
 	protected $em;
@@ -95,8 +96,13 @@ class ActionQueueImpl implements ActionQueue {
 		return $this->removeActionPool->getAction($entity);
 	}
 
-	public function add(Action $action) {
-		$this->actionJobs[spl_object_hash($action)] = $action;
+	public function add(Action $action, bool $prepend = false) {
+		if (!$prepend) {
+			$this->actionJobs[spl_object_hash($action)] = $action;
+			return;
+		}
+
+		$this->actionJobs = [spl_object_hash($action) => $action] + $this->actionJobs;
 	}
 
 	public function remove(Action $action) {

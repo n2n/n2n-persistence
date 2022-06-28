@@ -32,7 +32,7 @@ interface ActionQueue {
 	/**
 	 * @param Action $action
 	 */
-	public function add(Action $action);
+	public function add(Action $action, bool $prepend = false);
 	/**
 	 * @param object $entity
 	 * @param bool $manageIfTransient
