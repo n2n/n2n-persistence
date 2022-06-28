@@ -28,6 +28,11 @@ abstract class ActionAdapter implements Action {
 	protected $atStartClosures = array();
 	protected $atEndClosures = array();
 	protected $dependents = array();
+
+	function getPriority(): int {
+		return self::PRIORITY_DEFAULT;
+	}
+
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\store\Action::executeAtStart()
 	 */
@@ -42,7 +47,6 @@ abstract class ActionAdapter implements Action {
 	}
 	/**
 	 * @param Action $actionJob
-	 * @return Action[]
 	 */
 	public function addDependent(Action $actionJob) {
 		$this->dependents[] = $actionJob;

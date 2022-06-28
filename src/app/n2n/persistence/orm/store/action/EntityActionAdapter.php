@@ -44,10 +44,6 @@ abstract class EntityActionAdapter extends ActionAdapter implements EntityAction
 		$this->entity = $entity;
 	}
 
-	function getPriority(): int {
-		return self::PRIORITY_DEFAULT;
-	}
-
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\store\action\EntityAction::getActionQueue()
 	 */
