@@ -26,10 +26,6 @@ use n2n\persistence\Pdo;
 
 class InsertPersistAction extends PersistActionAdapter {
 
-	function getPriority(): int {
-		return self::PRIORITY_INSERT;
-	}
-
 	public function isNew() {
 		return true;
 	}

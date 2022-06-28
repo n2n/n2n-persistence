@@ -22,7 +22,6 @@
 namespace n2n\persistence\orm\store\action;
 
 interface Action {
-	const PRIORITY_INSERT = 3;
 	const PRIORITY_DEFAULT = 2;
 	const PRIORITY_REMOVE = 1;
 
