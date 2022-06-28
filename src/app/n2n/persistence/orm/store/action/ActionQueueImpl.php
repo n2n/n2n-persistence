@@ -96,8 +96,13 @@ class ActionQueueImpl implements ActionQueue {
 		return $this->removeActionPool->getAction($entity);
 	}
 
-	public function add(Action $action) {
-		$this->actionJobs[spl_object_hash($action)] = $action;
+	public function add(Action $action, bool $prepend = false) {
+		if (!$prepend) {
+			$this->actionJobs[spl_object_hash($action)] = $action;
+			return;
+		}
+
+		$this->actionJobs = [spl_object_hash($action) => $action] + $this->actionJobs;
 	}
 
 	public function remove(Action $action) {

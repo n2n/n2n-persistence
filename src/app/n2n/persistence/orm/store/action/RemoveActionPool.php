@@ -82,7 +82,7 @@ class RemoveActionPool {
 		
 		$this->removeActions[$objHash] = $removeAction;
 		$this->unsuppliedRemoveActions[$objHash] = $removeAction;
-		$this->actionQueue->add($removeAction);
+		$this->actionQueue->add($removeAction, true);
 		
 		$this->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::PRE_REMOVE, $entity,
 				$removeAction->getEntityModel(), $removeAction->getId()));
