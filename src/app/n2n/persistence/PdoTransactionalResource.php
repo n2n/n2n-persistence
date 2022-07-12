@@ -42,7 +42,7 @@ class PdoTransactionalResource implements TransactionalResource {
 	/* (non-PHPdoc)
 	 * @see \n2n\core\container\TransactionalResource::beginTransaction()
 	 */
-	public function beginTransaction(Transaction $transaction) {
+	public function beginTransaction(Transaction $transaction): void {
 		$this->beginClosure->invoke($transaction);
 	}
 	/* (non-PHPdoc)
@@ -54,13 +54,13 @@ class PdoTransactionalResource implements TransactionalResource {
 	/* (non-PHPdoc)
 	 * @see \n2n\core\container\TransactionalResource::commit()
 	 */
-	public function commit(Transaction $transaction) {
+	public function commit(Transaction $transaction): void {
 		$this->commitClosure->invoke($transaction);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\core\container\TransactionalResource::rollBack()
 	 */
-	public function rollBack(Transaction $transaction) {
+	public function rollBack(Transaction $transaction): void {
 		$this->rollBackClosure->invoke($transaction);
 	}
 
