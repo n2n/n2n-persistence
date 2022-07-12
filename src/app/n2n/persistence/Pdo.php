@@ -26,55 +26,85 @@ use n2n\reflection\ReflectionUtils;
 use n2n\core\container\TransactionManager;
 use n2n\core\container\Transaction;
 use n2n\core\container\CommitFailedException;
+use n2n\util\ex\IllegalStateException;
+use n2n\persistence\meta\Dialect;
 
 class Pdo {
-    private \PDO $pdo;
-	private $dataSourceName;
-	private $entityManager;
-	private $dialect;
-	private $logger;
-	private $metaData;
-	private $transactionManager;
-	private $listeners = array();
-	
-	public function __construct(PersistenceUnitConfig $persistenceUnitConfig, TransactionManager $transactionManager = null) {
+	private ?\PDO $pdo = null;
+	private Dialect $dialect;
+	private PdoLogger $logger;
+	private MetaData $metaData;
+	private array $listeners = array();
+
+	public function __construct(private PersistenceUnitConfig $persistenceUnitConfig,
+			private ?TransactionManager $transactionManager = null) {
+		$this->logger = new PdoLogger($this->getDataSourceName());
+
+		$dialectClass = ReflectionUtils::createReflectionClass($persistenceUnitConfig->getDialectClassName());
+		if (!$dialectClass->implementsInterface('n2n\\persistence\\meta\\Dialect')) {
+			throw new \InvalidArgumentException(
+					'Dialect class must implement n2n\\persistence\\meta\\Dialect: '
+					. $dialectClass->getName());
+		}
+		$this->dialect = $dialectClass->newInstance();
+		$this->metaData = new MetaData($this, $this->dialect);
+
+		$transactionManager?->registerResource(new PdoTransactionalResource(
+				function(Transaction $transaction) {
+					$this->performBeginTransaction($transaction);
+				},
+				function(Transaction $transaction) {
+					return $this->prepareCommit($transaction);
+				},
+				function(Transaction $transaction) {
+					try {
+						$this->performCommit($transaction);
+					} catch (PdoCommitException $e) {
+						throw new CommitFailedException('Pdo commit failed. Reason: ' . $e->getMessage(), 0, $e);
+					}
+				},
+				function(Transaction $transaction) {
+					$this->performRollBack($transaction);
+				},
+				function() {
+					$this->release();
+				}));
+	}
+
+	function release(): void {
+		if ($this->pdo !== null && $this->pdo->inTransaction()) {
+			throw new IllegalStateException('Can not release connection while in transaction.');
+		}
+
+		$this->pdo = null;
+	}
+
+	function reconnect(): void {
+		$this->release();
+
 		try {
-			$this->pdo = new \PDO($persistenceUnitConfig->getDsnUri(), $persistenceUnitConfig->getUser(),
-					$persistenceUnitConfig->getPassword(), array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+			$this->pdo = new \PDO($this->persistenceUnitConfig->getDsnUri(), $this->persistenceUnitConfig->getUser(),
+					$this->persistenceUnitConfig->getPassword(), array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
 							\PDO::ATTR_STATEMENT_CLASS => array('n2n\persistence\PdoStatement', array())));
 		} catch (\PDOException $e) {
 			throw new PdoException($e);
 		}
-		$this->dataSourceName = $persistenceUnitConfig->getName();
-		$this->logger = new PdoLogger($this->dataSourceName);
-		
-		$dialectClass = ReflectionUtils::createReflectionClass($persistenceUnitConfig->getDialectClassName());
-		if (!$dialectClass->implementsInterface('n2n\\persistence\\meta\\Dialect')) {
-			throw new \InvalidArgumentException(
-					'Dialect class must implement n2n\\persistence\\meta\\Dialect: ' 
-							. $dialectClass->getName());
-		}
-		$this->dialect = $dialectClass->newInstance();
-		$this->dialect->initializeConnection($this, $persistenceUnitConfig);
-		$this->metaData = new MetaData($this, $this->dialect);
-		
-		$this->transactionManager = $transactionManager;
-		
-		if ($transactionManager !== null) {
-			$that = $this;
-			$transactionManager->registerResource(new PdoTransactionalResource(
-					function (Transaction $transaction) use ($that) { $that->performBeginTransaction($transaction); },
-					function (Transaction $transaction) use ($that) { return $that->prepareCommit($transaction); },
-					function (Transaction $transaction) use ($that) {
-						try {
-							$that->performCommit($transaction);
-						} catch (PdoCommitException $e) {
-							throw new CommitFailedException('Pdo commit failed. Reason: ' . $e->getMessage(), 0, $e);
-						}
-					},
-					function (Transaction $transaction) use ($that) { $that->performRollBack($transaction); }));
-		}
+
+		$this->dialect->initializeConnection($this, $this->persistenceUnitConfig);
 	}
+
+	function isConnected(): bool {
+		return $this->pdo !== null;
+	}
+
+	private function pdo() {
+		if ($this->pdo === null) {
+			$this->reconnect();
+		}
+
+		return $this->pdo;
+	}
+
 	/**
 	 * @return TransactionManager
 	 */
@@ -85,28 +115,28 @@ class Pdo {
 	 * @return string
 	 */
 	public function getDataSourceName() {
-		return $this->dataSourceName;
+		return $this->persistenceUnitConfig->getName();
 	}
 	/**
-	 * @return \n2n\persistence\PdoLogger
+	 * @return PdoLogger
 	 */
 	public function getLogger() {
 		return $this->logger;
 	}
 	/**
 	 *
-	 * @param object $pdo
+	 * @param mixed $pdo
 	 * @return boolean
 	 */
-	public function equals($dbh) {
-		if (!($dbh instanceof Pdo)) return false;
+	public function equals(mixed $pdo) {
+		if (!($pdo instanceof Pdo)) return false;
 
-		return $this->dataSourceName == $dbh->getDataSourcename();
+		return $this->getDataSourceName() === $pdo->getDataSourcename();
 	}
 
-    function inTransaction(): bool {
-        return $this->pdo->inTransaction();
-    }
+	function inTransaction(): bool {
+		return $this->pdo()->inTransaction();
+	}
 
 	/**
 	 *
@@ -115,12 +145,12 @@ class Pdo {
 	public function prepare($statement, $driverOptions = array()) {
 		try {
 			$mtime = microtime(true);
-				
-			$stmt = $this->pdo->prepare($statement, $driverOptions);
-			
+
+			$stmt = $this->pdo()->prepare($statement, $driverOptions);
+
 			$this->logger->addPreparation($statement, (microtime(true) - $mtime));
 			$stmt->setLogger($this->logger);
-			
+
 			return $stmt;
 		} catch (PDOException $e) {
 			throw new PdoStatementException($e, $statement);
@@ -130,7 +160,7 @@ class Pdo {
 	public function query(string $statement, ?int $fetchMode = null, ...$fetchModeArgs) {
 		try {
 			$mtime = microtime(true);
-			$query = $this->pdo->query($statement, $fetchMode, $fetchModeArgs);
+			$query = $this->pdo()->query($statement, $fetchMode, $fetchModeArgs);
 			$this->logger->addQuery($statement, (microtime(true) - $mtime));
 			return $query;
 		} catch (\PDOException $e) {
@@ -141,10 +171,10 @@ class Pdo {
 	 *
 	 * @return int
 	 */
-	public function exec($statement) {
+	public function exec(string $statement) {
 		try {
 			$mtime = microtime(true);
-			$stmt = $this->pdo->exec($statement);
+			$stmt = $this->pdo()->exec($statement);
 			$this->logger->addExecution($statement, (microtime(true) - $mtime));
 			return $stmt;
 		} catch (\PDOException $e) {
@@ -160,7 +190,7 @@ class Pdo {
 			$this->performBeginTransaction();
 			return;
 		}
-		
+
 		if (!$this->transactionManager->hasOpenTransaction()) {
 			$this->transactionManager->createTransaction();
 		}
@@ -174,7 +204,7 @@ class Pdo {
 			$this->prepareCommit();
 			$this->performCommit();
 		}
-		
+
 		if ($this->transactionManager->hasOpenTransaction()) {
 			$this->transactionManager->getRootTransaction()->commit();
 		}
@@ -188,54 +218,54 @@ class Pdo {
 			$this->performRollBack();
 			return;
 		}
-		
+
 		if ($this->transactionManager->hasOpenTransaction()) {
 			$this->transactionManager->getRootTransaction()->rollBack();
 		}
 	}
-	
-	
+
+
 	private function performBeginTransaction(Transaction $transaction = null) {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_BEGIN, $transaction);
 		$mtime = microtime(true);
-		$this->pdo->beginTransaction();
+		$this->pdo()->beginTransaction();
 		$this->logger->addTransactionBegin(microtime(true) - $mtime);
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_BEGAN, $transaction);
 	}
-	
+
 	private function prepareCommit(Transaction $transaction = null) {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_COMMIT, $transaction);
 		return true;
 	}
-	
+
 	private function performCommit(Transaction $transaction = null) {
 		$mtime = microtime(true);
-		
+
 		$preErr = error_get_last();
-		$result = @$this->pdo->commit();
+		$result = @$this->pdo()->commit();
 		$postErr = error_get_last();
-		
-		// Problem: Warining: Error while sending QUERY packet. PID=223316 --> $this->pdo->commit() will return true but
-		// triggers warning. 
+
+		// Problem: Warining: Error while sending QUERY packet. PID=223316 --> $this->pdo()->commit() will return true but
+		// triggers warning.
 		// http://php.net/manual/de/pdo.transactions.php
 		if (!$result || $preErr !== $postErr) {
 			throw new PdoCommitException($postErr['message'] ?? 'Commit failed due to unknown reason.');
 		}
-		
+
 		$this->logger->addTransactionCommit(microtime(true) - $mtime);
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_COMMITTED, $transaction);
 	}
-	
+
 	private function performRollBack(Transaction $transaction = null) {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_ROLL_BACK, $transaction);
 		$mtime = microtime(true);
-		$this->pdo->rollBack();
+		$this->pdo()->rollBack();
 		$this->logger->addTransactionRollBack(microtime(true) - $mtime);
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ROLLED_BACK, $transaction);
 	}
 
 	function quote(string $string, int $type = \PDO::PARAM_STR): string {
-		return $this->pdo->quote($string, $type);
+		return $this->pdo()->quote($string, $type);
 	}
 
 	/**
@@ -247,7 +277,7 @@ class Pdo {
 	}
 
 	function lastInsertId(string $name = null) {
-		return $this->pdo->lastInsertId($name);
+		return $this->pdo()->lastInsertId($name);
 	}
 // 	/**
 // 	 *
@@ -262,7 +292,7 @@ class Pdo {
 	public function getMetaData() {
 		return $this->metaData;
 	}
-	
+
 	private function triggerTransactionEvent($type, Transaction $transaction = null) {
 		$e = new TransactionEvent($type, $transaction);
 		foreach ($this->listeners as $listener) {
@@ -290,15 +320,15 @@ class TransactionEvent {
 	const TYPE_COMMITTED = 'committed';
 	const TYPE_ON_ROLL_BACK = 'onRollback';
 	const TYPE_ROLLED_BACK = 'rollBacked';
-	
+
 	private $type;
 	private $transaction;
-	
+
 	public function __construct($type, Transaction $transaction = null) {
 		$this->type = $type;
 		$this->transaction = $transaction;
 	}
-	
+
 	public function getType() {
 		return $this->type;
 	}

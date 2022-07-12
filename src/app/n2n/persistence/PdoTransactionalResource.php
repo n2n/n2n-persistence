@@ -29,13 +29,15 @@ class PdoTransactionalResource implements TransactionalResource {
 	private $prepareCommitClosure;
 	private $commitClosure;
 	private $rollBackClosure;
+	private $releaseClosure;
 
-	public function __construct(\Closure $beginClosure, \Closure $prepareCommitClosure, 
-			\Closure $commitClosure, \Closure $rollBackClosure) {
+	public function __construct(\Closure $beginClosure, \Closure $prepareCommitClosure,
+			\Closure $commitClosure, \Closure $rollBackClosure, \Closure $releaseClosure) {
 		$this->beginClosure = new \ReflectionFunction($beginClosure);
 		$this->prepareCommitClosure = new \ReflectionFunction($prepareCommitClosure);
 		$this->commitClosure = new \ReflectionFunction($commitClosure);
-		$this->rollBackClosure = new \ReflectionFunction($rollBackClosure);	
+		$this->rollBackClosure = new \ReflectionFunction($rollBackClosure);
+		$this->releaseClosure = new \ReflectionFunction($releaseClosure);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\core\container\TransactionalResource::beginTransaction()
@@ -60,5 +62,9 @@ class PdoTransactionalResource implements TransactionalResource {
 	 */
 	public function rollBack(Transaction $transaction) {
 		$this->rollBackClosure->invoke($transaction);
+	}
+
+	function release(): void {
+		$this->releaseClosure->invoke();
 	}
 }
