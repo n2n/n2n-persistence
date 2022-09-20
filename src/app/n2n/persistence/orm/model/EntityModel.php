@@ -312,10 +312,10 @@ class EntityModel implements EntityPropertyCollection {
 		}
 	}
 	
-	public function createActionMeta() {
+	public function createActionMeta(bool $new) {
 		switch ($this->getInheritanceType()) {
 			case InheritanceType::SINGLE_TABLE:
-				return new SingleTableActionMeta($this);
+				return new SingleTableActionMeta($this, $new);
 			case InheritanceType::JOINED:
 				return new JoinedTableActionMeta($this);
 			case InheritanceType::TABLE_PER_CLASS:

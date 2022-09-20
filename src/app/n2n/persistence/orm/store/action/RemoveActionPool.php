@@ -130,7 +130,7 @@ class RemoveActionPool {
 		$oldValueHashCol = $persistenceContext->getValueHashColByEntityObj($entity);
 		IllegalStateException::assertTrue($oldValueHashCol !== null);
 
-		$actionMeta = $entityModel->createActionMeta();
+		$actionMeta = $entityModel->createActionMeta(false);
 		$actionMeta->setIdRawValue($entityModel->getIdDef()->getEntityProperty()
 				->buildRaw($entityInfo->getId(), $this->actionQueue->getEntityManager()->getPdo()));
 		

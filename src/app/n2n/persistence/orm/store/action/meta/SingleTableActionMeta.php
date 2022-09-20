@@ -24,10 +24,12 @@ namespace n2n\persistence\orm\store\action\meta;
 use n2n\persistence\orm\model\EntityModel;
 
 class SingleTableActionMeta extends SimpleActionMeta {
-	public function __construct(EntityModel $entityModel) {
+	public function __construct(EntityModel $entityModel, bool $new) {
 		parent::__construct($entityModel);
-		
-		$this->setRawValue($entityModel, $entityModel->getDiscriminatorColumnName(), 
-				$entityModel->getDiscriminatorValue());
+
+		if ($new) {
+			$this->setRawValue($entityModel, $entityModel->getDiscriminatorColumnName(),
+					$entityModel->getDiscriminatorValue());
+		}
 	}
 }

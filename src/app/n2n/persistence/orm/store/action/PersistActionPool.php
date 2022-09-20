@@ -180,7 +180,7 @@ class PersistActionPool {
 	}
 	
 	private function createActionMeta(EntityModel $entityModel, EntityInfo $entityInfo) {
-		$actionMeta = $entityModel->createActionMeta();
+		$actionMeta = $entityModel->createActionMeta($entityInfo->getState() === EntityInfo::STATE_NEW);
 		if ($entityInfo->hasId()) {
 			$actionMeta->setIdRawValue($entityModel->getIdDef()->getEntityProperty()
 					->buildRaw($entityInfo->getId(), $this->actionQueue->getEntityManager()->getPdo()));
