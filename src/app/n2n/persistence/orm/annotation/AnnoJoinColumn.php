@@ -25,8 +25,13 @@ use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
 use n2n\util\type\ArgUtils;
+use n2n\persistence\orm\attribute\JoinColumn;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoJoinColumn implements PropertyAnnotation {
+/**
+ * @deprecated use { @link JoinColumn }
+ */
+class AnnoJoinColumn implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
 	
 	private $name;
@@ -42,5 +47,13 @@ class AnnoJoinColumn implements PropertyAnnotation {
 	
 	public function setName($name) {
 		$this->name = $name;
+	}
+
+	public function getAttributeName(): string {
+		return JoinColumn::class;
+	}
+
+	public function toAttributeInstance() {
+		return new JoinColumn($this->name);
 	}
 }

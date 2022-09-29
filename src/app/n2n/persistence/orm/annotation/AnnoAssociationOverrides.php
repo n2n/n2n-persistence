@@ -27,8 +27,13 @@ use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
 use n2n\reflection\annotation\ClassAnnotationTrait;
+use n2n\persistence\orm\attribute\AssociationOverrides;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoAssociationOverrides implements ClassAnnotation, PropertyAnnotation {
+/**
+ * @deprecated use { @link AssociationOverrides }
+ */
+class AnnoAssociationOverrides implements ClassAnnotation, PropertyAnnotation, LegacyAnnotation {
 	use ClassAnnotationTrait, PropertyAnnotationTrait, AnnotationTrait;
 	
 	private $annoJoinColumns;
@@ -41,16 +46,27 @@ class AnnoAssociationOverrides implements ClassAnnotation, PropertyAnnotation {
 		$this->annoJoinTables = (array) $annoJoinTables;
 		ArgUtils::valArray($this->annoJoinTables, 'n2n\persistence\orm\annotation\AnnoJoinTable');
 	}
+
 	/**
 	 * @return AnnoJoinColumn[]
 	 */
 	public function getAnnoJoinColumns() {
 		return $this->annoJoinColumns;
 	}
+
 	/**
 	 * @return AnnoJoinTable[]
 	 */
 	public function getAnnoJoinTables() {
 		return $this->annoJoinTables;
+	}
+
+	public function getAttributeName(): string {
+		return AssociationOverrides::class;
+	}
+
+	public function toAttributeInstance() {
+		return new AssociationOverrides(array_map(fn($ajc) => $ajc->toAttributeInstance(), $this->annoJoinColumns),
+				array_map(fn($ajt) => $ajt->toAttributeInstance(), $this->annoJoinTables));
 	}
 }

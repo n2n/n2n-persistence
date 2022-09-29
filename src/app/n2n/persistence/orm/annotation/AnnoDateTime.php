@@ -24,7 +24,21 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\DateTime;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
+use n2n\persistence\orm\attribute\AssociationOverrides;
 
-class AnnoDateTime implements PropertyAnnotation {
+/**
+ * @deprecated use { @link DateTime }
+ */
+class AnnoDateTime implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
+
+	public function getAttributeName(): string {
+		return DateTime::class;
+	}
+
+	public function toAttributeInstance() {
+		return new DateTime();
+	}
 }

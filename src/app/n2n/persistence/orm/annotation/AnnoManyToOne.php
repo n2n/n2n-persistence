@@ -21,7 +21,13 @@
  */
 namespace n2n\persistence\orm\annotation;
 
-class AnnoManyToOne extends OrmRelationAnnotation {
+use n2n\persistence\orm\attribute\ManyToOne;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
+
+/**
+ * @deprecated use { @link ManyToOne }
+ */
+class AnnoManyToOne extends OrmRelationAnnotation implements LegacyAnnotation {
 	public function __construct(\ReflectionClass $targetEntityClass, int $cascadeType = null, 
 			string $fetchType = null) {
 		if (3 < count(func_get_args())) {
@@ -29,5 +35,13 @@ class AnnoManyToOne extends OrmRelationAnnotation {
 		}
 				
 		parent::__construct($targetEntityClass, $cascadeType, $fetchType);
+	}
+
+	public function getAttributeName(): string {
+		return ManyToOne::class;
+	}
+
+	public function toAttributeInstance() {
+		return new ManyToOne($this->getTargetEntityClass(), $this->getCascadeType(), $this->getFetchType());
 	}
 }

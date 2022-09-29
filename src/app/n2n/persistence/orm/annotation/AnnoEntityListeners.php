@@ -25,8 +25,13 @@ use n2n\util\type\ArgUtils;
 use n2n\reflection\annotation\ClassAnnotation;
 use n2n\reflection\annotation\ClassAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\EntityListeners;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoEntityListeners implements ClassAnnotation {
+/**
+ * @deprecated use { @link EntityListeners }
+ */
+class AnnoEntityListeners implements ClassAnnotation, LegacyAnnotation {
 	use ClassAnnotationTrait, AnnotationTrait;
 	
 	private $classes = array();
@@ -42,5 +47,13 @@ class AnnoEntityListeners implements ClassAnnotation {
 	
 	public function getClasses() {
 		return $this->classes;
+	}
+
+	public function getAttributeName(): string {
+		return EntityListeners::class;
+	}
+
+	public function toAttributeInstance() {
+		return new EntityListeners(...$this->classes);
 	}
 }

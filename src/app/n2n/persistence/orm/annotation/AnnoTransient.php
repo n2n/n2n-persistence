@@ -24,7 +24,20 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\Transient;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoTransient implements PropertyAnnotation {
-	use PropertyAnnotationTrait, AnnotationTrait;	
+/**
+ * @deprecated use { @link Transient }
+ */
+class AnnoTransient implements PropertyAnnotation, LegacyAnnotation {
+	use PropertyAnnotationTrait, AnnotationTrait;
+
+	public function getAttributeName(): string {
+		return Transient::class;
+	}
+
+	public function toAttributeInstance() {
+		return new Transient();
+	}
 }

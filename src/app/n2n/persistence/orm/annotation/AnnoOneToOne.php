@@ -21,22 +21,28 @@
  */
 namespace n2n\persistence\orm\annotation;
 
-use n2n\util\type\ArgUtils;
+use n2n\persistence\orm\attribute\OneToOne;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoOneToOne extends MappableOrmRelationAnnotation {
-	private $orphanRemoval = false;
-	
+/**
+ * @deprecated use { @link OneToOne }
+ */
+class AnnoOneToOne extends MappableOrmRelationAnnotation implements LegacyAnnotation {
 	public function __construct(\ReflectionClass $targetEntityClass, string $mappedBy = null,
-			int $cascadeType = null, string $fetchType = null, bool $orphanRemoval = null) {
+			int $cascadeType = null, string $fetchType = null, private bool $orphanRemoval = false) {
 		parent::__construct($targetEntityClass, $mappedBy, $cascadeType, $fetchType);
-		
-		if ($orphanRemoval !== null) {
-			ArgUtils::valType($orphanRemoval, 'bool');
-			$this->orphanRemoval = $orphanRemoval;
-		}
 	}
 
 	public function isOrphanRemoval() {
 		return $this->orphanRemoval;
+	}
+
+	public function getAttributeName(): string {
+		return OneToOne::class;
+	}
+
+	public function toAttributeInstance() {
+		return new OneToOne($this->getTargetEntityClass(), $this->getMappedBy(), $this->getCascadeType(),
+				$this->getFetchType(), $this->orphanRemoval);
 	}
 }

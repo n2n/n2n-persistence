@@ -26,8 +26,14 @@ use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
 use n2n\reflection\annotation\ClassAnnotation;
 use n2n\reflection\annotation\ClassAnnotationTrait;
+use n2n\persistence\orm\attribute\AttributeOverrides;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
+use n2n\persistence\orm\attribute\AssociationOverrides;
 
-class AnnoAttributeOverrides implements ClassAnnotation, PropertyAnnotation {
+/**
+ * @deprecated use { @link AttributeOverrides }
+ */
+class AnnoAttributeOverrides implements ClassAnnotation, PropertyAnnotation, LegacyAnnotation {
 	use ClassAnnotationTrait, PropertyAnnotationTrait, AnnotationTrait;
 	
 	private $propertyColumnMap;
@@ -38,5 +44,13 @@ class AnnoAttributeOverrides implements ClassAnnotation, PropertyAnnotation {
 	
 	public function getPropertyColumnMap() {
 		return $this->propertyColumnMap;
+	}
+
+	public function getAttributeName(): string {
+		return AttributeOverrides::class;
+	}
+
+	public function toAttributeInstance() {
+		return new AttributeOverrides($this->propertyColumnMap);
 	}
 }

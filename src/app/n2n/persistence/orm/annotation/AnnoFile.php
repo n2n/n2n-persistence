@@ -24,7 +24,21 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\File;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
+use n2n\persistence\orm\attribute\AssociationOverrides;
 
-class AnnoFile implements PropertyAnnotation {
+/**
+ * @deprecated use { @link File }
+ */
+class AnnoFile implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
+
+	public function getAttributeName(): string {
+		return File::class;
+	}
+
+	public function toAttributeInstance() {
+		return new File();
+	}
 }

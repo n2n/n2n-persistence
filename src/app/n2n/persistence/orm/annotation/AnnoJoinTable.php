@@ -24,8 +24,13 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\JoinTable;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoJoinTable implements PropertyAnnotation {
+/**
+ * @deprecated use { @link JoinTable }
+ */
+class AnnoJoinTable implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
 	
 	private $name;
@@ -48,5 +53,15 @@ class AnnoJoinTable implements PropertyAnnotation {
 	
 	public function getInverseJoinColumnName() {
 		return $this->inverseJoinColumnName;
-	} 
+	}
+
+	public function getAttributeName(): string {
+		return JoinTable::class;
+	}
+
+	public function toAttributeInstance() {
+		return new JoinTable($this->name, $this->joinColumnName, $this->inverseJoinColumnName);
+	}
+
+
 }

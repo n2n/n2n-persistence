@@ -24,7 +24,20 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\N2nLocale;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoN2nLocale implements PropertyAnnotation {
+/**
+ * @deprecated use { @link N2nLocale }
+ */
+class AnnoN2nLocale implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
+
+	public function getAttributeName(): string {
+		return N2nLocale::class;
+	}
+
+	public function toAttributeInstance() {
+		return new N2nLocale();
+	}
 }

@@ -24,7 +24,11 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\Boolean;
 
+/**
+ * @deprecated use type declaration
+ */
 class AnnoBool implements PropertyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
 }

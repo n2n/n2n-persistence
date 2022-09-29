@@ -24,8 +24,13 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\OrderBy;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoOrderBy implements PropertyAnnotation {
+/**
+ * @deprecated use { @link OrderBy }
+ */
+class AnnoOrderBy implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
 	
 	private $orderDefs;
@@ -36,5 +41,13 @@ class AnnoOrderBy implements PropertyAnnotation {
 	
 	public function getOrderDefs() {
 		return $this->orderDefs;
+	}
+
+	public function getAttributeName(): string {
+		return OrderBy::class;
+	}
+
+	public function toAttributeInstance() {
+		return new OrderBy($this->orderDefs);
 	}
 }

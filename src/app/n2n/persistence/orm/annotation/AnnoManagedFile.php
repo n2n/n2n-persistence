@@ -26,8 +26,13 @@ use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
 use n2n\io\managed\FileLocator;
 use n2n\io\managed\FileManager;
+use n2n\persistence\orm\attribute\ManagedFile;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoManagedFile implements PropertyAnnotation {
+/**
+ * @deprecated use { @link ManagedFile }
+ */
+class AnnoManagedFile implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
 	
 	private $fileManagerlookupId;
@@ -70,5 +75,13 @@ class AnnoManagedFile implements PropertyAnnotation {
 	
 	public function isCascadeDelete() {
 		return $this->cascadeDelete;
+	}
+
+	public function getAttributeName(): string {
+		return ManagedFile::class;
+	}
+
+	public function toAttributeInstance() {
+		return new ManagedFile($this->fileManagerlookupId, $this->fileLocator, $this->cascadeDelete);
 	}
 }

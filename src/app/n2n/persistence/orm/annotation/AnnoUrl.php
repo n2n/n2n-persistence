@@ -24,7 +24,20 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\Url;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoUrl implements PropertyAnnotation {
+/**
+ * @deprecated use { @link Url }
+ */
+class AnnoUrl implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
+
+	public function getAttributeName(): string {
+		return Url::class;
+	}
+
+	public function toAttributeInstance() {
+		return new Url();
+	}
 }

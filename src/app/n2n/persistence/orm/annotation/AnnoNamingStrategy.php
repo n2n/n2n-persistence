@@ -25,8 +25,12 @@ use n2n\persistence\orm\model\NamingStrategy;
 use n2n\reflection\annotation\ClassAnnotation;
 use n2n\reflection\annotation\AnnotationTrait;
 use n2n\reflection\annotation\ClassAnnotationTrait;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoNamingStrategy implements ClassAnnotation {
+/**
+ * @deprecated use { @link NamingStrategy }
+ */
+class AnnoNamingStrategy implements ClassAnnotation, LegacyAnnotation {
 	use AnnotationTrait, ClassAnnotationTrait;
 	
 	private $namingStrategy;
@@ -38,4 +42,14 @@ class AnnoNamingStrategy implements ClassAnnotation {
 	public function getNamingStrategy() {
 		return $this->namingStrategy;
 	}
+
+	public function getAttributeName(): string {
+		return \n2n\persistence\orm\attribute\NamingStrategy::class;
+	}
+
+	public function toAttributeInstance() {
+		return new \n2n\persistence\orm\attribute\NamingStrategy($this->namingStrategy);
+	}
+
+
 }

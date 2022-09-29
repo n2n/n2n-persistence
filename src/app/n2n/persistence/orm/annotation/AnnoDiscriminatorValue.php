@@ -25,8 +25,14 @@ use n2n\reflection\annotation\ClassAnnotation;
 use n2n\reflection\annotation\ClassAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
 use n2n\util\type\ArgUtils;
+use n2n\persistence\orm\attribute\DiscriminatorValue;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
+use n2n\persistence\orm\attribute\AssociationOverrides;
 
-class AnnoDiscriminatorValue implements ClassAnnotation {
+/**
+ * @deprecated use { @link DiscriminatorValue }
+ */
+class AnnoDiscriminatorValue implements ClassAnnotation, LegacyAnnotation {
 	use ClassAnnotationTrait, AnnotationTrait;
 	
 	private $value;
@@ -38,5 +44,13 @@ class AnnoDiscriminatorValue implements ClassAnnotation {
 	
 	public function getValue() {
 		return $this->value;
+	}
+
+	public function getAttributeName(): string {
+		return DiscriminatorValue::class;
+	}
+
+	public function toAttributeInstance() {
+		return new DiscriminatorValue($this->value);
 	}
 }

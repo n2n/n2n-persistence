@@ -24,8 +24,14 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\Column;
+use n2n\persistence\orm\attribute\AssociationOverrides;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoColumn implements PropertyAnnotation {
+/**
+ * @deprecated use { @link Column }
+ */
+class AnnoColumn implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
 	
 	private $name;
@@ -41,5 +47,13 @@ class AnnoColumn implements PropertyAnnotation {
 	
 	public function isNullable() {
 		return $this->nullable;
+	}
+
+	public function getAttributeName(): string {
+		return Column::class;
+	}
+
+	public function toAttributeInstance() {
+		return new Column($this->name);
 	}
 }

@@ -24,8 +24,14 @@ namespace n2n\persistence\orm\annotation;
 use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\AnnotationTrait;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
+use n2n\persistence\orm\attribute\Id;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
+use n2n\persistence\orm\attribute\AssociationOverrides;
 
-class AnnoId implements PropertyAnnotation {
+/**
+ * @deprecated use { @link Id }
+ */
+class AnnoId implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
 	
 	private $generated = true;
@@ -42,5 +48,13 @@ class AnnoId implements PropertyAnnotation {
 		
 	public function getSequenceName() {
 		return $this->sequenceName;
+	}
+
+	public function getAttributeName(): string {
+		return Id::class;
+	}
+
+	public function toAttributeInstance() {
+		return new Id($this->generated, $this->sequenceName);
 	}
 }

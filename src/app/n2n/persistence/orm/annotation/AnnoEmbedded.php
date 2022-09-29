@@ -25,8 +25,13 @@ use n2n\reflection\annotation\PropertyAnnotation;
 use n2n\reflection\annotation\PropertyAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
 use n2n\util\type\ArgUtils;
+use n2n\persistence\orm\attribute\Embedded;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoEmbedded implements PropertyAnnotation {
+/**
+ * @deprecated use { @link Embedded }
+ */
+class AnnoEmbedded implements PropertyAnnotation, LegacyAnnotation {
 	use PropertyAnnotationTrait, AnnotationTrait;
 	
 	private $targetClass;
@@ -61,5 +66,13 @@ class AnnoEmbedded implements PropertyAnnotation {
 	 */
 	public function getColumnSuffix() {
 		return $this->columnSuffix;
+	}
+
+	public function getAttributeName(): string {
+		return Embedded::class;
+	}
+
+	public function toAttributeInstance() {
+		return new Embedded($this->targetClass, $this->columnPrefix, $this->columnSuffix);
 	}
 }

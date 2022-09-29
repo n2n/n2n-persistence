@@ -25,8 +25,13 @@ use n2n\reflection\annotation\ClassAnnotation;
 use n2n\reflection\annotation\ClassAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
 use n2n\util\type\ArgUtils;
+use n2n\persistence\orm\attribute\DiscriminatorColumn;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoDiscriminatorColumn implements ClassAnnotation {
+/**
+ * @deprecated use { @link DiscriminatorColumn }
+ */
+class AnnoDiscriminatorColumn implements ClassAnnotation, LegacyAnnotation {
 	use ClassAnnotationTrait, AnnotationTrait;
 	
 	private $columnName;
@@ -38,5 +43,13 @@ class AnnoDiscriminatorColumn implements ClassAnnotation {
 	
 	public function getColumnName() {
 		return $this->columnName;
+	}
+
+	public function getAttributeName(): string {
+		return DiscriminatorColumn::class;
+	}
+
+	public function toAttributeInstance() {
+		return new DiscriminatorColumn($this->columnName);
 	}
 }

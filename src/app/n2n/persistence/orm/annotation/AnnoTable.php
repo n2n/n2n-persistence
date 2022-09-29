@@ -25,8 +25,13 @@ use n2n\reflection\annotation\ClassAnnotation;
 use n2n\util\type\ArgUtils;
 use n2n\reflection\annotation\ClassAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\Table;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoTable implements ClassAnnotation {
+/**
+ * @deprecated use { @link Table }
+ */
+class AnnoTable implements ClassAnnotation, LegacyAnnotation {
 	use ClassAnnotationTrait, AnnotationTrait;
 	
 	private $name;
@@ -38,5 +43,13 @@ class AnnoTable implements ClassAnnotation {
 	
 	public function getName() {
 		return $this->name;
+	}
+
+	public function getAttributeName(): string {
+		return Table::class;
+	}
+
+	public function toAttributeInstance() {
+		return new Table($this->name);
 	}
 }

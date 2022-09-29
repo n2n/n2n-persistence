@@ -21,10 +21,25 @@
  */
 namespace n2n\persistence\orm\annotation;
 
-class AnnoManyToMany extends MappableOrmRelationAnnotation {
+use n2n\persistence\orm\attribute\ManyToMany;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
+
+/**
+ * @deprecated use { @link ManyToMany }
+ */
+class AnnoManyToMany extends MappableOrmRelationAnnotation implements LegacyAnnotation{
 	public function __construct(\ReflectionClass $targetEntityClass, string $mappedBy = null,
 			int $cascadeType = null, string $fetchType = null) {
 		
 		parent::__construct($targetEntityClass, $mappedBy, $cascadeType, $fetchType);
+	}
+
+	public function getAttributeName(): string {
+		return ManyToMany::class;
+	}
+
+	public function toAttributeInstance() {
+		return new ManyToMany($this->getTargetEntityClass(), $this->getMappedBy(), $this->getCascadeType(),
+				$this->getFetchType());
 	}
 }

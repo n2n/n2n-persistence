@@ -26,8 +26,13 @@ use n2n\util\type\ArgUtils;
 use n2n\reflection\annotation\ClassAnnotation;
 use n2n\reflection\annotation\ClassAnnotationTrait;
 use n2n\reflection\annotation\AnnotationTrait;
+use n2n\persistence\orm\attribute\Inheritance;
+use n2n\reflection\attribute\legacy\LegacyAnnotation;
 
-class AnnoInheritance implements ClassAnnotation {
+/**
+ * @deprecated use { @link Inheritance }
+ */
+class AnnoInheritance implements ClassAnnotation, LegacyAnnotation {
 	use ClassAnnotationTrait, AnnotationTrait;
 	
 	private $strategy;
@@ -39,5 +44,13 @@ class AnnoInheritance implements ClassAnnotation {
 		
 	public function getStrategy() {
 		return $this->strategy;
+	}
+
+	public function getAttributeName(): string {
+		return Inheritance::class;
+	}
+
+	public function toAttributeInstance() {
+		return new Inheritance($this->strategy);
 	}
 }
