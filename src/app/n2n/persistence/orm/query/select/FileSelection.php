@@ -24,7 +24,7 @@ namespace n2n\persistence\orm\query\select;
 use n2n\persistence\meta\data\QueryItem;
 use n2n\persistence\PdoStatement;
 use n2n\persistence\orm\CorruptedDataException;
-use n2n\io\ResourceStream;
+use n2n\util\io\stream\ResourceStream;
 use n2n\io\managed\impl\FileFactory;
 
 class FileSelection implements Selection {
