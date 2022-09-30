@@ -34,13 +34,10 @@ use n2n\reflection\ReflectionUtils;
  * Allowes you to access the {@see EntityModel} of each entity.
  */
 class EntityModelManager {
-	private $registeredClassNames = array();
-	private $entityModelFactory;
-	
 	private $entityClasses = null;
 	private $entityModels = array();
 
-	public function __construct(array $registeredClassNames, EntityModelFactory $entityModelFactory) {
+	public function __construct(private array $registeredClassNames, private EntityModelFactory $entityModelFactory) {
 		ArgUtils::valArray($registeredClassNames, 'string', false, 'registeredClassNames');
 		
 		$this->registeredClassNames = $registeredClassNames;
@@ -72,37 +69,53 @@ class EntityModelManager {
 		}
 		return $this->entityClasses;
 	}
-	
+
 	/**
-	 * @param \ReflectionClass $class
+	 * @param string|\ReflectionClass $classP
 	 * @return EntityModel
 	 */
-	public function getEntityModelByClass(\ReflectionClass $class) {
-		$className = $class->getName();
+	public function getEntityModelByClass(string|\ReflectionClass $classP) {
+		$className = null;
+		$class = null;
+		if (is_string($classP)) {
+			$className = $classP;
+		} else {
+			$className = $classP->getName();
+			$class = $classP;
+		}
+
 		if (isset($this->entityModels[$className])) {
 			return $this->entityModels[$className];
 		}
-		
+
+		if ($class === null) {
+			$class =  ReflectionUtils::createReflectionClass($className);
+		}
+
+		return $this->compileEntityModelPath($class);
+	}
+
+	private function compileEntityModelPath(\ReflectionClass $class) {
 		$entityModel = null;
 		foreach ($this->resolveEntityClasses($class) as $class) {
 			$className = $class->getName();
-			
+
 			if (isset($this->entityModels[$className])) {
 				$entityModel = $this->entityModels[$className];
 			} else {
 				try {
 					$entityModel = $this->entityModels[$className]
 							= $this->entityModelFactory->create($class, $entityModel);
-				} catch (ModelInitializationException $e) {
+				} catch (\n2n\persistence\orm\model\ModelInitializationException $e) {
 					throw new OrmConfigurationException('Invalid entity registered: ' . $class->getName(), 0, $e);
 				}
-				
+
 				$this->entityModelFactory->cleanUp($this);
-				
+
 				$this->initSubEntityModels($entityModel->getSupremeEntityModel());
 			}
 		}
-		
+
 		return $entityModel;
 	}
 	
@@ -111,7 +124,9 @@ class EntityModelManager {
 		foreach ($this->getEntityClasses() as $entityClass) {
 			// @todo ReflectionClass::isSubclassOf(): Internal error: Failed to retrieve the reflection object
 			$entityClass = new \ReflectionClass($entityClass->getName());
-			if (!$entityClass->isSubclassOf($class)) continue;
+			if (!$entityClass->isSubclassOf($class)) {
+				continue;
+			}
 			
 			$this->getEntityModelByClass($entityClass);
 		}

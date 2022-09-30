@@ -211,7 +211,7 @@ class LazyEntityManager implements EntityManager {
 		return $this->nqlParser->parse($nql, $params);
 	}
 	
-	public function find(\ReflectionClass $class, $id) {
+	public function find(string|\ReflectionClass $class, $id): mixed {
 		$this->ensureEntityManagerOpen();
 		
 		if ($id === null) return null;

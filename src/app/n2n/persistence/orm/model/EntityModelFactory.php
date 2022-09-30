@@ -51,7 +51,7 @@ class EntityModelFactory {
 	private $nampingStrategy;
 	private $currentsetupProcess;
 	/**
-	 * @param array $entityPropertyProviderClassNames
+	 * @param string[] $entityPropertyProviderClassNames
 	 */
 	public function __construct(array $entityPropertyProviderClassNames, 
 			$defaultNamingStrategyClassName = null) {
