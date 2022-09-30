@@ -56,7 +56,8 @@ class SetupProcess {
 			return;
 		}
 		
-		throw new IllegalStateException('EntityProperty ' . get_class($this->entityModel->getIdDef()->getEntityProperty())
+		throw new IllegalStateException('EntityProperty '
+				. get_class($this->entityModel->getIdDef()->getEntityProperty())
 				. ' has\'t registered its collumn and is therefore wrong implemented.');
 	}
 	
