@@ -40,6 +40,10 @@ use n2n\persistence\Pdo;
 use n2n\persistence\orm\criteria\item\CriteriaProperty;
 use n2n\persistence\orm\store\LoadingQueue;
 use n2n\persistence\orm\criteria\item\CriteriaFunction;
+use test\model\Entity;
+use n2n\persistence\orm\store\action\ActionQueue;
+use n2n\util\magic\MagicContext;
+use n2n\persistence\orm\criteria\Criteria;
 
 class LazyEntityManager implements EntityManager {
 	private $closed = false;
@@ -53,9 +57,11 @@ class LazyEntityManager implements EntityManager {
 	private $actionQueue;
 	private $loadingQueue;
 	private $nqlParser;
+
 	/**
 	 * @param string $dataSourceName
 	 * @param PdoPool $dbhPool
+	 * @param $transactionalScoped
 	 */
 	public function __construct($dataSourceName, PdoPool $dbhPool, $transactionalScoped) {
 		$this->dataSourceName = $dataSourceName;
@@ -67,41 +73,35 @@ class LazyEntityManager implements EntityManager {
 		$this->loadingQueue = new LoadingQueue($this->persistenceContext, $this->actionQueue);
 		$this->nqlParser = new NqlParser($this, $this->entityModelManager);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\EntityManager::getEntityModelManager()
-	 */
-	public function getEntityModelManager() {
+
+	public function getEntityModelManager(): EntityModelManager {
 		$this->ensureEntityManagerOpen();
 		return $this->entityModelManager;
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\EntityManager::getPersistenceContext()
-	 */
-	public function getPersistenceContext() {
+
+	public function getPersistenceContext(): PersistenceContext {
 		$this->ensureEntityManagerOpen();
 		return $this->persistenceContext;
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\EntityManager::getActionQueue()
-	 */
-	public function getActionQueue() {
+
+	public function getActionQueue(): ActionQueue {
 		$this->ensureEntityManagerOpen();
 		return $this->actionQueue;
 	}
 	
-	public function getLoadingQueue() {
+	public function getLoadingQueue(): LoadingQueue {
 		$this->ensureEntityManagerOpen();
 		return $this->loadingQueue;
 	}
 	
-	public function getMagicContext() {
+	public function getMagicContext(): MagicContext {
 		return $this->dbhPool->getMagicContext();
 	}
+
 	/**
-	 *
 	 * @return \n2n\persistence\Pdo
 	 */
-	public function getPdo() {
+	public function getPdo(): Pdo {
 		if ($this->pdo !== null) {
 			return $this->pdo;
 		}
@@ -147,7 +147,7 @@ class LazyEntityManager implements EntityManager {
 	 * @param string $entityAlias
 	 * @return \n2n\persistence\orm\criteria\BaseCriteria
 	 */
-	public function createCriteria() {
+	public function createCriteria(): Criteria {
 		$this->ensureEntityManagerOpen();
 		return new BaseCriteria($this);
 	}
@@ -162,7 +162,7 @@ class LazyEntityManager implements EntityManager {
 	 * @return \n2n\persistence\orm\criteria\BaseCriteria
 	 */
 	public function createSimpleCriteria(\ReflectionClass $class, array $matches = null, array $order = null, 
-			$limit = null, $num = null) {
+			int $limit = null, int $num = null): Criteria {
 		$this->ensureEntityManagerOpen();
 			
 		$criteria = $this->createCriteria();
@@ -205,7 +205,7 @@ class LazyEntityManager implements EntityManager {
 		return new CriteriaFunction($criteriaItem->getName(), $newParameters);
 	}
 	
-	public function createNqlCriteria($nql, array $params = array()) {
+	public function createNqlCriteria($nql, array $params = array()): Criteria {
 		$this->ensureEntityManagerOpen();
 		
 		return $this->nqlParser->parse($nql, $params);
@@ -226,7 +226,7 @@ class LazyEntityManager implements EntityManager {
 				->toQuery()->fetchSingle();
 	}
 	
-	public function getReference(\ReflectionClass $class, $id) {
+	public function getReference(string|\ReflectionClass $class, $id): mixed {
 		return $this->getPersistenceContext()->getOrCreateEntityProxy(
 				EntityModelManager::getInstance()->getEntityModelByClass($class), $id);
 	}
@@ -256,50 +256,50 @@ class LazyEntityManager implements EntityManager {
 		}
 	}
 	
-	public function merge($entity) {
+	public function merge(object $entity): mixed {
 		$this->ensureTransactionOpen('Merge');
 		
 		$mergeOperation = new MergeOperationImpl($this->actionQueue);
 		return $mergeOperation->mergeEntity($entity);
 	}
 	
-	public function persist($entity) {
+	public function persist(object $entity): void {
 		$this->ensureTransactionOpen('Persist');
 		
 		$persitOperation = new PersistOperation($this->actionQueue);
 		$persitOperation->cascade($entity);
 	}
 	
-	public function refresh($entity) {
+	public function refresh(object $entity): void {
 		$this->ensureEntityManagerOpen();
 		
 		$refreshOperation = new RefreshOperation($this);
 		$refreshOperation->cascade($entity);
 	}
 	
-	public function remove($entity) {
+	public function remove(object $entity): void {
 		$this->ensureTransactionOpen('Remove');
 		
 		$removeOperation = new RemoveOperation($this->actionQueue);
 		$removeOperation->cascade($entity);
 	}
 
-	public function detach($entity) {
+	public function detach(object $entity): void {
 		$this->ensureEntityManagerOpen();
 			
 		$removeOperation = new DetachOperation($this->actionQueue);
 		$removeOperation->cascade($entity);
 	}
 	
-	public function swap($entity, $newEntity) {
-		$this->ensureTransactionOpen('Swap');
-		
-		$tcaq = $this->getPersistenceContext()->createTypeChangeActionQueue();
-		$tcaq->initialize($entity, $newEntity);
-		$tcaq->activate();
-	}
+//	public function swap($entity, $newEntity) {
+//		$this->ensureTransactionOpen('Swap');
+//
+//		$tcaq = $this->getPersistenceContext()->createTypeChangeActionQueue();
+//		$tcaq->initialize($entity, $newEntity);
+//		$tcaq->activate();
+//	}
 	
-	public function flush() {
+	public function flush(): void {
 		$this->ensureTransactionOpen('Flush');
 		
 		$persistOperation = new PersistOperation($this->actionQueue);
@@ -310,7 +310,7 @@ class LazyEntityManager implements EntityManager {
 		$this->actionQueue->flush();
 	}
 	
-	public function close() {
+	public function close(): void {
 		if ($this->closed) return;
 		
 		if ($this->pdo !== null) {
@@ -330,7 +330,7 @@ class LazyEntityManager implements EntityManager {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\EntityManager::contains()
 	 */
-	public function contains($object) {
+	public function contains($object): bool {
 		$this->ensureEntityManagerOpen();
 		
 		$this->getPersistenceContext()->containsManagedEntityObj($object);
@@ -338,7 +338,7 @@ class LazyEntityManager implements EntityManager {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\EntityManager::clear()
 	 */
-	public function clear() {
+	public function clear(): void {
 		$this->ensureEntityManagerOpen();
 		
 		$this->persistenceContext->clear();
@@ -347,11 +347,11 @@ class LazyEntityManager implements EntityManager {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\EntityManager::isOpen()
 	 */
-	public function isOpen() {
+	public function isOpen(): bool {
 		return !$this->closed;
 	}
 	
-	public function registerLifecycleListener(LifecycleListener $listener) {
+	public function registerLifecycleListener(LifecycleListener $listener): void {
 		$this->ensureEntityManagerOpen();
 		
 		$this->actionQueue->registerLifecycleListener($listener);

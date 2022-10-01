@@ -97,9 +97,9 @@ interface EntityManager {
 	/**
 	 * Make an instance managed and persistent.
 	 * @param object $entity
-	 * @return mixed
+	 * @return void
 	 */
-	public function persist(object $entity): mixed;
+	public function persist(object $entity): void;
 
 	/**
 	 * Refresh the state of the instance from the database, overwriting changes made to the entity, if any. 
