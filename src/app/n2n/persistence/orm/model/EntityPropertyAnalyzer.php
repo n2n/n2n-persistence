@@ -25,6 +25,9 @@ use n2n\reflection\property\PropertiesAnalyzer;
 use n2n\reflection\ReflectionContext;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\persistence\orm\property\ClassSetup;
+use n2n\persistence\orm\attribute\AttributeOverrides;
+use n2n\persistence\orm\attribute\Transient;
+use n2n\persistence\orm\attribute\MappedSuperclass;
 
 class EntityPropertyAnalyzer {
 	private $class;
@@ -39,20 +42,18 @@ class EntityPropertyAnalyzer {
 	public function analyzeClass(ClassSetup $classSetup) {
 		$class = $classSetup->getClass();
 		$propertiesAnalyzer = new PropertiesAnalyzer($class, true);
-		$annotationSet = $classSetup->getAttributeSet();
+		$attributeSet = $classSetup->getAttributeSet();
 		
-		$annoAttributeOverrides = $annotationSet->getClassAnnotation(
-				'n2n\persistence\orm\annotation\AnnoAttributeOverrides');
-		if (null !== $annoAttributeOverrides) {
-			$classSetup->addAttributeOverrides($annoAttributeOverrides);
+		$attrAttributeOverrides = $attributeSet->getClassAttribute(AttributeOverrides::class);
+		if (null !== $attrAttributeOverrides) {
+			$classSetup->addAttributeOverrides($attrAttributeOverrides->getInstance());
 		}
 		
 		foreach ($propertiesAnalyzer->analyzeProperties(true, false) as $propertyAccessProxy) {
 			$propertyAccessProxy->setForcePropertyAccess(true);
 			
 			$propertyName = $propertyAccessProxy->getPropertyName();
-			if (null !== $annotationSet->getPropertyAnnotation($propertyName,
-					'n2n\persistence\orm\annotation\AnnoTransient')) {
+			if (null !== $attributeSet->getPropertyAttribute($propertyName, Transient::class)) {
 				continue;
 			}
 				
@@ -71,16 +72,15 @@ class EntityPropertyAnalyzer {
 		// stupid return type bool
 		if ($superClass === false) return;
 
-		$superAnnotationSet = ReflectionContext::getAnnotationSet($superClass);
-		$annoMappedSuperClass = $superAnnotationSet->getClassAnnotation(
-				'n2n\persistence\orm\annotation\AnnoMappedSuperclass');
-		if (null === $annoMappedSuperClass) return;
+		$superAttributeSet = ReflectionContext::getAttributeSet($superClass);
+		$attrMappedSuperClass = $superAttributeSet->getClassAttribute(MappedSuperclass::class);
+		if (null === $attrMappedSuperClass) return;
 
 		$superClassSetup = new ClassSetup($classSetup->getSetupProcess(), $superClass,
 				$classSetup->getNamingStrategy(), $classSetup);
 
-		if (null !== $annoAttributeOverrides) {
-			$superClassSetup->addAttributeOverrides($annoAttributeOverrides);
+		if (null !== $attrAttributeOverrides) {
+			$superClassSetup->addAttributeOverrides($attrAttributeOverrides->getInstance());
 		}
 
 		$this->analyzeClass($superClassSetup);
