@@ -12,12 +12,12 @@ class Embedded {
 	 * @param string $columnSuffix
 	 * @throws \InvalidArgumentException
 	 */
-	public function __construct(private \ReflectionClass $targetClass, private ?string $columnPrefix = null, private ?string $columnSuffix = null) {
+	public function __construct(private string $targetClass, private ?string $columnPrefix = null, private ?string $columnSuffix = null) {
 		ArgUtils::assertTrue(!$targetClass->isInterface() && !$targetClass->isTrait());
 	}
 
 	/**
-	 * @return \ReflectionClass
+	 * @return string
 	 */
 	public function getTargetClass() {
 		return $this->targetClass;

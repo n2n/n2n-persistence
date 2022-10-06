@@ -22,21 +22,23 @@
 namespace n2n\persistence\orm\property;
 
 use n2n\reflection\ReflectionContext;
-use n2n\persistence\orm\annotation\AnnoAttributeOverrides;
 use n2n\persistence\orm\model\NamingStrategy;
 use n2n\reflection\property\AccessProxy;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\OrmException;
 use n2n\persistence\orm\OrmErrorException;
+use n2n\persistence\orm\attribute\Column;
+use n2n\reflection\attribute\AttributeSet;
+use n2n\persistence\orm\attribute\AttributeOverrides;
 
 class ClassSetup {
 	private $setupProcess;
 	private $class;
-	private $annotationSet;
+	private $attributeSet;
 	private $namingStrategy;
 	private $parentClassSetup;
-	private $annoAttributeOverrides = array();
+	private $attributeOverrides = array();
 	private $entityProperties = array();
 	private $parentPropertyName;
 	
@@ -44,7 +46,7 @@ class ClassSetup {
 			NamingStrategy $namingStrategy, ClassSetup $parentClassSetup = null, $parentPropertyName = null) {
 		$this->setupProcess = $setupProcess;
 		$this->class = $class;
-		$this->annotationSet = ReflectionContext::getAnnotationSet($this->class);
+		$this->attributeSet = ReflectionContext::getAttributeSet($this->class);
 		$this->namingStrategy = $namingStrategy;
 		$this->parentClassSetup = $parentClassSetup;
 		$this->parentPropertyName = $parentPropertyName;
@@ -84,10 +86,10 @@ class ClassSetup {
 		return $this->parentPropertyName;
 	}
 	/**
-	 * @return \n2n\reflection\annotation\AnnotationSet
+	 * @return AttributeSet
 	 */
-	public function getAnnotationSet() {
-		return $this->annotationSet;
+	public function getAttributeSet() {
+		return $this->attributeSet;
 	}
 	/**
 	 * @return NamingStrategy
@@ -102,16 +104,16 @@ class ClassSetup {
 		return $this->setupProcess->getEntityModel();
 	}
 	/**
-	 * @return AnnoAttributeOverrides
+	 * @return AttributeOverrides[]
 	 */
-	public function getAnnoAttributeOverrides() {
-		return $this->annoAttributeOverrides;
+	public function getAttributeOverrides() {
+		return $this->attributeOverrides;
 	}
 	/**
-	 * @param AnnoAttributeOverrides $annoAttributeOverrides
+	 * @param AttributeOverrides $attributeOverrides
 	 */
-	public function addAnnoAttributeOverrides(AnnoAttributeOverrides $annoAttributeOverrides) {
-		$this->annoAttributeOverrides[] = $annoAttributeOverrides;
+	public function addAttributeOverrides(AttributeOverrides $attributeOverrides) {
+		$this->attributeOverrides[] = $attributeOverrides;
 	}
 	/**
 	 * @param \Exception $e
@@ -123,7 +125,7 @@ class ClassSetup {
 			array $causingComponents = array()) {
 		$property = $propertyAccessProxy->getProperty();
 		return $this->createException('Initialization of entity property '
-				. $property->getClass()->getName() . '::$' . $property->getName() . ' failed. Reason: '
+				. $property->getDeclaringClass()->getName() . '::$' . $property->getName() . ' failed. Reason: '
 				. $e->getMessage(), $e, $causingComponents);
 	}
 	/**
@@ -144,12 +146,12 @@ class ClassSetup {
 	 * @return string|null
 	 */
 	private function determineColumnName($propertyName, $overrideAllowed, array &$relatedComponents) {
-		foreach ($this->annoAttributeOverrides as $attributeOverrides) {
+		foreach ($this->attributeOverrides as $attributeOverrides) {
 			$map = $attributeOverrides->getPropertyColumnMap();
 			if (!isset($map[$propertyName]))  continue;
 			
 			if ($overrideAllowed) { 
-				$relatedComponents[] = $this->annoAttributeOverrides;
+				$relatedComponents[] = $this->attributeOverrides;
 				return $map[$propertyName];
 			}
 			
@@ -158,17 +160,16 @@ class ClassSetup {
 					null, array($attributeOverrides));
 		}
 	
-		$annoColumn = $this->annotationSet->getPropertyAnnotation($propertyName,
-				'n2n\persistence\orm\annotation\AnnoColumn');
-		if ($annoColumn !== null) {
+		$attrColumn = $this->attributeSet->getPropertyAttribute($propertyName, Column::class);
+		if ($attrColumn !== null) {
 			if ($overrideAllowed) {
-				$relatedComponents[] = $annoColumn;
-				return $annoColumn->getName();
+				$relatedComponents[] = $attrColumn;
+				return $attrColumn->getInstance()->getName();
 			}
 			
 			throw $this->createException('Illegal Column override for property: '
 							. $this->class->getName() . '::$' . $propertyName,
-					null, array($annoColumn));
+					null, array($attrColumn));
 		}
 	
 		return null;

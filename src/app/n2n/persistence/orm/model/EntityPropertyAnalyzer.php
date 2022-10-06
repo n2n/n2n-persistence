@@ -39,12 +39,12 @@ class EntityPropertyAnalyzer {
 	public function analyzeClass(ClassSetup $classSetup) {
 		$class = $classSetup->getClass();
 		$propertiesAnalyzer = new PropertiesAnalyzer($class, true);
-		$annotationSet = $classSetup->getAnnotationSet();
+		$annotationSet = $classSetup->getAttributeSet();
 		
 		$annoAttributeOverrides = $annotationSet->getClassAnnotation(
 				'n2n\persistence\orm\annotation\AnnoAttributeOverrides');
 		if (null !== $annoAttributeOverrides) {
-			$classSetup->addAnnoAttributeOverrides($annoAttributeOverrides);
+			$classSetup->addAttributeOverrides($annoAttributeOverrides);
 		}
 		
 		foreach ($propertiesAnalyzer->analyzeProperties(true, false) as $propertyAccessProxy) {
@@ -80,7 +80,7 @@ class EntityPropertyAnalyzer {
 				$classSetup->getNamingStrategy(), $classSetup);
 
 		if (null !== $annoAttributeOverrides) {
-			$superClassSetup->addAnnoAttributeOverrides($annoAttributeOverrides);
+			$superClassSetup->addAttributeOverrides($annoAttributeOverrides);
 		}
 
 		$this->analyzeClass($superClassSetup);

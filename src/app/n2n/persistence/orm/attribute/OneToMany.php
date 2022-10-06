@@ -5,9 +5,9 @@ use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class OneToMany extends MappableOrmRelationAttribute {
-	public function __construct(\ReflectionClass $targetEntityClass, string $mappedBy = null,
+	public function __construct(string $targetEntityClass, string $mappedBy = null,
 			int $cascadeType = null, string $fetchType = null, private bool $orphanRemoval = false) {
-		parent::__construct($targetEntityClass, $mappedBy, $cascadeType, $fetchType);
+		parent::__construct(new \ReflectionClass($targetEntityClass), $mappedBy, $cascadeType, $fetchType);
 	}
 
 	public function isOrphanRemoval() {
