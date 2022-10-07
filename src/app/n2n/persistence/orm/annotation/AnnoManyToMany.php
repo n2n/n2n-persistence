@@ -27,7 +27,7 @@ use n2n\reflection\attribute\legacy\LegacyAnnotation;
 /**
  * @deprecated use { @link ManyToMany }
  */
-class AnnoManyToMany extends MappableOrmRelationAnnotation implements LegacyAnnotation{
+class AnnoManyToMany extends MappableOrmRelationAnnotation implements LegacyAnnotation {
 	public function __construct(\ReflectionClass $targetEntityClass, string $mappedBy = null,
 			int $cascadeType = null, string $fetchType = null) {
 		
@@ -39,7 +39,7 @@ class AnnoManyToMany extends MappableOrmRelationAnnotation implements LegacyAnno
 	}
 
 	public function toAttributeInstance() {
-		return new ManyToMany($this->getTargetEntityClass(), $this->getMappedBy(), $this->getCascadeType(),
+		return new ManyToMany($this->getTargetEntityClass()->getName(), $this->getMappedBy(), $this->getCascadeType(),
 				$this->getFetchType());
 	}
 }

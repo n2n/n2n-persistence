@@ -42,6 +42,6 @@ class AnnoManyToOne extends OrmRelationAnnotation implements LegacyAnnotation {
 	}
 
 	public function toAttributeInstance() {
-		return new ManyToOne($this->getTargetEntityClass(), $this->getCascadeType(), $this->getFetchType());
+		return new ManyToOne($this->getTargetEntityClass()->getName(), $this->getCascadeType(), $this->getFetchType());
 	}
 }

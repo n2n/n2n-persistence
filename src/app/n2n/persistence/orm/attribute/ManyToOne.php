@@ -11,6 +11,6 @@ class ManyToOne extends MappableOrmRelationAttribute {
 			throw new \InvalidArgumentException('Maximum parameter number for AnnoManyToOne is 3.');
 		}
 
-		parent::__construct(new \ReflectionClass($targetEntityClass), $cascadeType, $fetchType);
+		parent::__construct(new \ReflectionClass($targetEntityClass), null, $cascadeType, $fetchType);
 	}
 }
