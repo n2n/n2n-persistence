@@ -30,7 +30,6 @@ use n2n\persistence\orm\attribute\Transient;
 use n2n\persistence\orm\attribute\MappedSuperclass;
 
 class EntityPropertyAnalyzer {
-	private $class;
 	private $entityPropertyProviders;
 	
 	private $currentPropertyAccessProxy;
