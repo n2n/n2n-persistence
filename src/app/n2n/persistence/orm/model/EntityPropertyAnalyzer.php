@@ -23,17 +23,18 @@ namespace n2n\persistence\orm\model;
 
 use n2n\reflection\property\PropertiesAnalyzer;
 use n2n\reflection\ReflectionContext;
-use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\persistence\orm\property\ClassSetup;
 use n2n\persistence\orm\attribute\AttributeOverrides;
 use n2n\persistence\orm\attribute\Transient;
 use n2n\persistence\orm\attribute\MappedSuperclass;
+use n2n\util\ex\err\ConfigurationError;
+use n2n\util\type\TypeUtils;
 
 class EntityPropertyAnalyzer {
 	private $entityPropertyProviders;
-	
+
 	private $currentPropertyAccessProxy;
-	
+
 	public function __construct(array $entityPropertyProviders) {
 		$this->entityPropertyProviders = $entityPropertyProviders;
 	}
@@ -62,9 +63,10 @@ class EntityPropertyAnalyzer {
 			}
 				
 			if ($classSetup->containsEntityPropertyName($propertyName)) continue;
-			
-			$classSetup->provideEntityProperty(new ScalarEntityProperty($propertyAccessProxy,
-					$classSetup->requestColumn($propertyName)));
+
+			$property = $propertyAccessProxy->getProperty();
+			throw new ConfigurationError('Orm could not initialize property: '
+					. TypeUtils::prettyReflPropName($property), $property->getDeclaringClass()->getFileName());
 		}
 		
 		$superClass = $class->getParentClass();
