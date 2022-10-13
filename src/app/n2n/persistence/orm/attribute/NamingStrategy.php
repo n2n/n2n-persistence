@@ -10,6 +10,6 @@ class NamingStrategy {
 	}
 
 	public function getNamingStrategy() {
-		return $this->namingStrategy;
+		return new $this->namingStrategy();
 	}
 }
