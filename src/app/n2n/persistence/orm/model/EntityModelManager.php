@@ -112,7 +112,7 @@ class EntityModelManager {
 
 				$this->entityModelFactory->cleanUp($this);
 
-				$this->initSubEntityModels($entityModel->getSupremeEntityModel());
+				$this->initSubEntityModels($entityModel);
 			}
 		}
 
@@ -121,6 +121,7 @@ class EntityModelManager {
 	
 	private function initSubEntityModels(EntityModel $entityModel) {
 		$class = $entityModel->getClass();
+		test($class->getName());
 		foreach ($this->getEntityClasses() as $entityClass) {
 			// @todo ReflectionClass::isSubclassOf(): Internal error: Failed to retrieve the reflection object
 			$entityClass = new \ReflectionClass($entityClass->getName());

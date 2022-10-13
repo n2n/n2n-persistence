@@ -13,7 +13,6 @@ class Embedded {
 	 * @throws \InvalidArgumentException
 	 */
 	public function __construct(private string $targetClass, private ?string $columnPrefix = null, private ?string $columnSuffix = null) {
-		ArgUtils::assertTrue(!$targetClass->isInterface() && !$targetClass->isTrait());
 	}
 
 	/**
