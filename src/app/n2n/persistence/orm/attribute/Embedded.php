@@ -2,10 +2,10 @@
 namespace n2n\persistence\orm\attribute;
 
 use Attribute;
-use n2n\util\type\ArgUtils;
+use n2n\persistence\orm\property\AttributeWithTarget;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Embedded {
+class Embedded implements AttributeWithTarget {
 	/**
 	 * @param \ReflectionClass $targetClass
 	 * @param string $columnPrefix
@@ -18,7 +18,7 @@ class Embedded {
 	/**
 	 * @return string|null
 	 */
-	public function getTargetClass() {
+	public function getTargetEntity(): ?string {
 		return $this->targetClass;
 	}
 
