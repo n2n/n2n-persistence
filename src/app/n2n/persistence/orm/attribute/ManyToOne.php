@@ -5,7 +5,7 @@ use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ManyToOne extends MappableOrmRelationAttribute {
-	public function __construct(string $targetEntityClass, int $cascadeType = null,
+	public function __construct(string $targetEntityClass = null, int $cascadeType = null,
 			string $fetchType = null) {
 		if (3 < count(func_get_args())) {
 			throw new \InvalidArgumentException('Maximum parameter number for AnnoManyToOne is 3.');

@@ -12,11 +12,11 @@ class Embedded {
 	 * @param string $columnSuffix
 	 * @throws \InvalidArgumentException
 	 */
-	public function __construct(private string $targetClass, private ?string $columnPrefix = null, private ?string $columnSuffix = null) {
+	public function __construct(private ?string $targetClass = null, private ?string $columnPrefix = null, private ?string $columnSuffix = null) {
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
 	public function getTargetClass() {
 		return $this->targetClass;

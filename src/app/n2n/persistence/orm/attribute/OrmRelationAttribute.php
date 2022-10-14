@@ -9,7 +9,7 @@ use n2n\util\type\ArgUtils;
 abstract class OrmRelationAttribute {
 	private $orphanRemoval = false;
 
-	public function __construct(private \ReflectionClass $targetEntityClass,
+	public function __construct(private ?string $targetEntityClass = null,
 			private ?int $cascadeType = CascadeType::NONE, $fetchType = FetchType::LAZY) {
 
 		ArgUtils::valEnum($fetchType, FetchType::getValues(), null, true, 'fetchType');

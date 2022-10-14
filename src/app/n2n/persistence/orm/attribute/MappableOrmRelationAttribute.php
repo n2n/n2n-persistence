@@ -5,7 +5,7 @@ namespace n2n\persistence\orm\attribute;
 abstract class MappableOrmRelationAttribute extends OrmRelationAttribute {
 	private $mappedBy = null;
 
-	public function __construct(\ReflectionClass $targetEntityClass, string $mappedBy = null,
+	public function __construct(string $targetEntityClass = null, string $mappedBy = null,
 			int $cascadeType = null, string $fetchType = null) {
 		parent::__construct($targetEntityClass, $cascadeType, $fetchType);
 
