@@ -5,9 +5,8 @@ namespace n2n\persistence\orm\attribute;
 use n2n\persistence\orm\CascadeType;
 use n2n\persistence\orm\FetchType;
 use n2n\util\type\ArgUtils;
-use n2n\persistence\orm\property\AttributeWithTarget;
 
-abstract class OrmRelationAttribute implements AttributeWithTarget {
+abstract class OrmRelationAttribute {
 	private $orphanRemoval = false;
 
 	public function __construct(private ?string $targetEntity = null,

@@ -2,14 +2,13 @@
 namespace n2n\persistence\orm\attribute;
 
 use Attribute;
-use n2n\persistence\orm\property\AttributeWithTarget;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Embedded implements AttributeWithTarget {
+class Embedded {
 	/**
-	 * @param \ReflectionClass $targetClass
-	 * @param string $columnPrefix
-	 * @param string $columnSuffix
+	 * @param string|null $targetClass
+	 * @param string|null $columnPrefix
+	 * @param string|null $columnSuffix
 	 * @throws \InvalidArgumentException
 	 */
 	public function __construct(private ?string $targetClass = null, private ?string $columnPrefix = null, private ?string $columnSuffix = null) {
@@ -23,14 +22,14 @@ class Embedded implements AttributeWithTarget {
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
 	public function getColumnPrefix() {
 		return $this->columnPrefix;
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
 	public function getColumnSuffix() {
 		return $this->columnSuffix;
