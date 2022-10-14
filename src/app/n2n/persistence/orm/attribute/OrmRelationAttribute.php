@@ -16,15 +16,15 @@ abstract class OrmRelationAttribute {
 		$this->fetchType = $fetchType;
 	}
 
-	public function getTargetEntityClass() {
+	public function getTargetEntity() {
 		return $this->targetEntityClass;
 	}
 
-	public function getCascadeType() {
+	public function getCascade() {
 		return $this->cascadeType;
 	}
 
-	public function getFetchType() {
+	public function getFetch() {
 		return $this->fetchType;
 	}
 }
