@@ -132,9 +132,8 @@ class PersistSupplyJob extends SupplyJobAdapter {
 				$oldValueHash = $this->getOldValueHash($propertyString);
 				if ($oldValueHash->matches($valueHash)) continue;
 			}
-			
+
 			$property->supplyPersistAction($this->entityAction, $this->getValue($propertyString), $valueHash, $oldValueHash);
-			
 		}
 
 		foreach ($entityModel->getActionDependencies() as $actionDependency) {
