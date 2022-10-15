@@ -36,13 +36,8 @@ class AnnoEntityListeners implements ClassAnnotation, LegacyAnnotation {
 	
 	private $classes = array();
 	
-	public function __construct(\ReflectionClass $listenerClass = null, \ReflectionClass $listenerClass2 = null, 
-			\ReflectionClass $listenerClass3 = null) {
-		$this->classes = func_get_args();
-		
-		if (count($this->classes) > 3) {
-			ArgUtils::valArray($this->classes, '\ReflectionClass');
-		}
+	public function __construct(\ReflectionClass ...$listenerClasses) {
+		$this->classes = $listenerClasses;
 	}
 	
 	public function getClasses() {
@@ -54,6 +49,6 @@ class AnnoEntityListeners implements ClassAnnotation, LegacyAnnotation {
 	}
 
 	public function toAttributeInstance() {
-		return new EntityListeners(...$this->classes);
+		return new EntityListeners(...array_map(fn (\ReflectionClass $c) => $c->getName(), $this->classes));
 	}
 }
