@@ -16,7 +16,8 @@ class EntityModelFactoryTest extends TestCase {
 
 	public function testClassAttributes() {
 		$entityModel = $this->emf->create(new \ReflectionClass(ClassAttributeTestMock::class));
-		$this->assertEquals('test_table_name', $entityModel->getTableName());
+		// NamingStrategyTest:
+		$this->assertEquals('classattributetestmock', $entityModel->getTableName());
 		$this->assertEquals('discValue', $entityModel->getDiscriminatorValue());
 		$this->assertEquals('discColumn', $entityModel->getDiscriminatorColumnName());
 		$this->assertEquals(InheritanceType::SINGLE_TABLE, $entityModel->getInheritanceType());
