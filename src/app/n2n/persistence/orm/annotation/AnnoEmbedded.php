@@ -73,6 +73,6 @@ class AnnoEmbedded implements PropertyAnnotation, LegacyAnnotation {
 	}
 
 	public function toAttributeInstance() {
-		return new Embedded($this->targetClass, $this->columnPrefix, $this->columnSuffix);
+		return new Embedded($this->targetClass->getName(), $this->columnPrefix, $this->columnSuffix);
 	}
 }

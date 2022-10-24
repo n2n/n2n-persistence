@@ -290,8 +290,11 @@ class EntityModelFactory {
 		}
 		
 		$entityListenerAttr = $this->attributeSet->getClassAttribute(EntityListeners::class);
+
 		if ($entityListenerAttr !== null) {
-			$this->entityModel->setEntityListenerClasses($entityListenerAttr->getInstance()->getClasses());
+			$this->entityModel->setEntityListenerClasses(array_map(
+					fn ($className) => ReflectionUtils::createReflectionClass($className),
+					$entityListenerAttr->getInstance()->getClasses()));
 		}
 	}
 	/**
