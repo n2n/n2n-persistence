@@ -44,6 +44,10 @@ use n2n\persistence\orm\attribute\EntityListeners;
 use n2n\persistence\orm\attribute\Id;
 use n2n\reflection\attribute\PropertyAttribute;
 use n2n\persistence\orm\property\EntityPropertyProvider;
+use n2n\reflection\attribute\ClassAttribute;
+use n2n\util\ex\err\ConfigurationError;
+use n2n\core\TypeNotFoundException;
+use ReflectionClass;
 
 class EntityModelFactory {
 	const DEFAULT_ID_PROPERTY_NAME = 'id';
@@ -113,11 +117,11 @@ class EntityModelFactory {
 		return $this->entityPropertyProviders;
 	}
 	/**
-	 * @param \ReflectionClass $entityClass
+	 * @param ReflectionClass $entityClass
 	 * @param EntityModel $superEntityModel
 	 * @return \n2n\persistence\orm\model\EntityModel
 	 */
-	public function create(\ReflectionClass $entityClass, EntityModel $superEntityModel = null) {
+	public function create(ReflectionClass $entityClass, EntityModel $superEntityModel = null) {
 		if ($this->currentSetupProcess !== null) {
 			throw new IllegalStateException('SetupProcess not finished.');
 		}
@@ -289,12 +293,20 @@ class EntityModelFactory {
 			$this->entityModel->addLifecycleMethod($eventType, $method);
 		}
 		
-		$entityListenerAttr = $this->attributeSet->getClassAttribute(EntityListeners::class);
+		$entityListenerAttribute = $this->attributeSet->getClassAttribute(EntityListeners::class);
+		if ($entityListenerAttribute !== null) {
+			$this->entityModel->setEntityListenerClasses($this->extractEntityListenerClasses($entityListenerAttribute));
+		}
+	}
 
-		if ($entityListenerAttr !== null) {
-			$this->entityModel->setEntityListenerClasses(array_map(
-					fn ($className) => ReflectionUtils::createReflectionClass($className),
-					$entityListenerAttr->getInstance()->getClasses()));
+	private function extractEntityListenerClasses(ClassAttribute $classAttribute) {
+		try {
+			return array_map(
+					fn($className) => new ReflectionClass($className),
+					$classAttribute->getInstance()->getClasses());
+		} catch (\ReflectionException|TypeNotFoundException $e) {
+			throw new ConfigurationError('Could not load EntityListeners for '
+					. $classAttribute->getClass()->getName(), $classAttribute->getFile(), $classAttribute->getLine());
 		}
 	}
 	/**

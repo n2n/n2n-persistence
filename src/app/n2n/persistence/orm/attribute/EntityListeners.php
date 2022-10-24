@@ -7,16 +7,16 @@ use n2n\util\type\ArgUtils;
 #[Attribute(Attribute::TARGET_CLASS)]
 class EntityListeners {
 	/**
-	 * @var \ReflectionClass[]
+	 * @var string[]
 	 */
 	private array $classes;
 
 	public function __construct(string ...$classes) {
-		$this->classes = array_map(fn ($className) => new \ReflectionClass($className), $classes);
+		$this->classes = $classes;
 	}
 
 	/**
-	 * @return \ReflectionClass[]
+	 * @return string[]
 	 */
 	public function getClasses() {
 		return $this->classes;
