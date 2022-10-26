@@ -21,7 +21,6 @@ use n2n\persistence\Pdo;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\store\action\RemoveAction;
-use n2n\util\ex\UnsupportedOperationException;
 
 class EntityPropertyMock implements BasicEntityProperty {
 	private $entityModel;

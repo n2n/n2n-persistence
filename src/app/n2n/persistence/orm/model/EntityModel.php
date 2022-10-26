@@ -238,7 +238,12 @@ class EntityModel implements EntityPropertyCollection {
 	public function containsLevelEntityPropertyName(string $name): bool {
 		return isset($this->properties[$name]);
 	}
-	
+
+	/**
+	 * @param string $name
+	 * @return EntityProperty
+	 * @throws UnknownEntityPropertyException
+	 */
 	public function getLevelEntityPropertyByName(string $name): EntityProperty {
 		if (isset($this->properties[$name])) return $this->properties[$name];
 		

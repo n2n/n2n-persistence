@@ -9,22 +9,21 @@ use n2n\util\type\ArgUtils;
 abstract class OrmRelationAttribute {
 	private $orphanRemoval = false;
 
-	public function __construct(private \ReflectionClass $targetEntityClass,
-			private ?int $cascadeType = CascadeType::NONE, $fetchType = FetchType::LAZY) {
+	public function __construct(private ?string $targetEntity = null,
+			private ?int $cascade = CascadeType::NONE, private ?string $fetch = FetchType::LAZY) {
 
-		ArgUtils::valEnum($fetchType, FetchType::getValues(), null, true, 'fetchType');
-		$this->fetchType = $fetchType;
+		ArgUtils::valEnum($this->fetch, FetchType::getValues(), null, true, 'fetchType');
 	}
 
-	public function getTargetEntityClass() {
-		return $this->targetEntityClass;
+	public function getTargetEntity(): ?string {
+		return $this->targetEntity;
 	}
 
-	public function getCascadeType() {
-		return $this->cascadeType;
+	public function getCascade() {
+		return $this->cascade;
 	}
 
-	public function getFetchType() {
-		return $this->fetchType;
+	public function getFetch() {
+		return $this->fetch;
 	}
 }
