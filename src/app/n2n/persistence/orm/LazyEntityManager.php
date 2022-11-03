@@ -229,7 +229,7 @@ class LazyEntityManager implements EntityManager {
 	
 	public function getReference(string|ReflectionClass $class, $id): mixed {
 		return $this->getPersistenceContext()->getOrCreateEntityProxy(
-				EntityModelManager::getInstance()->getEntityModelByClass($class), $id);
+				$this->entityModelManager->getEntityModelByClass($class), $id, $this);
 	}
 	
 	private function ensureEntityManagerOpen() {
@@ -334,7 +334,7 @@ class LazyEntityManager implements EntityManager {
 	public function contains($object): bool {
 		$this->ensureEntityManagerOpen();
 		
-		$this->getPersistenceContext()->containsManagedEntityObj($object);
+		return $this->getPersistenceContext()->containsManagedEntityObj($object);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\EntityManager::clear()
