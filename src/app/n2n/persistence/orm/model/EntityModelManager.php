@@ -72,7 +72,7 @@ class EntityModelManager {
 
 	/**
 	 * @param string|\ReflectionClass $classP
-	 * @return EntityModel
+	 * @return mixed
 	 */
 	public function getEntityModelByClass(string|\ReflectionClass $classP) {
 		$className = null;
