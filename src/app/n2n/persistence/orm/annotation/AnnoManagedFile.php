@@ -51,7 +51,7 @@ class AnnoManagedFile implements PropertyAnnotation, LegacyAnnotation {
 // 		$class = null;
 // 		try {
 // 			$class = ReflectionUtils::createReflectionClass($lookupId);
-// 		} catch (TypeNotFoundException $e) {
+// 		} catch (\ReflectionException $e) {
 // 			throw new \InvalidArgumentException('FileManager not found: ' . $lookupId, 0, $e);	
 // 		}
 		

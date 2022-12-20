@@ -304,7 +304,7 @@ class EntityModelFactory {
 			return array_map(
 					fn($className) => new ReflectionClass($className),
 					$classAttribute->getInstance()->getClasses());
-		} catch (\ReflectionException|TypeNotFoundException $e) {
+		} catch (\ReflectionException $e) {
 			throw new ConfigurationError('Could not load EntityListeners for '
 					. $classAttribute->getClass()->getName(), $classAttribute->getFile(), $classAttribute->getLine());
 		}
