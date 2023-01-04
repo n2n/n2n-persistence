@@ -28,6 +28,7 @@ use n2n\core\container\Transaction;
 use n2n\core\container\CommitFailedException;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\meta\Dialect;
+use n2n\core\config\PersistenceUnitConfig;
 
 class Pdo {
 	private ?\PDO $pdo = null;

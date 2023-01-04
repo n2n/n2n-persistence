@@ -22,7 +22,7 @@
 // namespace n2n\persistence\orm;
 
 // use n2n\persistence\PdoListener;
-// use n2n\core\container\PdoPool;
+// use n2n\persistence\ext\PdoPool;
 // use n2n\core\container\TransactionManager;
 // use n2n\persistence\TransactionEvent;
 // use n2n\core\container\ContainerConflictException;
