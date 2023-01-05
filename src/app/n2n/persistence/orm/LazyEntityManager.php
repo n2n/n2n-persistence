@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm;
 
-use n2n\core\container\PdoPool;
+use n2n\persistence\ext\PdoPool;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\persistence\orm\criteria\BaseCriteria;
 use n2n\persistence\orm\criteria\item\CrIt;
