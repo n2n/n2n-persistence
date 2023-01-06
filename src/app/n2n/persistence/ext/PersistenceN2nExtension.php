@@ -10,7 +10,7 @@ class PersistenceN2nExtension implements N2nExtension {
 	public function __construct() {
 	}
 
-	function setUp(AppN2nContext $appN2NContext): void {
-		$appN2NContext->addAddonContext(new PersistenceAddOnContext(PdoPool::createFromAppN2nContext($appN2NContext)));
+	function setUp(AppN2nContext $appN2nContext): void {
+		$appN2nContext->addAddonContext(new PersistenceAddOnContext(PdoPool::createFromAppN2nContext($appN2nContext)));
 	}
 }

@@ -37,6 +37,7 @@ use n2n\persistence\UnknownPersistenceUnitException;
 use n2n\persistence\PdoPoolListener;
 use n2n\core\container\TransactionManager;
 use n2n\core\container\impl\AppN2nContext;
+use n2n\core\ext\N2nMonitor;
 
 class PdoPool {
 	const DEFAULT_DS_NAME = 'default';
@@ -49,7 +50,7 @@ class PdoPool {
 	private $dbhPoolListeners = array();
 
 	function __construct(private DbConfig $dbConfig, private OrmConfig $ormConfig, private MagicContext $magicContext,
-			private TransactionManager $transactionManager) {
+			private TransactionManager $transactionManager, private ?int $slowQueryTime, private ?N2nMonitor $n2nMonitor) {
 		foreach ($dbConfig->getPersistenceUnitConfigs() as $persistenceUnitConfig) {
 			$this->persistenceUnitConfigs[$persistenceUnitConfig->getName()] = $persistenceUnitConfig;
 		}
@@ -62,7 +63,8 @@ class PdoPool {
 
 	static function createFromAppN2nContext(AppN2nContext $n2nContext): PdoPool {
 		$appConfig = $n2nContext->getAppConfig();
-		return new PdoPool($appConfig->db(), $appConfig->orm(), $n2nContext, $n2nContext->getTransactionManager());
+		return new PdoPool($appConfig->db(), $appConfig->orm(), $n2nContext, $n2nContext->getTransactionManager(),
+				$appConfig->error()->getMonitorSlowQueryTime(), $n2nContext->getMonitor());
 	}
 
 	function clear() {
@@ -152,7 +154,7 @@ class PdoPool {
 	 * @return Pdo
 	 */
 	public function createPdo(PersistenceUnitConfig $persistenceUnitConfig) {
-		return new Pdo($persistenceUnitConfig, $this->transactionManager);
+		return new Pdo($persistenceUnitConfig, $this->transactionManager, $this->slowQueryTime, $this->n2nMonitor);
 	}
 	
 	/**
