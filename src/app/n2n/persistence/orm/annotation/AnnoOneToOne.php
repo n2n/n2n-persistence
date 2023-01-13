@@ -42,7 +42,7 @@ class AnnoOneToOne extends MappableOrmRelationAnnotation implements LegacyAnnota
 	}
 
 	public function toAttributeInstance() {
-		return new OneToOne($this->getTargetEntityClass(), $this->getMappedBy(), $this->getCascadeType(),
+		return new OneToOne($this->getTargetEntityClass()->getName(), $this->getMappedBy(), $this->getCascadeType(),
 				$this->getFetchType(), $this->orphanRemoval);
 	}
 }

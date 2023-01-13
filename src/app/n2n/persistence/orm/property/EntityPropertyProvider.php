@@ -22,12 +22,13 @@
 namespace n2n\persistence\orm\property;
 
 use n2n\reflection\property\AccessProxy;
+use n2n\reflection\property\PropertyAccessProxy;
 
 interface EntityPropertyProvider {
 	/**
 	 * @param AccessProxy $propertyAccessProxy
 	 * @param SetupProcess $setupProcess
 	 */
-	public function setupPropertyIfSuitable(AccessProxy $propertyAccessProxy,
+	public function setupPropertyIfSuitable(PropertyAccessProxy $propertyAccessProxy,
 			ClassSetup $setupProcess);
 }

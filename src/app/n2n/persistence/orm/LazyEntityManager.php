@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm;
 
-use n2n\core\container\PdoPool;
+use n2n\persistence\ext\PdoPool;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\persistence\orm\criteria\BaseCriteria;
 use n2n\persistence\orm\criteria\item\CrIt;
@@ -44,6 +44,7 @@ use test\model\Entity;
 use n2n\persistence\orm\store\action\ActionQueue;
 use n2n\util\magic\MagicContext;
 use n2n\persistence\orm\criteria\Criteria;
+use ReflectionClass;
 
 class LazyEntityManager implements EntityManager {
 	private $closed = false;
@@ -143,9 +144,9 @@ class LazyEntityManager implements EntityManager {
 	
 	/**
 	 *
-	 * @param \ReflectionClass $class
+	 * @param ReflectionClass $class
 	 * @param string $entityAlias
-	 * @return \n2n\persistence\orm\criteria\BaseCriteria
+	 * @return BaseCriteria
 	 */
 	public function createCriteria(): Criteria {
 		$this->ensureEntityManagerOpen();
@@ -154,14 +155,14 @@ class LazyEntityManager implements EntityManager {
 	
 	/**
 	 *
-	 * @param \ReflectionClass $class
+	 * @param string|ReflectionClass $class
 	 * @param array $matches
 	 * @param array $order
 	 * @param int $limit
 	 * @param int $num
-	 * @return \n2n\persistence\orm\criteria\BaseCriteria
+	 * @return BaseCriteria
 	 */
-	public function createSimpleCriteria(\ReflectionClass $class, array $matches = null, array $order = null, 
+	public function createSimpleCriteria(string|ReflectionClass $class, array $matches = null, array $order = null,
 			int $limit = null, int $num = null): Criteria {
 		$this->ensureEntityManagerOpen();
 			
@@ -211,7 +212,7 @@ class LazyEntityManager implements EntityManager {
 		return $this->nqlParser->parse($nql, $params);
 	}
 	
-	public function find(string|\ReflectionClass $class, $id): mixed {
+	public function find(string|ReflectionClass $class, $id): mixed {
 		$this->ensureEntityManagerOpen();
 		
 		if ($id === null) return null;
@@ -226,9 +227,9 @@ class LazyEntityManager implements EntityManager {
 				->toQuery()->fetchSingle();
 	}
 	
-	public function getReference(string|\ReflectionClass $class, $id): mixed {
+	public function getReference(string|ReflectionClass $class, $id): mixed {
 		return $this->getPersistenceContext()->getOrCreateEntityProxy(
-				EntityModelManager::getInstance()->getEntityModelByClass($class), $id);
+				$this->entityModelManager->getEntityModelByClass($class), $id, $this);
 	}
 	
 	private function ensureEntityManagerOpen() {
@@ -333,7 +334,7 @@ class LazyEntityManager implements EntityManager {
 	public function contains($object): bool {
 		$this->ensureEntityManagerOpen();
 		
-		$this->getPersistenceContext()->containsManagedEntityObj($object);
+		return $this->getPersistenceContext()->containsManagedEntityObj($object);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\EntityManager::clear()

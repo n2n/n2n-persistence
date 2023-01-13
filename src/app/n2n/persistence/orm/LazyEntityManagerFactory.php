@@ -21,8 +21,9 @@
  */
 namespace n2n\persistence\orm;
 
-use n2n\core\container\PdoPool;
+
 use n2n\util\ex\IllegalStateException;
+use n2n\persistence\ext\PdoPool;
 
 class LazyEntityManagerFactory implements EntityManagerFactory {
 	private $persistenceUnitName;

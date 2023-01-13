@@ -28,6 +28,8 @@ use n2n\core\container\Transaction;
 use n2n\core\container\CommitFailedException;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\meta\Dialect;
+use n2n\core\config\PersistenceUnitConfig;
+use n2n\core\ext\N2nMonitor;
 
 class Pdo {
 	private ?\PDO $pdo = null;
@@ -37,13 +39,13 @@ class Pdo {
 	private array $listeners = array();
 
 	public function __construct(private PersistenceUnitConfig $persistenceUnitConfig,
-			private ?TransactionManager $transactionManager = null) {
-		$this->logger = new PdoLogger($this->getDataSourceName());
+			private ?TransactionManager $transactionManager = null, private ?int $slowQueryTime = null,
+			private ?N2nMonitor $n2nMonitor = null) {
+		$this->logger = new PdoLogger($this->getDataSourceName(), $this->n2nMonitor);
 
 		$dialectClass = ReflectionUtils::createReflectionClass($persistenceUnitConfig->getDialectClassName());
 		if (!$dialectClass->implementsInterface('n2n\\persistence\\meta\\Dialect')) {
-			throw new \InvalidArgumentException(
-					'Dialect class must implement n2n\\persistence\\meta\\Dialect: '
+			throw new \InvalidArgumentException('Dialect class must implement n2n\\persistence\\meta\\Dialect: '
 					. $dialectClass->getName());
 		}
 		$this->dialect = $dialectClass->newInstance();

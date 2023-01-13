@@ -28,14 +28,26 @@ use n2n\persistence\orm\InheritanceType;
 use n2n\persistence\orm\property\SetupProcess;
 use n2n\persistence\orm\OrmConfigurationException;
 use n2n\persistence\orm\property\BasicEntityProperty;
-use n2n\web\dispatch\model\ModelInitializationException;
 use n2n\persistence\orm\property\PropertyInitializationException;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\property\ClassSetup;
 use n2n\persistence\orm\OrmErrorException;
 use n2n\persistence\orm\property\IdDef;
 use n2n\persistence\orm\LifecycleUtils;
-use n2n\persistence\orm\annotation\AnnoMappedSuperclass;
+use n2n\persistence\orm\attribute\MappedSuperclass;
+use n2n\reflection\attribute\AttributeSet;
+use n2n\persistence\orm\attribute\DiscriminatorColumn;
+use n2n\persistence\orm\attribute\Inheritance;
+use n2n\persistence\orm\attribute\DiscriminatorValue;
+use n2n\persistence\orm\attribute\Table;
+use n2n\persistence\orm\attribute\EntityListeners;
+use n2n\persistence\orm\attribute\Id;
+use n2n\reflection\attribute\PropertyAttribute;
+use n2n\persistence\orm\property\EntityPropertyProvider;
+use n2n\reflection\attribute\ClassAttribute;
+use n2n\util\ex\err\ConfigurationError;
+use n2n\core\TypeNotFoundException;
+use ReflectionClass;
 
 class EntityModelFactory {
 	const DEFAULT_ID_PROPERTY_NAME = 'id';
@@ -45,11 +57,16 @@ class EntityModelFactory {
 	private $entityPropertyProviders;
 	private $defaultNamingStrategy;
 	private $onFinalizeQueue;
-	
-	private $annotationSet;
+	/**
+	 * @var AttributeSet
+	 */
+	private $attributeSet;
+	/**
+	 * @var EntityModel
+	 */
 	private $entityModel;
-	private $nampingStrategy;
-	private $currentsetupProcess;
+	private NamingStrategy $namingStrategy;
+	private $currentSetupProcess;
 	/**
 	 * @param string[] $entityPropertyProviderClassNames
 	 */
@@ -64,9 +81,9 @@ class EntityModelFactory {
 		} 
 		
 		$class = ReflectionUtils::createReflectionClass($defaultNamingStrategyClassName);
-		if (!$class->implementsInterface('n2n\persistence\orm\model\NamingStrategy')) {
+		if (!$class->implementsInterface(NamingStrategy::class)) {
 			throw new \InvalidArgumentException('Naming strategy class must implement interface'
-					. ' n2n\persistence\orm\model\NamingStrategy: ' . $defaultNamingStrategyClassName);
+					. NamingStrategy::class . ': ' . $defaultNamingStrategyClassName);
 		}
 		$this->defaultNamingStrategy = ReflectionUtils::createObject($class);
 	}
@@ -88,9 +105,9 @@ class EntityModelFactory {
 		$this->entityPropertyProviders = array();
 		foreach ($this->entityPropertyProviderClassNames as $entityPropertyProviderClassName) {
 			$providerClass = ReflectionUtils::createReflectionClass($entityPropertyProviderClassName);
-			if (!$providerClass->isSubclassOf('n2n\persistence\orm\property\EntityPropertyProvider')) {
+			if (!$providerClass->isSubclassOf(EntityPropertyProvider::class)) {
 				throw new OrmConfigurationException('EntityPropertyProvider must implement ' 
-						. 'interface n2n\persistence\orm\property\EntityPropertyProvider: ' 
+						. 'interface . ' . EntityPropertyProvider::class . ': '
 						. $providerClass->getName());
 			}	
 
@@ -100,39 +117,40 @@ class EntityModelFactory {
 		return $this->entityPropertyProviders;
 	}
 	/**
-	 * @param \ReflectionClass $entityClass
+	 * @param ReflectionClass $entityClass
 	 * @param EntityModel $superEntityModel
 	 * @return \n2n\persistence\orm\model\EntityModel
 	 */
-	public function create(\ReflectionClass $entityClass, EntityModel $superEntityModel = null) {
-		if ($this->currentsetupProcess !== null) {
+	public function create(ReflectionClass $entityClass, EntityModel $superEntityModel = null) {
+		if ($this->currentSetupProcess !== null) {
 			throw new IllegalStateException('SetupProcess not finished.');
 		}
 		
-		$this->annotationSet = ReflectionContext::getAnnotationSet($entityClass);
+		$this->attributeSet = ReflectionContext::getAttributeSet($entityClass);
 		
-		if (null !== $this->annotationSet->getClassAnnotation(AnnoMappedSuperclass::class)) {
+		if (null !== $this->attributeSet->getClassAttribute(MappedSuperclass::class)) {
 			throw new ModelInitializationException('Could not initialize MappedSuperclass as entity: '
 					. $entityClass->getName());
 		}
 		
 		$this->entityModel = $entityModel = new EntityModel($entityClass, $superEntityModel);
 		
-		$this->currentsetupProcess = new SetupProcess($this->entityModel, 
+		$this->currentSetupProcess = new SetupProcess($this->entityModel,
 				new EntityPropertyAnalyzer($this->getEntityPropertyProviders()),
 				$this->onFinalizeQueue);
-		$this->setupProcesses[$entityClass->getName()] = $this->currentsetupProcess;
+		$this->setupProcesses[$entityClass->getName()] = $this->currentSetupProcess;
 		
 		if ($superEntityModel !== null) {
 			$superEntityClassName = $superEntityModel->getClass()->getName();
 			IllegalStateException::assertTrue(isset($this->setupProcesses[$superEntityClassName]));
-			$this->currentsetupProcess->inherit($this->setupProcesses[$superEntityClassName]);
+			$this->currentSetupProcess->inherit($this->setupProcesses[$superEntityClassName]);
 		}
 		
-		$this->nampingStrategy = $this->defaultNamingStrategy;
-		if (null !== ($annoNamingStrategy = $this->annotationSet->getClassAnnotation(
-				'n2n\persistence\orm\annotation\AnnoNamingStrategy'))) {
-			$this->nampingStrategy = $annoNamingStrategy->getNamingStrategy();
+		$this->namingStrategy = $this->defaultNamingStrategy;
+		$namingStrategyAttrInstance = $this->attributeSet->getClassAttribute(
+				\n2n\persistence\orm\attribute\NamingStrategy::class)?->getInstance();
+		if (null !== $namingStrategyAttrInstance) {
+			$this->namingStrategy = $namingStrategyAttrInstance->getNamingStrategy();
 		}
 		
 		$this->analyzeInheritanceType();
@@ -152,12 +170,12 @@ class EntityModelFactory {
 	}
 	
 	public function cleanUp(EntityModelManager $entityModelManager) {
-		if ($this->currentsetupProcess === null) {
+		if ($this->currentSetupProcess === null) {
 			throw new IllegalStateException('No pending SetupProcess');
 		}
 				
-		$this->currentsetupProcess = null;
-		$this->annotationSet = null;
+		$this->currentSetupProcess = null;
+		$this->attributeSet = null;
 		$this->entityModel = null;
 		$this->propertiesAnalyzer = null;
 		
@@ -175,25 +193,24 @@ class EntityModelFactory {
 							.  $this->entityModel->getClass()->getName(),  
 					array($this->entityModel->getSupremeEntityModel()->getClass()));
 		}
-		
-		$annoInheritance = $this->annotationSet->getClassAnnotation(
-				'n2n\persistence\orm\annotation\AnnoInheritance');
-		
-		if (null === $annoInheritance) return;
+
+		$inheritanceAttr = $this->attributeSet->getClassAttribute(Inheritance::class);
+		if (null === $inheritanceAttr) return;
 		
 		if ($superEntityModel !== null) {
 			throw OrmErrorException::create('Inheritance strategy of ' . $this->entityModel->getClass()->getName()
-							. 'has to be specified in supreme class', array($annoInheritance));
+							. 'has to be specified in supreme class', array($inheritanceAttr));
 		}
 
-		$this->entityModel->setInheritanceType($annoInheritance->getStrategy());
+		$inheritanceAttrInstance = $inheritanceAttr->getInstance();
+		$this->entityModel->setInheritanceType($inheritanceAttrInstance->getStrategy());
 
-		if ($annoInheritance->getStrategy() == InheritanceType::SINGLE_TABLE) {
-			$annoDiscriminatorColumn = $this->annotationSet->getClassAnnotation('n2n\persistence\orm\annotation\AnnoDiscriminatorColumn');
-			if ($annoDiscriminatorColumn === null) {
+		if ($inheritanceAttrInstance->getStrategy() == InheritanceType::SINGLE_TABLE) {
+			$discriminatorColumnAttr = $this->attributeSet->getClassAttribute(DiscriminatorColumn::class);
+			if ($discriminatorColumnAttr === null) {
 				$discriminatorColumnName = self::DEFAULT_DISCRIMINATOR_COLUMN;
 			} else {
-				$discriminatorColumnName = $annoDiscriminatorColumn->getColumnName(); 
+				$discriminatorColumnName = $discriminatorColumnAttr->getInstance()->getColumnName();
 			}
 			$this->entityModel->setDiscriminatorColumnName($discriminatorColumnName);
 		}
@@ -202,14 +219,13 @@ class EntityModelFactory {
 	 * 
 	 */
 	private function analyzeDiscriminatorColumn() {
-		$annoDiscriminatorValue = $this->annotationSet->getClassAnnotation(
-				'n2n\persistence\orm\annotation\AnnoDiscriminatorValue');
+		$discriminatorValueAttr = $this->attributeSet->getClassAttribute(DiscriminatorValue::class);
 		
-		if ($annoDiscriminatorValue === null) {
+		if ($discriminatorValueAttr === null) {
 			if ($this->entityModel->getInheritanceType() == InheritanceType::SINGLE_TABLE
 					&& !$this->entityModel->getClass()->isAbstract()) {
 				throw OrmErrorException::create('No discriminator value defined for entity: '
-						. $this->class->getName(), array($annoDiscriminatorValue));
+						. $this->entityModel->getClass()->getName(), array($discriminatorValueAttr));
 			}
 			
 			return;
@@ -217,15 +233,15 @@ class EntityModelFactory {
 		
 		if ($this->entityModel->getInheritanceType() != InheritanceType::SINGLE_TABLE) {
 			throw OrmErrorException::create('Discriminator value can only be defined for entities with inheritance type SINGLE_TABLE'
-					. $this->entityModel->getClass()->getName(), array($annoDiscriminatorValue));
+					. $this->entityModel->getClass()->getName(), array($discriminatorValueAttr));
 		}
 
 		if ($this->entityModel->getClass()->isAbstract()) {
 			throw OrmErrorException::create('Discriminator value must not be defined for abstract entity: '
-					. $this->entityModel->getClass()->getName(), array($annoDiscriminatorValue));
+					. $this->entityModel->getClass()->getName(), array($discriminatorValueAttr));
 		}
 			
-		$this->entityModel->setDiscriminatorValue($annoDiscriminatorValue->getValue());
+		$this->entityModel->setDiscriminatorValue($discriminatorValueAttr->getInstance()->getValue());
 	}
 	/**
 	 * 
@@ -235,10 +251,10 @@ class EntityModelFactory {
 				|| $this->entityModel->getClass()->isAbstract()) {
 			return;
 		}
-		
-		if (null !== ($annoDiscriminatorValue = $this->annotationSet->getClassAnnotation(
-				'n2n\persistence\orm\annotation\AnnoDiscriminatorValue'))) {
-			$this->entityModel->setDiscriminatorValue($annoDiscriminatorValue->getValue());
+
+		$discriminatorValueAttr = $this->attributeSet->getClassAttribute(DiscriminatorValue::class);
+		if (null !== $discriminatorValueAttr) {
+			$this->entityModel->setDiscriminatorValue($discriminatorValueAttr->getInstance()->getValue());
 			return;
 		}
 		
@@ -256,12 +272,11 @@ class EntityModelFactory {
 		} 
 		
 		$tableName = null;
-		if (null !== ($annoTable = $this->annotationSet->getClassAnnotation(
-				'n2n\persistence\orm\annotation\AnnoTable'))) {
-			$tableName = $annoTable->getName();
+		if (null !== ($tableAttr = $this->attributeSet->getClassAttribute(Table::class))) {
+			$tableName = $tableAttr->getInstance()->getName();
 		} 
 		
-		$this->entityModel->setTableName($this->nampingStrategy->buildTableName(
+		$this->entityModel->setTableName($this->namingStrategy->buildTableName(
 				$this->entityModel->getClass(), $tableName));
 	}
 	/**
@@ -278,19 +293,29 @@ class EntityModelFactory {
 			$this->entityModel->addLifecycleMethod($eventType, $method);
 		}
 		
-		$annoEntityListener = $this->annotationSet->getClassAnnotation(
-				'n2n\persistence\orm\annotation\AnnoEntityListeners');
-		if ($annoEntityListener !== null) {
-			$this->entityModel->setEntityListenerClasses($annoEntityListener->getClasses());
+		$entityListenerAttribute = $this->attributeSet->getClassAttribute(EntityListeners::class);
+		if ($entityListenerAttribute !== null) {
+			$this->entityModel->setEntityListenerClasses($this->extractEntityListenerClasses($entityListenerAttribute));
+		}
+	}
+
+	private function extractEntityListenerClasses(ClassAttribute $classAttribute) {
+		try {
+			return array_map(
+					fn($className) => new ReflectionClass($className),
+					$classAttribute->getInstance()->getClasses());
+		} catch (\ReflectionException $e) {
+			throw new ConfigurationError('Could not load EntityListeners for '
+					. $classAttribute->getClass()->getName(), $classAttribute->getFile(), $classAttribute->getLine());
 		}
 	}
 	/**
 	 * 
 	 */
 	private function analyzeProperties() {
-		$classSetup = new ClassSetup($this->currentsetupProcess, $this->entityModel->getClass(), 
-				$this->nampingStrategy);
-		$this->currentsetupProcess->getEntityPropertyAnalyzer()->analyzeClass($classSetup);
+		$classSetup = new ClassSetup($this->currentSetupProcess, $this->entityModel->getClass(),
+				$this->namingStrategy);
+		$this->currentSetupProcess->getEntityPropertyAnalyzer()->analyzeClass($classSetup);
 			
 		foreach ($classSetup->getEntityProperties() as $property) {
 			$this->entityModel->addEntityProperty($property);
@@ -300,35 +325,38 @@ class EntityModelFactory {
 	 * 
 	 */
 	private function analyzeId() {
-		$annoIds = $this->annotationSet->getPropertyAnnotationsByName('n2n\persistence\orm\annotation\AnnoId');
-		if (count($annoIds) > 1) {
+		$idAttrs = $this->attributeSet->getPropertyAttributesByName(Id::class);
+		if (count($idAttrs) > 1) {
 			throw OrmErrorException::create('Multiple ids defined in Entity: ' 
-					. $this->entityModel->getClass()->getName(), $annoIds);
+					. $this->entityModel->getClass()->getName(), $idAttrs);
 		} 
 		
 		$propertyName = self::DEFAULT_ID_PROPERTY_NAME;
 		$generatedValue = $this->entityModel->getInheritanceType() != InheritanceType::TABLE_PER_CLASS;
 		$sequenceName = null;
-		
-		$annoId = ArrayUtils::current($annoIds);
-		if ($annoId === null) {
+		/**
+		 * @var PropertyAttribute $idAttr
+		 */
+		$idAttr = ArrayUtils::current($idAttrs);
+
+		if ($idAttr === null) {
 			if ($this->entityModel->hasSuperEntityModel()) return;
 		} else {
 			if ($this->entityModel->hasSuperEntityModel()) {
 				throw OrmErrorException::create(
-						'Id for ' . $this->class->getName() . ' already defined in super class '
+						'Id for ' . $this->entityModel->getClass()->getName() . ' already defined in super class '
 								. $this->entityModel->getSuperEntityModel()->getClass()->getName(),
-						array($annoId));
+						array($idAttr));
 			}
-			
-			$propertyName = $annoId->getAnnotatedProperty()->getName();
-			$generatedValue = $annoId->isGenerated();
+
+			$propertyName = $idAttr->getProperty()->getName();
+			$generatedValue = $idAttr->getInstance()->isGenerated();
 			if ($generatedValue && $this->entityModel->getInheritanceType() == InheritanceType::TABLE_PER_CLASS) {
 				throw OrmErrorException::create(
 						'Ids with generated values are not compatible with inheritance type TABLE_PER_CLASS in ' 
-								. $this->entityModel->getClass()->getName() . '.', $annoIds);
+								. $this->entityModel->getClass()->getName() . '.', $idAttrs);
 			}
-			$sequenceName = $annoId->getSequenceName();
+			$sequenceName = $idAttr->getInstance()->getSequenceName();
 		}
 
 		try {
@@ -337,9 +365,10 @@ class EntityModelFactory {
 				$this->entityModel->setIdDef(new IdDef($idProperty, $generatedValue, $sequenceName));
 				return;
 			}
-			throw $this->currentsetupProcess->createPropertyException('Invalid property type for id.', null, $annoIds);
+
+			throw $this->currentSetupProcess->createPropertyException('Invalid property type for id.', null, $idAttr);
 		} catch (UnknownEntityPropertyException $e) {
-			throw $this->currentsetupProcess->createPropertyException('No id property defined.', $e, $annoIds);
+			throw $this->currentSetupProcess->createPropertyException('No id property defined.', $e, []);
 		}
 	}
 }

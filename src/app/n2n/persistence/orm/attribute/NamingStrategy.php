@@ -5,11 +5,11 @@ use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 class NamingStrategy {
-	public function __construct(private \n2n\persistence\orm\model\NamingStrategy $namingStrategy) {
+	public function __construct(private string $namingStrategy) {
 
 	}
 
 	public function getNamingStrategy() {
-		return $this->namingStrategy;
+		return new $this->namingStrategy();
 	}
 }

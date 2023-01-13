@@ -5,9 +5,9 @@ namespace n2n\persistence\orm\attribute;
 abstract class MappableOrmRelationAttribute extends OrmRelationAttribute {
 	private $mappedBy = null;
 
-	public function __construct(\ReflectionClass $targetEntityClass, string $mappedBy = null,
-			int $cascadeType = null, string $fetchType = null) {
-		parent::__construct($targetEntityClass, $cascadeType, $fetchType);
+	public function __construct(string $targetEntity = null, string $mappedBy = null,
+			int $cascade = null, string $fetchType = null) {
+		parent::__construct($targetEntity, $cascade, $fetchType);
 
 		if ($mappedBy !== null) {
 			if (is_numeric($mappedBy)) {

@@ -511,7 +511,7 @@ class ValueHashColFactory {
 		
 		foreach ($this->entityPropertyCollection->getEntityProperties() as $entityProperty) {
 			$propertyString = $entityProperty->toPropertyString();
-			
+
 			if (array_key_exists($propertyString, $this->valueHashes)) {
 				$valueHashCol->putValueHash($propertyString, $this->valueHashes[$propertyString]);
 				continue;
@@ -522,7 +522,7 @@ class ValueHashColFactory {
 						$values[$propertyString] = $this->values[$propertyString], $this->em));
 				continue;
 			}
-			
+
 			$valueHashCol->putValueHash($propertyString, $entityProperty->createValueHash(
 					$values[$propertyString] = $entityProperty->readValue($object), $this->em));
 		}
