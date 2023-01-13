@@ -5,6 +5,7 @@ use n2n\core\container\impl\AppN2nContext;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\model\EntityModelFactory;
 use n2n\util\magic\impl\SimpleMagicContext;
+use n2n\persistence\orm\EntityManagerFactory;
 
 class PersistenceAddOnContext extends SimpleMagicContext implements AddOnContext {
 
@@ -12,7 +13,7 @@ class PersistenceAddOnContext extends SimpleMagicContext implements AddOnContext
 		parent::__construct([
 			PdoPool::class => $pdoPool,
 			EntityManager::class => fn () => $pdoPool->getEntityManagerFactory()->getExtended(),
-			EntityModelFactory::class => fn () => $pdoPool->getEntityManagerFactory()
+			EntityManagerFactory::class => fn () => $pdoPool->getEntityManagerFactory()
 		]);
 	}
 
