@@ -41,7 +41,7 @@ class Pdo {
 	public function __construct(private PersistenceUnitConfig $persistenceUnitConfig,
 			private ?TransactionManager $transactionManager = null, private ?int $slowQueryTime = null,
 			private ?N2nMonitor $n2nMonitor = null) {
-		$this->logger = new PdoLogger($this->getDataSourceName(), $this->n2nMonitor);
+		$this->logger = new PdoLogger($this->getDataSourceName(), $slowQueryTime, $this->n2nMonitor);
 
 		$dialectClass = ReflectionUtils::createReflectionClass($persistenceUnitConfig->getDialectClassName());
 		if (!$dialectClass->implementsInterface('n2n\\persistence\\meta\\Dialect')) {
