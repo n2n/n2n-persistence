@@ -28,7 +28,7 @@ class PdoLogger {
 	private array $log = [];
 	private bool $capturing = false;
 
-	public function __construct(string $dataSourceName, private readonly ?int $slowQueryTime = null,
+	public function __construct(string $dataSourceName, private readonly ?float $slowQueryTime = null,
 			private readonly ?N2nMonitor $n2nMonitor = null) {
 		$this->dsName = $dataSourceName;
 	}

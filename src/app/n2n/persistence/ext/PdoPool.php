@@ -50,7 +50,7 @@ class PdoPool {
 	private $dbhPoolListeners = array();
 
 	function __construct(private DbConfig $dbConfig, private OrmConfig $ormConfig, private MagicContext $magicContext,
-			private TransactionManager $transactionManager, private ?int $slowQueryTime, private ?N2nMonitor $n2nMonitor) {
+			private TransactionManager $transactionManager, private ?float $slowQueryTime, private ?N2nMonitor $n2nMonitor) {
 		foreach ($dbConfig->getPersistenceUnitConfigs() as $persistenceUnitConfig) {
 			$this->persistenceUnitConfigs[$persistenceUnitConfig->getName()] = $persistenceUnitConfig;
 		}

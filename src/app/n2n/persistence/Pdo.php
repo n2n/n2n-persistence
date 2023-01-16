@@ -39,7 +39,7 @@ class Pdo {
 	private array $listeners = array();
 
 	public function __construct(private PersistenceUnitConfig $persistenceUnitConfig,
-			private ?TransactionManager $transactionManager = null, private ?int $slowQueryTime = null,
+			private ?TransactionManager $transactionManager = null, private ?float $slowQueryTime = null,
 			private ?N2nMonitor $n2nMonitor = null) {
 		$this->logger = new PdoLogger($this->getDataSourceName(), $slowQueryTime, $this->n2nMonitor);
 
