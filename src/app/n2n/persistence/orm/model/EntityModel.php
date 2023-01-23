@@ -180,8 +180,26 @@ class EntityModel implements EntityPropertyCollection {
 	protected function addSubEntityModel(EntityModel $subEntityModel) {
 		$this->subEntityModels[$subEntityModel->getClass()->getName()] = $subEntityModel;
 	}
+
+	private ?\Closure $subEntityModelsAccessCallback = null;
+
+	function setSubEntityModelsAccessCallback(\Closure $closure) {
+		$this->subEntityModelsAccessCallback = $closure;
+	}
+
+	function ensureSubEntityModelsInit(): void {
+		if ($this->subEntityModelsAccessCallback === null) {
+			return;
+		}
+
+		$callback = $this->subEntityModelsAccessCallback;
+		$this->subEntityModelsAccessCallback = null;
+		$callback();
+	}
 	
 	public function hasSubEntityModels() {
+		$this->ensureSubEntityModelsInit();
+
 		return (bool) sizeof($this->subEntityModels);
 	}
 	
@@ -189,11 +207,13 @@ class EntityModel implements EntityPropertyCollection {
 	 * @return EntityModel[]
 	 */
 	public function getSubEntityModels() {
+		$this->ensureSubEntityModelsInit();
+
 		return $this->subEntityModels;
 	}
 	
 	public function getAllSubEntityModels() {
-		$subEntityModels = $this->subEntityModels;
+		$subEntityModels = $this->getSubEntityModels();
 		foreach ($subEntityModels as $subEntityModel) {
 			$subEntityModels = array_merge($subEntityModels, $subEntityModel->getAllSubEntityModels()); 
 		}
@@ -261,7 +281,7 @@ class EntityModel implements EntityPropertyCollection {
 	
 	public function getAllEntityProperties() {
 		$properties = $this->getEntityProperties();
-		foreach ($this->subEntityModels as $subEntityModel) {
+		foreach ($this->getSubEntityModels() as $subEntityModel) {
 			$properties = array_merge($properties, $subEntityModel->getAllEntityProperties());
 		}
 		return $properties;

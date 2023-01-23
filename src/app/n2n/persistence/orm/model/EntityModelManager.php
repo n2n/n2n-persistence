@@ -112,7 +112,10 @@ class EntityModelManager {
 
 				$this->entityModelFactory->cleanUp($this);
 
-				$this->initSubEntityModels($entityModel);
+				$entityModel->setSubEntityModelsAccessCallback(function () use ($entityModel) {
+					$this->initSubEntityModels($entityModel);
+				});
+
 			}
 		}
 
