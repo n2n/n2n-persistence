@@ -105,7 +105,7 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getInheritanceType() {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		if ($this->superEntityModel !== null) {
 			return $this->superEntityModel->getInheritanceType();
@@ -119,7 +119,7 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getDiscriminatorColumnName() {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		if ($this->superEntityModel !== null) {
 			return $this->superEntityModel->getDiscriminatorColumnName();
@@ -132,7 +132,7 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getDiscriminatorValue() {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		return $this->discriminatorValue;
 	}
@@ -149,7 +149,7 @@ class EntityModel implements EntityPropertyCollection {
 	 * @return IdDef
 	 */
 	public function getIdDef() {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		if ($this->superEntityModel !== null) {
 			return $this->superEntityModel->getIdDef();
@@ -168,7 +168,7 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getTableName() {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		return $this->tableName;
 	}
@@ -198,7 +198,7 @@ class EntityModel implements EntityPropertyCollection {
 		$this->entityModelAccessCallback = $closure;
 	}
 
-	private function ensureEntityModelInit(): void {
+	function ensureInit(): void {
 		if ($this->entityModelAccessCallback === null) {
 			return;
 		}
@@ -263,7 +263,7 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function containsEntityPropertyName($name) {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		if  (isset($this->properties[$name])) return true;
 	
@@ -274,7 +274,7 @@ class EntityModel implements EntityPropertyCollection {
 	 * @return EntityProperty[] key is NOT the property name
 	 */
 	public function getEntityProperties() {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		if ($this->superEntityModel === null) {
 			return array_values($this->properties);
@@ -287,7 +287,7 @@ class EntityModel implements EntityPropertyCollection {
 	 * @see \n2n\persistence\orm\model\EntityPropertyCollection::getEntityPropertyByName()
 	 */
 	public function getEntityPropertyByName($name) {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		if (!$this->containsEntityPropertyName($name)) {
 			throw new UnknownEntityPropertyException('Unkown entity property: ' . $this->class->getName() 
@@ -300,7 +300,7 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function containsLevelEntityPropertyName(string $name): bool {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		return isset($this->properties[$name]);
 	}
@@ -311,7 +311,7 @@ class EntityModel implements EntityPropertyCollection {
 	 * @throws UnknownEntityPropertyException
 	 */
 	public function getLevelEntityPropertyByName(string $name): EntityProperty {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		if (isset($this->properties[$name])) return $this->properties[$name];
 		
@@ -324,7 +324,7 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getLevelEntityProperties(): array {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		return $this->properties;
 	}
@@ -338,7 +338,7 @@ class EntityModel implements EntityPropertyCollection {
 	}	
 	
 	public function getLifecycleMethodsByEventType($eventType) {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		$methods = array();
 		if (isset($this->lifecylceMethods[$eventType])) {
@@ -362,7 +362,7 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getEntityListenerClasses() {
-		$this->ensureEntityModelInit();
+		$this->ensureInit();
 
 		return $this->entityListenerClasses;
 	}

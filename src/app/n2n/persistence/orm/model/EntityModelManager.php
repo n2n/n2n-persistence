@@ -69,11 +69,7 @@ class EntityModelManager {
 		return $this->entityClasses;
 	}
 
-	/**
-	 * @param string|\ReflectionClass $classP
-	 * @return mixed
-	 */
-	public function getEntityModelByClass(string|\ReflectionClass $classP) {
+	public function getEntityModelByClass(string|\ReflectionClass $classP): EntityModel {
 		$className = null;
 		$class = null;
 		if (is_string($classP)) {
