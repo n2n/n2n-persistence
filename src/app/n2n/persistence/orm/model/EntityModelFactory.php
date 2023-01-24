@@ -52,34 +52,24 @@ use ReflectionClass;
 class EntityModelFactory {
 	const DEFAULT_ID_PROPERTY_NAME = 'id';
 	const DEFAULT_DISCRIMINATOR_COLUMN = 'discr';
-	
-	private $entityPropertyProviderClassNames;
-	private $entityPropertyProviders;
-	private $defaultNamingStrategy;
-	private $onFinalizeQueue;
-	/**
-	 * @var AttributeSet
-	 */
-	private $attributeSet;
-	/**
-	 * @var EntityModel
-	 */
-	private $entityModel;
-	private NamingStrategy $namingStrategy;
-	private $currentSetupProcess;
+
+	private ?array $entityPropertyProviders = null;
+	private NamingStrategy $defaultNamingStrategy;
+	private OnFinalizeQueue $onFinalizeQueue;
+	private array $entityModelInitializers = [];
+
+
 	/**
 	 * @param string[] $entityPropertyProviderClassNames
 	 */
-	public function __construct(array $entityPropertyProviderClassNames, 
+	public function __construct(private readonly array $entityPropertyProviderClassNames,
 			$defaultNamingStrategyClassName = null) {
-		$this->entityPropertyProviderClassNames = $entityPropertyProviderClassNames;
-		$this->onFinalizeQueue = new OnFinalizeQueue();
-	
+
 		if ($defaultNamingStrategyClassName === null) {
 			$this->defaultNamingStrategy = new HyphenatedNamingStrategy();
 			return;
-		} 
-		
+		}
+
 		$class = ReflectionUtils::createReflectionClass($defaultNamingStrategyClassName);
 		if (!$class->implementsInterface(NamingStrategy::class)) {
 			throw new \InvalidArgumentException('Naming strategy class must implement interface'
@@ -87,72 +77,123 @@ class EntityModelFactory {
 		}
 		$this->defaultNamingStrategy = ReflectionUtils::createObject($class);
 	}
+
+	function setOnFinalizeQueue(OnFinalizeQueue $onFinalizeQueue): void {
+		$this->onFinalizeQueue = $onFinalizeQueue;
+	}
+
 	/**
 	 * @return array
 	 */
-	public function getEntityPropertyProviderClassNames() {
+	public function getEntityPropertyProviderClassNames(): array {
 		return $this->entityPropertyProviderClassNames;
 	}
+
 	/**
-	 * @throws OrmConfigurationException
 	 * @return \n2n\persistence\orm\property\EntityPropertyProvider[]
+	 * @throws OrmConfigurationException
 	 */
 	private function getEntityPropertyProviders() {
 		if ($this->entityPropertyProviders !== null) {
 			return $this->entityPropertyProviders;
 		}
-		
+
 		$this->entityPropertyProviders = array();
 		foreach ($this->entityPropertyProviderClassNames as $entityPropertyProviderClassName) {
 			$providerClass = ReflectionUtils::createReflectionClass($entityPropertyProviderClassName);
 			if (!$providerClass->isSubclassOf(EntityPropertyProvider::class)) {
-				throw new OrmConfigurationException('EntityPropertyProvider must implement ' 
+				throw new OrmConfigurationException('EntityPropertyProvider must implement '
 						. 'interface . ' . EntityPropertyProvider::class . ': '
 						. $providerClass->getName());
-			}	
+			}
 
 			$this->entityPropertyProviders[] = $providerClass->newInstance();
 		}
-		
+
 		return $this->entityPropertyProviders;
 	}
+
 	/**
 	 * @param ReflectionClass $entityClass
 	 * @param EntityModel $superEntityModel
-	 * @return \n2n\persistence\orm\model\EntityModel
+	 * @return EntityModel
 	 */
 	public function create(ReflectionClass $entityClass, EntityModel $superEntityModel = null) {
-		if ($this->currentSetupProcess !== null) {
-			throw new IllegalStateException('SetupProcess not finished.');
-		}
-		
-		$this->attributeSet = ReflectionContext::getAttributeSet($entityClass);
-		
-		if (null !== $this->attributeSet->getClassAttribute(MappedSuperclass::class)) {
+		$attributeSet = ReflectionContext::getAttributeSet($entityClass);
+
+		if (null !== $attributeSet->getClassAttribute(MappedSuperclass::class)) {
 			throw new ModelInitializationException('Could not initialize MappedSuperclass as entity: '
 					. $entityClass->getName());
 		}
-		
-		$this->entityModel = $entityModel = new EntityModel($entityClass, $superEntityModel);
-		
-		$this->currentSetupProcess = new SetupProcess($this->entityModel,
-				new EntityPropertyAnalyzer($this->getEntityPropertyProviders()),
-				$this->onFinalizeQueue);
-		$this->setupProcesses[$entityClass->getName()] = $this->currentSetupProcess;
-		
+
+		$entityModel = new EntityModel($entityClass, $superEntityModel);
+
+		$superEntityModelInitializer = null;
 		if ($superEntityModel !== null) {
 			$superEntityClassName = $superEntityModel->getClass()->getName();
-			IllegalStateException::assertTrue(isset($this->setupProcesses[$superEntityClassName]));
-			$this->currentSetupProcess->inherit($this->setupProcesses[$superEntityClassName]);
+			IllegalStateException::assertTrue(isset($this->entityModelInitializers[$superEntityClassName]));
+			$superEntityModelInitializer = $this->entityModelInitializers[$superEntityClassName];
 		}
-		
+
+		$this->entityModelInitializers[$entityClass->getName()] = $entityModelInitializer
+				= new EntityModelInitializer($entityModel, $this->defaultNamingStrategy, $attributeSet,
+						$this->getEntityPropertyProviders(), $this->onFinalizeQueue, $superEntityModelInitializer);
+		$entityModel->setEntityModelAccessCallback(function () use ($entityModelInitializer) {
+			$entityModelInitializer->execIfNecessary();
+		});
+
+		return $entityModel;
+	}
+
+	public function cleanUp(): void {
+		$this->onFinalizeQueue->finalize();
+	}
+
+}
+
+class EntityModelInitializer {
+	private ?SetupProcess $setupProcess = null;
+	private NamingStrategy $namingStrategy;
+
+	function __construct(private EntityModel $entityModel, private NamingStrategy $defaultNamingStrategy,
+			private AttributeSet $attributeSet, private array $entityPropertyProviders,
+			private OnFinalizeQueue $onFinalizeQueue, private ?EntityModelInitializer $superEntityModelInitializer = null) {
+
+	}
+
+	function getSetupProcess(): SetupProcess {
+		$this->execIfNecessary();
+		return $this->setupProcess;
+	}
+
+	private function pre(): void {
+		IllegalStateException::assertTrue($this->setupProcess === null, 'Already initialized.');
+
+		$this->setupProcess = new SetupProcess($this->entityModel,
+				new EntityPropertyAnalyzer($this->entityPropertyProviders),
+				$this->onFinalizeQueue);
+
+		if ($this->superEntityModelInitializer !== null) {
+			$this->setupProcess->inherit($this->superEntityModelInitializer->getSetupProcess());
+		}
+
 		$this->namingStrategy = $this->defaultNamingStrategy;
 		$namingStrategyAttrInstance = $this->attributeSet->getClassAttribute(
 				\n2n\persistence\orm\attribute\NamingStrategy::class)?->getInstance();
 		if (null !== $namingStrategyAttrInstance) {
 			$this->namingStrategy = $namingStrategyAttrInstance->getNamingStrategy();
 		}
-		
+	}
+
+	function execIfNecessary(): void {
+		if ($this->setupProcess !== null) {
+			return;
+		}
+
+		$this->onFinalizeQueue->push($this->entityModel);
+
+		$this->pre();
+
 		$this->analyzeInheritanceType();
 		$this->analyzeDiscriminatorColumn();
 		$this->analyzeDiscriminatorValue();
@@ -165,27 +206,14 @@ class EntityModelFactory {
 			throw new ModelInitializationException('Could not initialize entity: '
 					. $this->entityModel->getClass()->getName(), 0, $e);
 		}
-		
-		return $entityModel;
-	}
-	
-	public function cleanUp(EntityModelManager $entityModelManager) {
-		if ($this->currentSetupProcess === null) {
-			throw new IllegalStateException('No pending SetupProcess');
-		}
-				
-		$this->currentSetupProcess = null;
-		$this->attributeSet = null;
-		$this->entityModel = null;
-		$this->propertiesAnalyzer = null;
-		
-		$this->onFinalizeQueue->finalize($entityModelManager);
+
+		$this->onFinalizeQueue->pop($this->entityModel);
 	}
 	
 	/**
 	 * 
 	 */
-	private function analyzeInheritanceType() {
+	private function analyzeInheritanceType(): void {
 		$superEntityModel = $this->entityModel->getSuperEntityModel();
 		
 		if (null !== $superEntityModel && null == $superEntityModel->getInheritanceType()) {
@@ -208,7 +236,7 @@ class EntityModelFactory {
 		if ($inheritanceAttrInstance->getStrategy() == InheritanceType::SINGLE_TABLE) {
 			$discriminatorColumnAttr = $this->attributeSet->getClassAttribute(DiscriminatorColumn::class);
 			if ($discriminatorColumnAttr === null) {
-				$discriminatorColumnName = self::DEFAULT_DISCRIMINATOR_COLUMN;
+				$discriminatorColumnName = EntityModelFactory::DEFAULT_DISCRIMINATOR_COLUMN;
 			} else {
 				$discriminatorColumnName = $discriminatorColumnAttr->getInstance()->getColumnName();
 			}
@@ -313,9 +341,9 @@ class EntityModelFactory {
 	 * 
 	 */
 	private function analyzeProperties() {
-		$classSetup = new ClassSetup($this->currentSetupProcess, $this->entityModel->getClass(),
+		$classSetup = new ClassSetup($this->setupProcess, $this->entityModel->getClass(),
 				$this->namingStrategy);
-		$this->currentSetupProcess->getEntityPropertyAnalyzer()->analyzeClass($classSetup);
+		$this->setupProcess->getEntityPropertyAnalyzer()->analyzeClass($classSetup);
 			
 		foreach ($classSetup->getEntityProperties() as $property) {
 			$this->entityModel->addEntityProperty($property);
@@ -331,7 +359,7 @@ class EntityModelFactory {
 					. $this->entityModel->getClass()->getName(), $idAttrs);
 		} 
 		
-		$propertyName = self::DEFAULT_ID_PROPERTY_NAME;
+		$propertyName = EntityModelFactory::DEFAULT_ID_PROPERTY_NAME;
 		$generatedValue = $this->entityModel->getInheritanceType() != InheritanceType::TABLE_PER_CLASS;
 		$sequenceName = null;
 		/**
@@ -366,31 +394,47 @@ class EntityModelFactory {
 				return;
 			}
 
-			throw $this->currentSetupProcess->createPropertyException('Invalid property type for id.', null, $idAttr);
+			throw $this->setupProcess->createPropertyException('Invalid property type for id.', null, $idAttr);
 		} catch (UnknownEntityPropertyException $e) {
-			throw $this->currentSetupProcess->createPropertyException('No id property defined.', $e, []);
+			throw $this->setupProcess->createPropertyException('No id property defined.', $e, []);
 		}
 	}
 }
 
 class OnFinalizeQueue {
-	private $onFinalizeClosures = array();
-	private $entityModelManager = null;
+	private array $onFinalizeClosures = array();
+	private array $stackedClassNames = [];
+
+	function __construct(private EntityModelManager $entityModelManager) {
+
+	}
 	
-	public function onFinalize(\Closure $closure, $prepend = false) {
+	public function onFinalize(\Closure $closure, $prepend = false): void {
 		if ($prepend) {
 			array_unshift($this->onFinalizeClosures, $closure);
 		} else {
 			$this->onFinalizeClosures[] = $closure;
 		}
 	}
-	
-	public function finalize(EntityModelManager $entityModelManager) {
-		if ($this->entityModelManager !== null) return;
-		$this->entityModelManager = $entityModelManager;
-		while (null !== ($onFinalizeClosure = array_shift($this->onFinalizeClosures))) {
-			$onFinalizeClosure($entityModelManager);
+
+	function push(EntityModel $entityModel): void {
+		$this->stackedClassNames[] = $entityModel->getClass()->getName();
+	}
+
+	function pop(EntityModel $entityModel): void {
+		$className = array_pop($this->stackedClassNames);
+		IllegalStateException::assertTrue($className === $entityModel->getClass()->getName());
+
+		if (empty($this->stackedClassNames)) {
+			$this->finalize();
 		}
-		$this->entityModelManager = null;
+	}
+	
+	public function finalize(): void {
+		$this->stackedClassNames = [];
+
+		while (null !== ($onFinalizeClosure = array_shift($this->onFinalizeClosures))) {
+			$onFinalizeClosure($this->entityModelManager);
+		}
 	}
 } 

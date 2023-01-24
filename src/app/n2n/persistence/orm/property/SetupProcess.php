@@ -60,7 +60,7 @@ class SetupProcess {
 		
 		throw new IllegalStateException('EntityProperty '
 				. get_class($this->entityModel->getIdDef()->getEntityProperty())
-				. ' has\'t registered its collumn and is therefore wrong implemented.');
+				. ' has\'t registered its column and is therefore wrong implemented.');
 	}
 	
 	/**
@@ -95,12 +95,12 @@ class SetupProcess {
 						. $this->columnDefs[$columnName]['propertyString'] . '\' and \'' . $propertyString . '\'', 
 				null, $relatedComponents);
 	}
-	/**
-	 * @return NamingStrategy
-	 */
-	public function getDefaultNamingStrategy() {
-		return $this->defaultNamingStrategy;
-	}
+//	/**
+//	 * @return NamingStrategy
+//	 */
+//	public function getDefaultNamingStrategy() {
+//		return $this->defaultNamingStrategy;
+//	}
 	/**
 	 * @param string $message
 	 * @param \Exception $causingE

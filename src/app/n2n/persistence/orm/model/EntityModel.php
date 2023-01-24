@@ -105,6 +105,8 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getInheritanceType() {
+		$this->ensureEntityModelInit();
+
 		if ($this->superEntityModel !== null) {
 			return $this->superEntityModel->getInheritanceType();
 		}
@@ -117,6 +119,8 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getDiscriminatorColumnName() {
+		$this->ensureEntityModelInit();
+
 		if ($this->superEntityModel !== null) {
 			return $this->superEntityModel->getDiscriminatorColumnName();
 		}
@@ -128,6 +132,8 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getDiscriminatorValue() {
+		$this->ensureEntityModelInit();
+
 		return $this->discriminatorValue;
 	}
 	
@@ -143,6 +149,8 @@ class EntityModel implements EntityPropertyCollection {
 	 * @return IdDef
 	 */
 	public function getIdDef() {
+		$this->ensureEntityModelInit();
+
 		if ($this->superEntityModel !== null) {
 			return $this->superEntityModel->getIdDef();
 		}
@@ -160,6 +168,8 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getTableName() {
+		$this->ensureEntityModelInit();
+
 		return $this->tableName;
 	}
 	
@@ -178,12 +188,36 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	protected function addSubEntityModel(EntityModel $subEntityModel) {
+		IllegalStateException::assertTrue($this->subEntityModelsPresent);
 		$this->subEntityModels[$subEntityModel->getClass()->getName()] = $subEntityModel;
 	}
 
+	private ?\Closure $entityModelAccessCallback = null;
+
+	function setEntityModelAccessCallback(\Closure $closure) {
+		$this->entityModelAccessCallback = $closure;
+	}
+
+	private function ensureEntityModelInit(): void {
+		if ($this->entityModelAccessCallback === null) {
+			return;
+		}
+
+		$closure = $this->entityModelAccessCallback;
+		$this->entityModelAccessCallback = null;
+		try {
+			$closure();
+		} catch (\Throwable $e) {
+			$this->entityModelAccessCallback = $closure;
+			throw $e;
+		}
+	}
+
+	private bool $subEntityModelsPresent = false;
 	private ?\Closure $subEntityModelsAccessCallback = null;
 
-	function setSubEntityModelsAccessCallback(\Closure $closure) {
+	function setSubEntityModelsAccessCallback(bool $subEntityModelsPresent, \Closure $closure) {
+		$this->subEntityModelsPresent = $subEntityModelsPresent;
 		$this->subEntityModelsAccessCallback = $closure;
 	}
 
@@ -194,13 +228,17 @@ class EntityModel implements EntityPropertyCollection {
 
 		$callback = $this->subEntityModelsAccessCallback;
 		$this->subEntityModelsAccessCallback = null;
-		$callback();
+
+		try {
+			$callback();
+		} catch (\Throwable $e) {
+			$this->subEntityModelsAccessCallback = $callback;
+			throw $e;
+		}
 	}
 	
 	public function hasSubEntityModels() {
-		$this->ensureSubEntityModelsInit();
-
-		return (bool) sizeof($this->subEntityModels);
+		return $this->subEntityModelsPresent;
 	}
 	
 	/**
@@ -225,6 +263,8 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function containsEntityPropertyName($name) {
+		$this->ensureEntityModelInit();
+
 		if  (isset($this->properties[$name])) return true;
 	
 		return $this->superEntityModel !== null
@@ -234,6 +274,8 @@ class EntityModel implements EntityPropertyCollection {
 	 * @return EntityProperty[] key is NOT the property name
 	 */
 	public function getEntityProperties() {
+		$this->ensureEntityModelInit();
+
 		if ($this->superEntityModel === null) {
 			return array_values($this->properties);
 		}
@@ -245,6 +287,8 @@ class EntityModel implements EntityPropertyCollection {
 	 * @see \n2n\persistence\orm\model\EntityPropertyCollection::getEntityPropertyByName()
 	 */
 	public function getEntityPropertyByName($name) {
+		$this->ensureEntityModelInit();
+
 		if (!$this->containsEntityPropertyName($name)) {
 			throw new UnknownEntityPropertyException('Unkown entity property: ' . $this->class->getName() 
 					. '::$' . $name);
@@ -256,6 +300,8 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function containsLevelEntityPropertyName(string $name): bool {
+		$this->ensureEntityModelInit();
+
 		return isset($this->properties[$name]);
 	}
 
@@ -265,6 +311,8 @@ class EntityModel implements EntityPropertyCollection {
 	 * @throws UnknownEntityPropertyException
 	 */
 	public function getLevelEntityPropertyByName(string $name): EntityProperty {
+		$this->ensureEntityModelInit();
+
 		if (isset($this->properties[$name])) return $this->properties[$name];
 		
 		$superEntityProperty = $this->getEntityPropertyByName($name);
@@ -273,9 +321,11 @@ class EntityModel implements EntityPropertyCollection {
 				. TypeUtils::prettyClassPropName($this->class, $name)
 				. '. Requested entity property is defined in super class: ' 
 				. TypeUtils::prettyClassPropName($superEntityProperty->getEntityModel()->getClass(), $name));
-	}	
+	}
 	
 	public function getLevelEntityProperties(): array {
+		$this->ensureEntityModelInit();
+
 		return $this->properties;
 	}
 	
@@ -288,6 +338,8 @@ class EntityModel implements EntityPropertyCollection {
 	}	
 	
 	public function getLifecycleMethodsByEventType($eventType) {
+		$this->ensureEntityModelInit();
+
 		$methods = array();
 		if (isset($this->lifecylceMethods[$eventType])) {
 			$methods[] = $this->lifecylceMethods[$eventType];
@@ -310,6 +362,8 @@ class EntityModel implements EntityPropertyCollection {
 	}
 	
 	public function getEntityListenerClasses() {
+		$this->ensureEntityModelInit();
+
 		return $this->entityListenerClasses;
 	}
 // 	public function removeLifecycleMethodByEventType($eventType) {

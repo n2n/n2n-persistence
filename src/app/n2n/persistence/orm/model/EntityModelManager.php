@@ -39,9 +39,8 @@ class EntityModelManager {
 
 	public function __construct(private array $registeredClassNames, private EntityModelFactory $entityModelFactory) {
 		ArgUtils::valArray($registeredClassNames, 'string', false, 'registeredClassNames');
-		
-		$this->registeredClassNames = $registeredClassNames;
-		$this->entityModelFactory = $entityModelFactory;
+
+		$entityModelFactory->setOnFinalizeQueue(new OnFinalizeQueue($this));
 	}
 	
 	public function getRegisteredClassNames() {
@@ -110,30 +109,32 @@ class EntityModelManager {
 					throw new OrmConfigurationException('Invalid entity registered: ' . $class->getName(), 0, $e);
 				}
 
-				$this->entityModelFactory->cleanUp($this);
-
-				$entityModel->setSubEntityModelsAccessCallback(function () use ($entityModel) {
-					$this->initSubEntityModels($entityModel);
-				});
-
+				$this->initSubEntityModels($entityModel);
 			}
 		}
 
 		return $entityModel;
 	}
 	
-	private function initSubEntityModels(EntityModel $entityModel) {
+	private function initSubEntityModels(EntityModel $entityModel): void {
 		$class = $entityModel->getClass();
 
+		$subClasses = [];
 		foreach ($this->getEntityClasses() as $entityClass) {
 			// @todo ReflectionClass::isSubclassOf(): Internal error: Failed to retrieve the reflection object
 			$entityClass = new \ReflectionClass($entityClass->getName());
 			if (!$entityClass->isSubclassOf($class)) {
 				continue;
 			}
-			
-			$this->getEntityModelByClass($entityClass);
+
+			$subClasses[] = $entityClass;
 		}
+
+		$entityModel->setSubEntityModelsAccessCallback(!empty($subClasses), function () use ($subClasses) {
+			foreach ($subClasses as $subClass) {
+				$this->getEntityModelByClass($subClass);
+			}
+		});
 	}
 		
 	public function getEntityModelByEntityObj($entity) {		
