@@ -24,7 +24,7 @@ class PersistenceAddOnContext implements AddOnContext {
 	}
 
 	function lookupMagicObject(string $id, bool $required = true, string $contextNamespace = null): mixed {
-		return $this->lookupMagicObject($id, false, $contextNamespace);
+		return $this->simpleMagicContext->lookup($id, false, $contextNamespace);
 	}
 
 	function copyTo(AppN2nContext $appN2NContext): void {
