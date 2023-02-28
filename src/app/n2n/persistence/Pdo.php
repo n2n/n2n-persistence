@@ -84,15 +84,12 @@ class Pdo {
 	function reconnect(): void {
 		$this->release();
 
-		try {
-			$this->pdo = new \PDO($this->persistenceUnitConfig->getDsnUri(), $this->persistenceUnitConfig->getUser(),
-					$this->persistenceUnitConfig->getPassword(), array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-							\PDO::ATTR_STATEMENT_CLASS => array('n2n\persistence\PdoStatement', array())));
-		} catch (\PDOException $e) {
-			throw new PdoException($e);
-		}
+		$pdo = $this->dialect->createPDO($this->persistenceUnitConfig);
 
-		$this->dialect->initializeConnection($this, $this->persistenceUnitConfig);
+		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+		$pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('n2n\persistence\PdoStatement', array()));
+
+		$this->pdo = $pdo;
 	}
 
 	function isConnected(): bool {

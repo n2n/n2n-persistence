@@ -41,11 +41,14 @@ interface Dialect {
 	 * @return string
 	 */
 	public function getName(): string;
+
 	/**
-	 * @param Pdo $dbh
-	 * @param PersistenceUnitConfig $data
+	 * @param PersistenceUnitConfig $persistenceUnitConfig
+	 * @return \PDO
+	 * @throws \PDOException
 	 */
-	public function initializeConnection(Pdo $dbh, PersistenceUnitConfig $data);
+	function createPDO(PersistenceUnitConfig $persistenceUnitConfig): \PDO;
+
 	/**
 	 * @param Pdo $dbh
 	 * @return MetaManager
