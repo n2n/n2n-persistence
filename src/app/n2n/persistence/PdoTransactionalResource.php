@@ -48,8 +48,8 @@ class PdoTransactionalResource implements TransactionalResource {
 	/* (non-PHPdoc)
 	 * @see \n2n\core\container\TransactionalResource::prepareCommit()
 	 */
-	public function prepareCommit(Transaction $transaction): bool {
-		return $this->prepareCommitClosure->invoke($transaction);
+	public function prepareCommit(Transaction $transaction): void {
+		$this->prepareCommitClosure->invoke($transaction);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\core\container\TransactionalResource::commit()
