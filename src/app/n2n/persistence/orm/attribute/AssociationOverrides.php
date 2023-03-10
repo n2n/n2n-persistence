@@ -38,6 +38,7 @@ class AssociationOverrides {
 
 	/**
 	 * @return JoinColumn[]
+	 * @deprecated
 	 */
 	public function getJoinColumns() {
 		return $this->joinColumnsMap;
@@ -45,6 +46,7 @@ class AssociationOverrides {
 
 	/**
 	 * @return JoinTable[]
+	 * @deprecated
 	 */
 	public function getJoinTables() {
 		return $this->joinTablesMap;
