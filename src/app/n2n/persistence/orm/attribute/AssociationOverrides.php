@@ -26,10 +26,14 @@ use n2n\util\type\ArgUtils;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
 class AssociationOverrides {
-	
-	public function __construct(private array $joinColumnsMap = [], private array $joinTables = []) {
+
+	/**
+	 * @param JoinColumn[] $joinColumnsMap
+	 * @param JoinTable[] $joinTablesMap
+	 */
+	public function __construct(private array $joinColumnsMap = [], private array $joinTablesMap = []) {
 		ArgUtils::valArray($this->joinColumnsMap, JoinColumn::class);
-		ArgUtils::valArray($this->joinTables, JoinTable::class);
+		ArgUtils::valArray($this->joinTablesMap, JoinTable::class);
 	}
 
 	/**
@@ -40,9 +44,25 @@ class AssociationOverrides {
 	}
 
 	/**
-	 * @return JoinColumn[]
+	 * @return JoinTable[]
 	 */
 	public function getJoinTables() {
-		return $this->joinTables;
+		return $this->joinTablesMap;
 	}
+
+	/**
+	 * @return JoinColumn[]
+	 */
+	public function getJoinColumnsMap(): array {
+		return $this->joinColumnsMap;
+	}
+
+	/**
+	 * @return JoinTable[]
+	 */
+	public function getJoinTablesMap(): array {
+		return $this->joinTablesMap;
+	}
+
+
 }
