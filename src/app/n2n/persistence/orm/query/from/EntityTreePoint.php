@@ -48,8 +48,10 @@ abstract class EntityTreePoint extends ExtendableTreePoint {
 	}
 	
 	public function requestSelection(): Selection {
-		if ($this->entitySelection !== null) return $this->entitySelection;
-		return $this->entityselection = new EntityObjSelection($this->entityModel, $this->queryState, $this);
+		if ($this->entitySelection !== null) {
+			return $this->entitySelection;
+		}
+		return $this->entitySelection = new EntityObjSelection($this->entityModel, $this->queryState, $this);
 	}
 	
 	public function requestRepresentableQueryItem(): QueryItem {
