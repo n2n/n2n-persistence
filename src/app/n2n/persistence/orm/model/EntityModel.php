@@ -418,7 +418,7 @@ class EntityModel implements EntityPropertyCollection {
 	} 
 	
 	public function registerActionDependency(ActionDependency $actionDependency) {
-		$this->actionDependency[spl_object_hash($actionDependency)]	= $actionDependency;
+		$this->actionDependencies[spl_object_hash($actionDependency)]	= $actionDependency;
 	}
 	
 	public function getActionDependencies() {
