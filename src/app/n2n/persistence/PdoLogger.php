@@ -21,110 +21,82 @@
  */
 namespace n2n\persistence;
 
+use n2n\core\ext\N2nMonitor;
+
 class PdoLogger {
-	private $dsName;
-	private $log;
+	private string $dsName;
+	private array $log = [];
 	private bool $capturing = false;
 
-	/**
-	 *
-	 * @param string $dataSourceName
-	 */
-	public function __construct($dataSourceName) {
+	public function __construct(string $dataSourceName, private readonly ?float $slowQueryTime = null,
+			private readonly ?N2nMonitor $n2nMonitor = null) {
 		$this->dsName = $dataSourceName;
+	}
+	
+	public function clear(): void {
 		$this->log = array();
 	}
 	
-	public function clear() {
-		$this->log = array();
-	}
-	
-	public function getLog() {
+	public function getLog(): array {
 		return $this->log;
 	}
 
-	function setCapturing(bool $capturing) {
+	function setCapturing(bool $capturing): void {
 		$this->capturing = $capturing;
 	}
 
-	/**
-	 *
-	 * @param string $sqlStr
-	 * @param number $time
-	 */
-	public function addQuery($sqlStr, $time = null) {
-		if ($this->capturing) {
-			$this->log[] = array('sql' => $sqlStr, 'type' => 'query', 'time' => $time);
-		}
+	public function addQuery(string $sqlStr, float $time = null): void {
+		$this->addEntry(['sql' => $sqlStr, 'type' => 'query', 'time' => $time]);
 	}
-	/**
-	 *
-	 * @param string $sqlStr
-	 * @param number $time
-	 */
-	public function addExecution($sqlStr, $time = null) {
-		if ($this->capturing) {
-			$this->log[] = array('sql' => $sqlStr, 'type' => 'execute', 'time' => $time);
-		}
+
+	public function addExecution(string $sqlStr, float $time = null): void {
+		$this->addEntry(['sql' => $sqlStr, 'type' => 'execute', 'time' => $time]);
 	}
-	/**
-	 *
-	 * @param string $sqlStr
-	 * @param number $time
-	 */
-	public function addPreparation($sqlStr, $time = null) {
-		if ($this->capturing) {
-			$this->log[] = array('sql' => $sqlStr, 'type' => 'prepare', 'time' => $time);
-		}
+
+	public function addPreparation(string $sqlStr, float $time = null): void {
+		$this->addEntry(['sql' => $sqlStr, 'type' => 'prepare', 'time' => $time]);
 	}
-	/**
-	 *
-	 * @param string $sqlStr
-	 * @param array $values
-	 * @param number $time
-	 */
-	public function addPreparedExecution($sqlStr, array $values = null, $time = null) {
-		if ($this->capturing) {
-			$this->log[] = array('sql' => $sqlStr, 'values' => $values, 'type' => 'prepared-execute', 'time' => $time);
-		}
+
+	public function addPreparedExecution(string $sqlStr, array $values = null, float $time = null): void {
+		$this->addEntry(['sql' => $sqlStr, 'values' => $values, 'type' => 'prepared-execute', 'time' => $time]);
 	}
-	/**
-	 *
-	 * @param number $time
-	 */
-	public function addTransactionBegin($time = null) {
-		if ($this->capturing) {
-			$this->log[] = array('type' => 'begin transaction', 'time' => $time);
-		}
+
+	public function addTransactionBegin(float $time = null): void {
+		$this->addEntry(['type' => 'begin transaction', 'time' => $time]);
 	}
-	/**
-	 *
-	 * @param number $time
-	 */
-	public function addTransactionRollBack($time = null) {
-		if ($this->capturing) {
-			$this->log[] = array('type' => 'rollback', 'time' => $time);
-		}
+
+	public function addTransactionRollBack(float $time = null): void {
+		$this->addEntry(['type' => 'rollback', 'time' => $time]);
 	}
-	/**
-	 *
-	 * @param number $time
-	 */
-	public function addTransactionCommit($time = null) {
-		if ($this->capturing) {
-			$this->log[] = array('type' => 'commit', 'time' => $time);
-		}
+
+	public function addTransactionCommit(float $time = null): void {
+		$this->addEntry(['type' => 'commit', 'time' => $time]);
 	}
-	/**
-	 * @return array
-	 */
-	public function getEntries() {
+
+	public function getEntries(): array {
 		return $this->log;
 	}
-	/**
-	 * 
-	 */
-	public function dump() {
+
+	public function dump(): void {
 		test($this->log);
+	}
+
+	private function addEntry(array $logInfo): void {
+		if ($this->capturing) {
+			$this->log[] = $logInfo;
+		}
+
+		if ($this->slowQueryTime === null || $this->n2nMonitor === null || !isset($logInfo['time'])
+				|| $this->slowQueryTime > $logInfo['time']) {
+			return;
+		}
+
+		$text = json_encode($logInfo);
+		unset($logInfo['time']);
+		unset($logInfo['values']);
+		$hash = json_encode($logInfo);
+
+		$this->n2nMonitor->alert(self::class, $hash, $text);
+
 	}
 }

@@ -128,6 +128,10 @@ class EntityPropertyMock implements BasicEntityProperty {
 		throw new IllegalStateException('EntityProperty contains no target EntityPropertyCollection: ' . $this);
 	}
 
+	public function getEmbeddedCascadeEntityObj(mixed $entityObj): EntityPropertyCollection {
+		throw new IllegalStateException('EntityProperty contains no target EntityPropertyCollection: ' . $this);
+	}
+
 	public function __toString(): string {
 		return (new \ReflectionClass($this))->getShortName() . ' [' . $this->accessProxy . ']';
 	}

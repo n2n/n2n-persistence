@@ -54,14 +54,14 @@ interface EntityManager {
 
 	/**
 	 *
-	 * @param ReflectionClass $class
+	 * @param string|ReflectionClass $class
 	 * @param array|null $matches
 	 * @param array|null $order
 	 * @param int|null $limit
 	 * @param int|null $num
 	 * @return Criteria
 	 */
-	public function createSimpleCriteria(ReflectionClass $class, array $matches = null,
+	public function createSimpleCriteria(string|ReflectionClass $class, array $matches = null,
 			array $order = null, int $limit = null, int $num = null): Criteria;
 
 	/**
@@ -81,11 +81,11 @@ interface EntityManager {
 
 	/**
 	 * Get an instance, whose state may be lazily fetched.
-	 * @param ReflectionClass $class
+	 * @param string|ReflectionClass $class
 	 * @param mixed $id
 	 * @return mixed
 	 */
-	public function getReference(ReflectionClass $class, mixed $id): mixed;
+	public function getReference(string|ReflectionClass $class, mixed $id): mixed;
 
 	/**
 	 * Merge the state of the given entity into the current persistence context. 

@@ -125,6 +125,8 @@ interface EntityProperty {
 	public function hasEmbeddedEntityPropertyCollection(): bool;
 	
 	public function getEmbeddedEntityPropertyCollection(): EntityPropertyCollection;
+
+	public function getEmbeddedCascadeEntityObj(mixed $entityObj): mixed;
 	
 	public function hasTargetEntityModel(): bool;
 	

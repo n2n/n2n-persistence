@@ -66,7 +66,7 @@ class EntityProxyManager {
 		}
 
 		$proxyClass = $this->proxyClasses[$className];
-		$proxy = ReflectionUtils::createObject($proxyClass);
+		$proxy = ReflectionUtils::createObject($proxyClass, false);
 		$property = $this->getAccessibleListenerProperty($proxyClass);
 		$property->setValue($proxy, $proxyAccessListener);
 
@@ -102,7 +102,8 @@ class EntityProxyManager {
 			return $accessListener;
 		}
 
-		throw new IllegalStateException(get_class($entity) . '::' . $this->accessListenerPropertyNames[$className]
+		$className = get_class($entity);
+		throw new IllegalStateException($className . '::' . $this->accessListenerPropertyNames[$className]
 				. ' corrupted.');
 	}
 

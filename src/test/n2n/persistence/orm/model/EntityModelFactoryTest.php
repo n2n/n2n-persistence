@@ -12,6 +12,7 @@ class EntityModelFactoryTest extends TestCase {
 
 	public function setUp(): void {
 		$this->emf = new EntityModelFactory([PropertyProviderMock::class]);
+		$this->emf->setOnFinalizeQueue(new OnFinalizeQueue($this->createMock(EntityModelManager::class)));
 	}
 
 	public function testClassAttributes() {

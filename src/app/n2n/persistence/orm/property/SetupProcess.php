@@ -28,6 +28,8 @@ use n2n\persistence\orm\OrmErrorException;
 use n2n\persistence\orm\model\NamingStrategy;
 use n2n\persistence\orm\model\OnFinalizeQueue;
 use n2n\persistence\orm\InheritanceType;
+use n2n\reflection\ReflectionUtils;
+use n2n\util\ex\err\ConfigurationError;
 
 class SetupProcess {
 	private $entityModel;
@@ -58,7 +60,7 @@ class SetupProcess {
 		
 		throw new IllegalStateException('EntityProperty '
 				. get_class($this->entityModel->getIdDef()->getEntityProperty())
-				. ' has\'t registered its collumn and is therefore wrong implemented.');
+				. ' has\'t registered its column and is therefore wrong implemented.');
 	}
 	
 	/**
@@ -93,12 +95,12 @@ class SetupProcess {
 						. $this->columnDefs[$columnName]['propertyString'] . '\' and \'' . $propertyString . '\'', 
 				null, $relatedComponents);
 	}
-	/**
-	 * @return NamingStrategy
-	 */
-	public function getDefaultNamingStrategy() {
-		return $this->defaultNamingStrategy;
-	}
+//	/**
+//	 * @return NamingStrategy
+//	 */
+//	public function getDefaultNamingStrategy() {
+//		return $this->defaultNamingStrategy;
+//	}
 	/**
 	 * @param string $message
 	 * @param \Exception $causingE
@@ -111,10 +113,30 @@ class SetupProcess {
 			return new PropertyInitializationException($message, null, $causingE);
 		}
 
-		return OrmErrorException::create($message, $causingComponents, $causingE);
+		return self::createError($message, $causingComponents, $causingE);
 	}
 	
 	public function getOnFinalizeQueue() {
 		return $this->onFinalizeQueue;
+	}
+
+	private static function createError($message, array $causingComponents,
+			\Exception $previous = null, $documentId = null) {
+		$tps = array();
+		foreach ($causingComponents as $causingComponent) {
+			if ($causingComponent === null) continue;
+
+			$fileName = $lineNo = null;
+			ReflectionUtils::tp($causingComponent, $fileName, $lineNo);
+			$tps[$fileName . ':' . $lineNo] = array('fileName' => $fileName,
+					'line' => $lineNo);
+		}
+
+		$tp = array_shift($tps);
+		$e = new ConfigurationError($message, $tp['fileName'], $tp['line'], null, null, $previous);
+		foreach ($tps as $tp) {
+			$e->addAdditionalError($tp['fileName'], $tp['line']);
+		}
+		return $e;
 	}
 }

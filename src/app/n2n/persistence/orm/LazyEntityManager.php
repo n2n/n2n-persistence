@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm;
 
-use n2n\core\container\PdoPool;
+use n2n\persistence\ext\PdoPool;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\persistence\orm\criteria\BaseCriteria;
 use n2n\persistence\orm\criteria\item\CrIt;
@@ -33,25 +33,27 @@ use n2n\persistence\orm\store\operation\MergeOperationImpl;
 use n2n\persistence\orm\store\operation\RemoveOperation;
 use n2n\persistence\orm\store\operation\DetachOperation;
 use n2n\util\ex\IllegalStateException;
-use n2n\persistence\TransactionEvent;
 use n2n\persistence\orm\store\operation\RefreshOperation;
 use n2n\persistence\orm\nql\NqlParser;
 use n2n\persistence\Pdo;
 use n2n\persistence\orm\criteria\item\CriteriaProperty;
 use n2n\persistence\orm\store\LoadingQueue;
 use n2n\persistence\orm\criteria\item\CriteriaFunction;
-use test\model\Entity;
 use n2n\persistence\orm\store\action\ActionQueue;
 use n2n\util\magic\MagicContext;
 use n2n\persistence\orm\criteria\Criteria;
+use ReflectionClass;
+use n2n\core\container\TransactionManager;
+use n2n\core\container\TransactionalResource;
+use n2n\core\container\Transaction;
 
-class LazyEntityManager implements EntityManager {
+class LazyEntityManager implements EntityManager, TransactionalResource {
 	private $closed = false;
-	private $pdo = null;
+	private ?Pdo $pdo = null;
+	private ?TransactionManager $tm = null;
 	private $pdoListener = null;
 	private $dataSource;
 	private $dbhPool;
-	private $transactionalScoped = false;
 	private $entityModelManager;
 	private $persistenceContext;
 	private $actionQueue;
@@ -63,10 +65,8 @@ class LazyEntityManager implements EntityManager {
 	 * @param PdoPool $dbhPool
 	 * @param $transactionalScoped
 	 */
-	public function __construct($dataSourceName, PdoPool $dbhPool, $transactionalScoped) {
-		$this->dataSourceName = $dataSourceName;
+	public function __construct(private string $dataSourceName, PdoPool $dbhPool, private bool $transactionalScoped) {
 		$this->dbhPool = $dbhPool;
-		$this->transactionalScoped = (boolean) $transactionalScoped;
 		$this->entityModelManager = $dbhPool->getEntityModelManager();
 		$this->persistenceContext = new PersistenceContext($dbhPool->getEntityProxyManager());
 		$this->actionQueue = new ActionQueueImpl($this, $dbhPool->getMagicContext());
@@ -107,14 +107,14 @@ class LazyEntityManager implements EntityManager {
 		}
 		
 		$pdo = $this->dbhPool->getPdo($this->dataSourceName);
-		$this->bindPdo($pdo);		
+		$this->bindPdo($pdo, $this->dbhPool->getTransactionManager());
 		return $pdo;
 	}
 	/**
 	 * @param Pdo $pdo
 	 * @throws IllegalStateException
 	 */
-	public function bindPdo(Pdo $pdo) {
+	public function bindPdo(Pdo $pdo, ?TransactionManager $tm) {
 		$this->ensureEntityManagerOpen();
 		
 		if ($this->pdo !== null) {
@@ -122,30 +122,43 @@ class LazyEntityManager implements EntityManager {
 		}
 		
 		$this->pdo = $pdo;
-		$that = $this;
-		$this->pdoListener = new ClosurePdoListener(function (TransactionEvent $e) use ($that) {
-			$transaction = $e->getTransaction();
-			$type = $e->getType();
-			
-			if ($type == TransactionEvent::TYPE_ON_COMMIT && $that->isOpen()
-					&& ($transaction === null || !$transaction->isReadOnly())) {
-				$that->flush();
-				$that->actionQueue->commit();
-			}
-				
-			if ($that->transactionalScoped
-					&& ($type == TransactionEvent::TYPE_ON_COMMIT || $type == TransactionEvent::TYPE_ON_ROLL_BACK)) {
-				$that->close();
-			}
-		});
-		$pdo->registerListener($this->pdoListener);
+		$this->tm = $tm;
+
+		$this->tm?->registerResource($this);
+	}
+
+	public function beginTransaction(Transaction $transaction): void {
+	}
+
+	public function prepareCommit(Transaction $transaction): void {
+		if (!$this->isOpen() || $transaction->isReadOnly()) {
+			return;
+		}
+
+		$this->flush();
+		$this->actionQueue->commit();
+	}
+
+	public function commit(Transaction $transaction): void {
+		if ($this->transactionalScoped) {
+			$this->close();
+		}
+	}
+
+	public function rollBack(Transaction $transaction): void {
+		if ($this->transactionalScoped) {
+			$this->close();
+		}
+	}
+
+	function release(): void {
 	}
 	
 	/**
 	 *
-	 * @param \ReflectionClass $class
+	 * @param ReflectionClass $class
 	 * @param string $entityAlias
-	 * @return \n2n\persistence\orm\criteria\BaseCriteria
+	 * @return BaseCriteria
 	 */
 	public function createCriteria(): Criteria {
 		$this->ensureEntityManagerOpen();
@@ -154,14 +167,14 @@ class LazyEntityManager implements EntityManager {
 	
 	/**
 	 *
-	 * @param \ReflectionClass $class
+	 * @param string|ReflectionClass $class
 	 * @param array $matches
 	 * @param array $order
 	 * @param int $limit
 	 * @param int $num
-	 * @return \n2n\persistence\orm\criteria\BaseCriteria
+	 * @return BaseCriteria
 	 */
-	public function createSimpleCriteria(\ReflectionClass $class, array $matches = null, array $order = null, 
+	public function createSimpleCriteria(string|ReflectionClass $class, array $matches = null, array $order = null,
 			int $limit = null, int $num = null): Criteria {
 		$this->ensureEntityManagerOpen();
 			
@@ -211,7 +224,7 @@ class LazyEntityManager implements EntityManager {
 		return $this->nqlParser->parse($nql, $params);
 	}
 	
-	public function find(string|\ReflectionClass $class, $id): mixed {
+	public function find(string|ReflectionClass $class, $id): mixed {
 		$this->ensureEntityManagerOpen();
 		
 		if ($id === null) return null;
@@ -226,9 +239,9 @@ class LazyEntityManager implements EntityManager {
 				->toQuery()->fetchSingle();
 	}
 	
-	public function getReference(string|\ReflectionClass $class, $id): mixed {
+	public function getReference(string|ReflectionClass $class, $id): mixed {
 		return $this->getPersistenceContext()->getOrCreateEntityProxy(
-				EntityModelManager::getInstance()->getEntityModelByClass($class), $id);
+				$this->entityModelManager->getEntityModelByClass($class), $id, $this);
 	}
 	
 	private function ensureEntityManagerOpen() {
@@ -312,15 +325,14 @@ class LazyEntityManager implements EntityManager {
 	
 	public function close(): void {
 		if ($this->closed) return;
-		
-		if ($this->pdo !== null) {
-			$this->pdo->unregisterListener($this->pdoListener);		
-		}
-		
+
+		$this->tm?->unregisterResource($this);
+
 		$this->clear();
 		
 		$this->closed = true;
 		$this->pdo = null;
+		$this->tm = null;
 		$this->persistenceContext = null;
 		$this->actionQueue = null;
 		$this->loadingQueue = null;
@@ -333,7 +345,7 @@ class LazyEntityManager implements EntityManager {
 	public function contains($object): bool {
 		$this->ensureEntityManagerOpen();
 		
-		$this->getPersistenceContext()->containsManagedEntityObj($object);
+		return $this->getPersistenceContext()->containsManagedEntityObj($object);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\EntityManager::clear()
@@ -360,4 +372,6 @@ class LazyEntityManager implements EntityManager {
 	public function getScope(): string {
 		return $this->transactionalScoped ? self::SCOPE_TRANSACTION : self::SCOPE_EXTENDED;
 	}
+
+
 }

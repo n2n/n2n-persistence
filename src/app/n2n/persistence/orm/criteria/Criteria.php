@@ -41,6 +41,7 @@ use n2n\persistence\meta\data\OrderDirection;
 use n2n\persistence\orm\criteria\compare\ComparatorCriteria;
 use n2n\persistence\orm\criteria\compare\SelectColumnComparable;
 use n2n\util\type\TypeUtils;
+use ReflectionClass;
 
 class Criteria {
 	const ORDER_DIRECTION_ASC = OrderDirection::ASC;
@@ -115,12 +116,12 @@ class Criteria {
 		return $this;
 	}
 	/**
-	 * @param \ReflectionClass $entityClass
+	 * @param string|ReflectionClass $entityClass
 	 * @param string $alias
 	 * @param string $fetch
 	 * @return \n2n\persistence\orm\criteria\Criteria
 	 */
-	public function from(\ReflectionClass $entityClass, string $alias, bool $fetch = false) {
+	public function from(string|ReflectionClass $entityClass, string $alias, bool $fetch = false) {
 		$this->validateAlias($alias);
 		$this->treeModClosures[] = function (QueryModel $queryModel, QueryState $queryState) 
 				use ($entityClass, $alias, $fetch) {
@@ -152,7 +153,7 @@ class Criteria {
 	 * @param Criteria $criteria
 	 * @param string $alias
 	 * @param string $joinType
-	 * @return \n2n\persistence\orm\criteria\compare\CriteriaComparator
+	 * @return CriteriaComparator
 	 */
 	public function joinCriteria(Criteria $criteria, string $alias, $joinType = JoinType::INNER) {
 		$this->validateAlias($alias);
@@ -186,7 +187,7 @@ class Criteria {
 	 * @param string $alias
 	 * @param string $joinType
 	 * @param bool $fetch
-	 * @return \n2n\persistence\orm\criteria\compare\CriteriaComparator
+	 * @return CriteriaComparator
 	 */
 	public function joinPropertyOn($propertyExpression, string $alias, string $joinType = JoinType::INNER, 
 			bool $fetch = false) {
@@ -235,13 +236,13 @@ class Criteria {
 	}
 	
 	/**
-	 * @param \ReflectionClass $entityClass
+	 * @param string|ReflectionClass $entityClass
 	 * @param string $alias
 	 * @param string $joinType
 	 * @param string $fetch
-	 * @return \n2n\persistence\orm\criteria\compare\CriteriaComparator
+	 * @return CriteriaComparator
 	 */
-	public function join(\ReflectionClass $entityClass, string $alias, $joinType = JoinType::INNER, bool $fetch = false) {
+	public function join(string|ReflectionClass $entityClass, string $alias, $joinType = JoinType::INNER, bool $fetch = false) {
 		$this->validateAlias($alias);
 		
 		$onCriteriaComparator = new CriteriaComparator($this, null, false, false);
@@ -263,7 +264,7 @@ class Criteria {
 	}
 	/**
 	 * @param array $matches
-	 * @return \n2n\persistence\orm\criteria\compare\CriteriaComparator
+	 * @return CriteriaComparator
 	 */
 	public function where(array $matches = array()) {
 		foreach ($matches as $key => $value) {
@@ -293,7 +294,7 @@ class Criteria {
 	}
 	/**
 	 * @param array $matches
-	 * @return \n2n\persistence\orm\criteria\compare\CriteriaComparator
+	 * @return CriteriaComparator
 	 */
 	public function having(array $matches = array()) {
 		foreach ($matches as $key => $value) {

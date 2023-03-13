@@ -41,8 +41,8 @@ class ClassSetup {
 	private $attributeOverrides = array();
 	private $entityProperties = array();
 	private $parentPropertyName;
-	
-	public function __construct(SetupProcess $setupProcess, \ReflectionClass $class, 
+
+	public function __construct(SetupProcess $setupProcess, \ReflectionClass $class,
 			NamingStrategy $namingStrategy, ClassSetup $parentClassSetup = null, $parentPropertyName = null) {
 		$this->setupProcess = $setupProcess;
 		$this->class = $class;
@@ -69,7 +69,7 @@ class ClassSetup {
 	public function getClass() {
 		return $this->class;
 	}
-	
+
 // 	public function setParentClassSetup(ClassSetup $parentClassSetup = null) {
 // 		$this->parentClassSetup = $parentClassSetup;
 // 	}
@@ -98,7 +98,7 @@ class ClassSetup {
 		return $this->namingStrategy;
 	}
 	/**
-	 * @return EntityModel 
+	 * @return EntityModel
 	 */
 	public function getEntityModel() {
 		return $this->setupProcess->getEntityModel();
@@ -138,7 +138,7 @@ class ClassSetup {
 			array $causingComponents = array()) {
 		return SetupProcess::createPropertyException($message, $causingE, $causingComponents);
 	}
-	
+
 	/**
 	 * @param string $propertyName
 	 * @param bool $overrideAllowed
@@ -149,29 +149,29 @@ class ClassSetup {
 		foreach ($this->attributeOverrides as $attributeOverrides) {
 			$map = $attributeOverrides->getPropertyColumnMap();
 			if (!isset($map[$propertyName]))  continue;
-			
-			if ($overrideAllowed) { 
+
+			if ($overrideAllowed) {
 				$relatedComponents[] = $this->attributeOverrides;
 				return $map[$propertyName];
 			}
-			
-			throw $this->createException('Illegal Column override for property: ' 
-							. $this->class->getName() . '::$' . $propertyName, 
+
+			throw $this->createException('Illegal Column override for property: '
+					. $this->class->getName() . '::$' . $propertyName,
 					null, array($attributeOverrides));
 		}
-	
+
 		$attrColumn = $this->attributeSet->getPropertyAttribute($propertyName, Column::class);
 		if ($attrColumn !== null) {
 			if ($overrideAllowed) {
 				$relatedComponents[] = $attrColumn;
 				return $attrColumn->getInstance()->getName();
 			}
-			
+
 			throw $this->createException('Illegal Column override for property: '
-							. $this->class->getName() . '::$' . $propertyName,
+					. $this->class->getName() . '::$' . $propertyName,
 					null, array($attrColumn));
 		}
-	
+
 		return null;
 	}
 	/**
@@ -187,35 +187,45 @@ class ClassSetup {
 		if ($columnName === null) {
 			$columnName = $determineColumnName;
 		}
-		
+
 		$columnName = $this->namingStrategy->buildColumnName($propertyName, $columnName);
-		
+
 		$this->setupProcess->registerColumnName($columnName, $this->buildPropertyString($propertyName), $relatedComponents);
-		
+
 		return $columnName;
 	}
-	
+
+	public function requestJoinColumn(string $propertyName, string $targetIdPropertyName, string $joinColumnName = null, array $relatedComponents = array()) {
+		$this->determineColumnName($propertyName, false, $relatedComponents);
+
+		$columnName = $this->namingStrategy->buildJoinColumnName($propertyName, $targetIdPropertyName, $joinColumnName);
+
+		$this->setupProcess->registerColumnName($columnName, $this->buildPropertyString($propertyName), $relatedComponents);
+
+		return $columnName;
+	}
+
 	public function buildPropertyString($propertyName) {
 		$propertyNames = array($propertyName);
-		
+
 		$classSetup = $this;
 		$class = $this->class;
 		while (null !== ($classSetup = $classSetup->getParentClassSetup())) {
 			$parentPropertyName = $classSetup->getParentPropertyName();
 			if ($parentPropertyName === null) continue;
-			
+
 			array_unshift($propertyNames, $parentPropertyName);
 			$class = $classSetup->getClass();
 		}
-		
+
 		return $class->getName() . '::$' . implode('::$', $propertyNames);
-	} 
-	
+	}
+
 	public function containsEntityPropertyName($name) {
 		if ($this->isPseudo()) {
 			return $this->parentClassSetup->containsEntityPropertyName($name);
 		}
-		
+
 		return isset($this->entityProperties[$name]);
 	}
 	/**
@@ -224,22 +234,22 @@ class ClassSetup {
 	 * @throws OrmException
 	 * @throws OrmErrorException
 	 */
-	public function provideEntityProperty(EntityProperty $entityProperty, 
+	public function provideEntityProperty(EntityProperty $entityProperty,
 			array $relatedComponents = array()) {
-		
+
 		if ($this->isPseudo()) {
 			$this->parentClassSetup->provideEntityProperty($entityProperty, $relatedComponents);
 			return;
 		}
-		
+
 		if (!isset($this->entityProperties[$entityProperty->getName()])) {
 			$entityProperty->setEntityModel($this->setupProcess->getEntityModel());
 			$this->entityProperties[$entityProperty->getName()] = $entityProperty;
 			return;
 		}
-		
-		throw self::createPropertyException('Entity property for ' 
-				. $this->class->getName() . '::$' . $entityProperty->getName() 
+
+		throw self::createPropertyException('Entity property for '
+				. $this->class->getName() . '::$' . $entityProperty->getName()
 				. ' already defined.', null, $relatedComponents);
 	}
 	/**
@@ -247,7 +257,7 @@ class ClassSetup {
 	 */
 	public function getEntityProperties() {
 		IllegalStateException::assertTrue(!$this->isPseudo());
-		
+
 		return $this->entityProperties;
 	}
 	/**
