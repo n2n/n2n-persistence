@@ -24,21 +24,22 @@ namespace n2n\persistence\orm;
 
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\ext\PdoPool;
+use n2n\persistence\ext\EmPool;
 
 class LazyEntityManagerFactory implements EntityManagerFactory {
 	private $persistenceUnitName;
-	private $pdoPool;
+	private $emPool;
 	
 	private $shared;
 	private $transactionalEm;
 	
 	/**
 	 * @param string|null $persistenceUnitName
-	 * @param PdoPool $pdoPool
+	 * @param PdoPool $emPool
 	 */
-	public function __construct(string $persistenceUnitName = null, PdoPool $pdoPool) {
+	public function __construct(?string $persistenceUnitName, EmPool $emPool) {
 		$this->persistenceUnitName = $persistenceUnitName;
-		$this->pdoPool = $pdoPool;	
+		$this->emPool = $emPool;
 	}
 	
 	/**
@@ -50,13 +51,13 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 			return $this->transactionalEm;
 		}
 		
-		$pdo = $this->pdoPool->getPdo($this->persistenceUnitName);
+		$pdo = $this->emPool->getPdoPool()->getPdo($this->persistenceUnitName);
 		if (!$pdo->inTransaction()) {
 			throw new IllegalStateException('No tranaction open.');
 		}
 		
-		$this->transactionalEm = new LazyEntityManager($this->persistenceUnitName, $this->pdoPool, true);
-		$this->transactionalEm->bindPdo($pdo, $this->pdoPool->getTransactionManager());
+		$this->transactionalEm = new LazyEntityManager($this->persistenceUnitName, $this->emPool, true);
+		$this->transactionalEm->bindPdo($pdo, $this->emPool->getTransactionManager());
 	
 		return $this->transactionalEm;
 	}	
@@ -77,7 +78,7 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 	 * @see \n2n\persistence\orm\EntityManagerFactory::create()
 	 */
 	public function create(bool $clearOnResourcesRelease) {
-		return new LazyEntityManager($this->persistenceUnitName, $this->pdoPool, false, false);
+		return new LazyEntityManager($this->persistenceUnitName, $this->emPool, false, false);
 	}
 
 	function clear(): void {

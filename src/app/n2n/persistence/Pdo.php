@@ -33,9 +33,9 @@ use n2n\core\ext\N2nMonitor;
 
 class Pdo {
 	private ?\PDO $pdo = null;
-	private Dialect $dialect;
+	private ?Dialect $dialect = null;
 	private PdoLogger $logger;
-	private MetaData $metaData;
+	private ?MetaData $metaData = null;
 	private array $listeners = array();
 
 	public function __construct(private PersistenceUnitConfig $persistenceUnitConfig,
@@ -51,7 +51,7 @@ class Pdo {
 		$this->dialect = $dialectClass->newInstance();
 		$this->metaData = new MetaData($this, $this->dialect);
 
-		$transactionManager?->registerResource(new PdoTransactionalResource(
+		$this->pdoTransactionalResource = new PdoTransactionalResource(
 				function(Transaction $transaction) {
 					$this->performBeginTransaction($transaction);
 				},
@@ -70,15 +70,24 @@ class Pdo {
 				},
 				function() {
 					$this->release();
-				}));
+				});
 	}
 
+//	function fork(): Pdo {
+//		$pdo = new Pdo($this->persistenceUnitConfig, $this->transactionManager, $this->slowQueryTime, $this->n2nMonitor);
+//		$pdo->pdo = $this->pdo;
+//		return $pdo;
+//	}
+
 	function release(): void {
+		$this->ensureNotClosed();
+
 		if ($this->pdo !== null && $this->pdo->inTransaction()) {
 			throw new IllegalStateException('Can not release connection while in transaction.');
 		}
 
 		$this->pdo = null;
+		$this->transactionManager?->unregisterResource($this->pdoTransactionalResource);
 	}
 
 	function reconnect(): void {
@@ -89,11 +98,33 @@ class Pdo {
 		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 		$pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('n2n\persistence\PdoStatement', array()));
 
+		$this->transactionManager?->registerResource($this->pdoTransactionalResource);
+
 		$this->pdo = $pdo;
 	}
 
 	function isConnected(): bool {
 		return $this->pdo !== null;
+	}
+
+	function close(): void {
+		$this->transactionManager?->unregisterResource($this);
+		$this->transactionManager = null;
+		$this->metaData = null;
+		$this->dialect = null;
+	}
+
+	function isClosed(): bool {
+		return $this->metaData === null;
+	}
+
+	private function ensureNotClosed(): void {
+		if (!$this->isClosed()) {
+			return;
+		}
+
+		throw new IllegalStateException('Pdo closed (datasource name: ' . $this->getDataSourceName()
+				. ').');
 	}
 
 	private function pdo() {

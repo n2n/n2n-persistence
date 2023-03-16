@@ -46,6 +46,7 @@ use ReflectionClass;
 use n2n\core\container\TransactionManager;
 use n2n\core\container\TransactionalResource;
 use n2n\core\container\Transaction;
+use n2n\persistence\ext\EmPool;
 
 class LazyEntityManager implements EntityManager, TransactionalResource {
 	private $closed = false;
@@ -53,7 +54,7 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 	private ?TransactionManager $tm = null;
 	private $pdoListener = null;
 	private $dataSource;
-	private $dbhPool;
+	private $emPool;
 	private $entityModelManager;
 	private $persistenceContext;
 	private $actionQueue;
@@ -62,15 +63,15 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 
 	/**
 	 * @param string $dataSourceName
-	 * @param PdoPool $dbhPool
+	 * @param PdoPool $emPool
 	 * @param $transactionalScoped
 	 */
-	public function __construct(private string $dataSourceName, PdoPool $dbhPool, private bool $transactionalScoped,
+	public function __construct(private string $dataSourceName, EmPool $emPool, private bool $transactionalScoped,
 			private bool $clearOnResourcesRelease = false) {
-		$this->dbhPool = $dbhPool;
-		$this->entityModelManager = $dbhPool->getEntityModelManager();
-		$this->persistenceContext = new PersistenceContext($dbhPool->getEntityProxyManager());
-		$this->actionQueue = new ActionQueueImpl($this, $dbhPool->getMagicContext());
+		$this->emPool = $emPool;
+		$this->entityModelManager = $emPool->getEntityModelManager();
+		$this->persistenceContext = new PersistenceContext($emPool->getEntityProxyManager());
+		$this->actionQueue = new ActionQueueImpl($this, $emPool->getMagicContext());
 		$this->loadingQueue = new LoadingQueue($this->persistenceContext, $this->actionQueue);
 		$this->nqlParser = new NqlParser($this, $this->entityModelManager);
 	}
@@ -96,7 +97,7 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 	}
 	
 	public function getMagicContext(): MagicContext {
-		return $this->dbhPool->getMagicContext();
+		return $this->emPool->getMagicContext();
 	}
 
 	/**
@@ -107,8 +108,8 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 			return $this->pdo;
 		}
 		
-		$pdo = $this->dbhPool->getPdo($this->dataSourceName);
-		$this->bindPdo($pdo, $this->dbhPool->getTransactionManager());
+		$pdo = $this->emPool->getPdoPool()->getPdo($this->dataSourceName);
+		$this->bindPdo($pdo, $this->emPool->getTransactionManager());
 		return $pdo;
 	}
 	/**

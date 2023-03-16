@@ -41,73 +41,88 @@ use n2n\core\ext\N2nMonitor;
 
 class PdoPool {
 	const DEFAULT_DS_NAME = 'default';
-	
-	private array $persistenceUnitConfigs = array();
-	private $entityModelManager;
-	private $entityProxyManager;
-	private $dbhs = array();
-	private $entityManagerFactories = array();
-	private $dbhPoolListeners = array();
 
-	function __construct(private DbConfig $dbConfig, private OrmConfig $ormConfig, private MagicContext $magicContext,
-			private TransactionManager $transactionManager, private ?float $slowQueryTime, private ?N2nMonitor $n2nMonitor) {
-		foreach ($dbConfig->getPersistenceUnitConfigs() as $persistenceUnitConfig) {
-			$this->persistenceUnitConfigs[$persistenceUnitConfig->getName()] = $persistenceUnitConfig;
-		}
-		
-		$this->entityModelManager = new EntityModelManager($ormConfig->getEntityClassNames(), 
-				new EntityModelFactory($ormConfig->getEntityPropertyProviderClassNames(),
-						$ormConfig->getNamingStrategyClassName()));
+	protected array $dbhs = array();
+
+//	private $dbhPoolListeners = array();
+
+	function __construct(private array $persistenceUnitConfigs, private TransactionManager $transactionManager,
+			private ?float $slowQueryTime, private ?N2nMonitor $n2nMonitor) {
+		ArgUtils::valArray($this->persistenceUnitConfigs, PersistenceUnitConfig::class);
 		$this->entityProxyManager = EntityProxyManager::getInstance();
 	}
 
-	static function createFromAppN2nContext(AppN2nContext $n2nContext): PdoPool {
-		$appConfig = $n2nContext->getAppConfig();
-		return new PdoPool($appConfig->db(), $appConfig->orm(), $n2nContext, $n2nContext->getTransactionManager(),
-				$appConfig->error()->getMonitorSlowQueryTime(), $n2nContext->getMonitor());
-	}
 
-	function clear() {
-		$entityManagerFactories = $this->entityManagerFactories;
+//	/**
+//	 * Creates a copy of this PdoPool for another MagicContext and optional another TransactionManager.
+//	 *
+//	 * @param MagicContext $magicContext
+//	 * @param TransactionManager|null $transactionManager if provided already initialized pdos will not be forked.
+//	 * @return PdoPool
+//	 */
+//	function fork(MagicContext $magicContext, TransactionManager $transactionManager = null): PdoPool {
+//		$pdoPool = new PdoPool($this->persistenceUnitConfigs, $this->entityModelManager, $magicContext,
+//				$transactionManager ?? $this->transactionManager,
+//				$this->slowQueryTime, $this->n2nMonitor);
+//
+//
+//		if ($transactionManager === null) {
+//			$pdoPool->dbhs = $this->dbhs;
+//		}
+//
+//		return $pdoPool;
+//	}
+
+//	private static function createFromConfig(DbConfig $dbConfig, OrmConfig $ormConfig, MagicContext $magicContext,
+//			TransactionManager $transactionManager, ?float $slowQueryTime, ?N2nMonitor $n2nMonitor): PdoPool {
+//
+//
+//
+//		$entityModelManager = new EntityModelManager($ormConfig->getEntityClassNames(),
+//				new EntityModelFactory($ormConfig->getEntityPropertyProviderClassNames(),
+//						$ormConfig->getNamingStrategyClassName()));
+//
+//		return new PdoPool($persistenceUnitConfigs, $entityModelManager, $magicContext, $transactionManager,
+//				$slowQueryTime, $n2nMonitor);
+//
+//	}
+//
+//	static function createFromAppN2nContext(AppN2nContext $n2nContext): PdoPool {
+//		$appConfig = $n2nContext->getAppConfig();
+//		return self::createFromConfig($appConfig->db(), $appConfig->orm(), $n2nContext, $n2nContext->getTransactionManager(),
+//				$appConfig->error()->getMonitorSlowQueryTime(), $n2nContext->getMonitor());
+//	}
+
+	function clear(): void {
+		$pdos = $this->dbhs;
 
 		$this->dbhs = [];
-		$this->dbhPoolListeners = [];
-		$this->entityManagerFactories = [];
+//		$this->dbhPoolListeners = []
 
-		foreach ($entityManagerFactories as $entityManagerFactory) {
-			$entityManagerFactory->clear();
+		foreach ($pdos as $pdo) {
+			$pdo->close();
 		}
 	}
 
 	/**
 	 * @return TransactionManager
 	 */
-	public function getTransactionManager() {
+	public function getTransactionManager(): TransactionManager {
 		return $this->transactionManager;
 	}
+
 	/**
-	 * @param MagicContext $magicContext
+	 * @return string[]
 	 */
-	public function setMagicContext(MagicContext $magicContext = null) {
-		$this->magicContext = $magicContext;
-	}
-	/**
-	 * @return MagicContext
-	 */
-	public function getMagicContext() {
-		return $this->magicContext;
-	}
-	/**
-	 * @return string
-	 */
-	public function getPersistenceUnitNames() {
+	public function getPersistenceUnitNames(): array {
 		return array_keys($this->persistenceUnitConfigs);
 	}
+
 	/**
-	 * @param string $persistenceUnitName
-	 * @return \n2n\persistence\Pdo
+	 * @param ?string $persistenceUnitName
+	 * @return Pdo
 	 */
-	public function getPdo(string $persistenceUnitName = null) {
+	public function getPdo(string $persistenceUnitName = null): Pdo {
 		if ($persistenceUnitName === null) {
 			$persistenceUnitName = self::DEFAULT_DS_NAME;
 		}
@@ -130,76 +145,41 @@ class PdoPool {
 	function getInitializedPdos() {
 		return $this->dbhs;
 	}
-	
-	/**
-	 * @param string $persistenceUnitName
-	 * @param Pdo $pdo
-	 * @throws \InvalidArgumentException
-	 */
-	function setPdo(string $persistenceUnitName, Pdo $pdo) {
-		if ($persistenceUnitName === null) {
-			$persistenceUnitName = self::DEFAULT_DS_NAME;
-		}
-		
-		if (isset($this->dbhs[$persistenceUnitName])) {
-			throw new \InvalidArgumentException('Pdo for persistence unit already initialized: ' . $persistenceUnitName);
-		}
-		
-		$this->dbhs[$persistenceUnitName] = $pdo;
-	}
-	
-	
+
+//	/**
+//	 * @param string $persistenceUnitName
+//	 * @param Pdo $pdo
+//	 * @throws \InvalidArgumentException
+//	 */
+//	function setPdo(string $persistenceUnitName, Pdo $pdo) {
+//		if ($persistenceUnitName === null) {
+//			$persistenceUnitName = self::DEFAULT_DS_NAME;
+//		}
+//
+//		if (isset($this->dbhs[$persistenceUnitName])) {
+//			throw new \InvalidArgumentException('Pdo for persistence unit already initialized: ' . $persistenceUnitName);
+//		}
+//
+//		$this->dbhs[$persistenceUnitName] = $pdo;
+//	}
+
+
 	/**
 	 * @param PersistenceUnitConfig $persistenceUnitConfig
 	 * @return Pdo
 	 */
-	public function createPdo(PersistenceUnitConfig $persistenceUnitConfig) {
+	private function createPdo(PersistenceUnitConfig $persistenceUnitConfig): Pdo {
 		return new Pdo($persistenceUnitConfig, $this->transactionManager, $this->slowQueryTime, $this->n2nMonitor);
 	}
 	
-	/**
-	 *
-	 * @param string $persistenceUnitName
-	 * @return \n2n\persistence\orm\EntityManagerFactory
-	 */
-	public function getEntityManagerFactory($persistenceUnitName = null) {
-		if ($persistenceUnitName === null) {
-			$persistenceUnitName = self::DEFAULT_DS_NAME;
-		}
-		
-		if (!isset($this->entityManagerFactories[$persistenceUnitName])) {
-			$this->entityManagerFactories[$persistenceUnitName] 
-					= new LazyEntityManagerFactory($persistenceUnitName, $this);
-		}
-	
-		return $this->entityManagerFactories[$persistenceUnitName];
-	}
 
-	/**
-	 * @param Pdo $dbh
-	 * @return EntityManager
-	 */
-	private function createEntityManagerFactory($persistenceUnitName = null) {
-		return new LazyEntityManagerFactory($persistenceUnitName, $this);
-	}
-	/**
-	 * @return EntityModelManager
-	 */
-	public function getEntityModelManager() {
-		return $this->entityModelManager;
-	}
-	/**
-	 * @return EntityProxyManager 
-	 */
-	public function getEntityProxyManager() {
-		return $this->entityProxyManager;
-	}
 	
-	public function registerListener(PdoPoolListener $dbhPoolListener) {
-		$this->dbhPoolListeners[spl_object_hash($dbhPoolListener)] = $dbhPoolListener;
-	}
-	
-	public function unregisterListener(PdoPoolListener $dbhPoolListener) {
-		unset($this->dbhPoolListeners[spl_object_hash($dbhPoolListener)]);
-	}
+//	public function registerListener(PdoPoolListener $dbhPoolListener) {
+//		$this->dbhPoolListeners[spl_object_hash($dbhPoolListener)] = $dbhPoolListener;
+//	}
+//
+//	public function unregisterListener(PdoPoolListener $dbhPoolListener) {
+//		unset($this->dbhPoolListeners[spl_object_hash($dbhPoolListener)]);
+//	}
+
 }
