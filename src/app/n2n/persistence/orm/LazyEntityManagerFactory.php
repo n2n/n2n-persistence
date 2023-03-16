@@ -67,7 +67,7 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 	 */
 	public function getExtended() {
 		if (!isset($this->shared)) {
-			$this->shared = $this->create();
+			$this->shared = $this->create(true);
 		}
 		return $this->shared;
 	}
@@ -76,8 +76,8 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\EntityManagerFactory::create()
 	 */
-	public function create() {
-		return new LazyEntityManager($this->persistenceUnitName, $this->pdoPool, false);
+	public function create(bool $clearOnResourcesRelease) {
+		return new LazyEntityManager($this->persistenceUnitName, $this->pdoPool, false, false);
 	}
 
 	function clear(): void {

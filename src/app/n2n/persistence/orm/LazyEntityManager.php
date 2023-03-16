@@ -65,7 +65,8 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 	 * @param PdoPool $dbhPool
 	 * @param $transactionalScoped
 	 */
-	public function __construct(private string $dataSourceName, PdoPool $dbhPool, private bool $transactionalScoped) {
+	public function __construct(private string $dataSourceName, PdoPool $dbhPool, private bool $transactionalScoped,
+			private bool $clearOnResourcesRelease = false) {
 		$this->dbhPool = $dbhPool;
 		$this->entityModelManager = $dbhPool->getEntityModelManager();
 		$this->persistenceContext = new PersistenceContext($dbhPool->getEntityProxyManager());
@@ -152,6 +153,9 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 	}
 
 	function release(): void {
+		if ($this->clearOnResourcesRelease) {
+			$this->clear();
+		}
 	}
 	
 	/**

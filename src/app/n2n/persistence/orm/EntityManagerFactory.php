@@ -33,7 +33,7 @@ interface EntityManagerFactory {
 	/**
 	 * @return \n2n\persistence\orm\EntityManager
 	 */
-	public function create();
+	public function create(bool $clearOnResourcesRelease);
 
 	function clear(): void;
 }
