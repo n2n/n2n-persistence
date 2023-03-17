@@ -11,6 +11,7 @@ use n2n\core\container\TransactionManager;
 use n2n\core\config\PersistenceUnitConfig;
 use n2n\core\ext\N2nMonitor;
 use n2n\util\ex\IllegalStateException;
+use n2n\core\cache\AppCache;
 
 class PersistenceN2nExtension implements N2nExtension {
 	/**
@@ -22,7 +23,7 @@ class PersistenceN2nExtension implements N2nExtension {
 
 	private ?float $slowQueryTime;
 
-	public function __construct(AppConfig $appConfig) {
+	public function __construct(AppConfig $appConfig, AppCache $appCache) {
 		$ormConfig = $appConfig->orm();
 
 		$this->slowQueryTime = $appConfig->error()->getMonitorSlowQueryTime();
@@ -39,7 +40,7 @@ class PersistenceN2nExtension implements N2nExtension {
 	}
 
 	private function obtainPdoPool(TransactionManager $transactionManager, ?N2nMonitor $n2NMonitor): PdoPoolUsage {
-		if ($this->pdoPoolsMaps->offsetExists($transactionManager)) {
+		if (!$this->pdoPoolsMaps->offsetExists($transactionManager)) {
 			$this->pdoPoolsMaps->offsetSet($transactionManager, new PdoPoolUsage(new PdoPool(
 					$this->persistenceUnitConfigs, $transactionManager, $this->slowQueryTime, $n2NMonitor)));
 		}

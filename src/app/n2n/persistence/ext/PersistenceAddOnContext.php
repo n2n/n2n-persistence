@@ -37,7 +37,7 @@ class PersistenceAddOnContext implements AddOnContext {
 	}
 
 	function ensureNotFinalized(): void {
-		if ($this->isFinalized()) {
+		if (!$this->isFinalized()) {
 			return;
 		}
 
