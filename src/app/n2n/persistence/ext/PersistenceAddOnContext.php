@@ -14,6 +14,7 @@ class PersistenceAddOnContext implements AddOnContext {
 
 	function __construct(private EmPool $emPool, private \Closure $finalizeCallback) {
 		$this->simpleMagicContext = new SimpleMagicContext([
+			EmPool::class => $this->emPool,
 			PdoPool::class => $emPool->getPdoPool(),
 			EntityManager::class => fn () => $emPool->getEntityManagerFactory()->getExtended(),
 			EntityManagerFactory::class => fn () => $emPool->getEntityManagerFactory()
