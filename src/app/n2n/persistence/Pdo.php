@@ -39,9 +39,9 @@ class Pdo {
 	private array $listeners = array();
 
 	public function __construct(private PersistenceUnitConfig $persistenceUnitConfig,
-			private ?TransactionManager $transactionManager = null, private ?float $slowQueryTime = null,
-			private ?N2nMonitor $n2nMonitor = null) {
-		$this->logger = new PdoLogger($this->getDataSourceName(), $slowQueryTime, $this->n2nMonitor);
+			private ?TransactionManager $transactionManager = null, ?float $slowQueryTime = null,
+			?N2nMonitor $n2nMonitor = null) {
+		$this->logger = new PdoLogger($this->getDataSourceName(), $slowQueryTime, $n2nMonitor);
 
 		$dialectClass = ReflectionUtils::createReflectionClass($persistenceUnitConfig->getDialectClassName());
 		if (!$dialectClass->implementsInterface('n2n\\persistence\\meta\\Dialect')) {
@@ -93,14 +93,12 @@ class Pdo {
 	function reconnect(): void {
 		$this->release();
 
-		$pdo = $this->dialect->createPDO($this->persistenceUnitConfig);
+		$this->pdo = $this->dialect->createPDO($this->persistenceUnitConfig);
 
-		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-		$pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('n2n\persistence\PdoStatement', array()));
+		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+		$this->pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('n2n\persistence\PdoStatement', array()));
 
 		$this->transactionManager?->registerResource($this->pdoTransactionalResource);
-
-		$this->pdo = $pdo;
 	}
 
 	function isConnected(): bool {
