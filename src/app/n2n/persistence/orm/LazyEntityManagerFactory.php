@@ -57,7 +57,7 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 		}
 		
 		$this->transactionalEm = new LazyEntityManager($this->persistenceUnitName, $this->emPool, true);
-		$this->transactionalEm->bindPdo($pdo, $this->emPool->getTransactionManager());
+		$this->transactionalEm->bindPdo($pdo, $this->emPool->getPdoPool()->getTransactionManager());
 	
 		return $this->transactionalEm;
 	}	
