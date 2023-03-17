@@ -19,6 +19,8 @@ class EmPool {
 
 	function __construct(private PdoPool $pdoPool, private EntityModelManager $entityModelManager,
 			private MagicContext $magicContext) {
+
+		$this->entityProxyManager = EntityProxyManager::getInstance();
 	}
 
 	function getPdoPool(): PdoPool {
