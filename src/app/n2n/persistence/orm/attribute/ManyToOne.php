@@ -2,6 +2,8 @@
 namespace n2n\persistence\orm\attribute;
 
 use Attribute;
+use n2n\persistence\orm\CascadeType;
+use n2n\persistence\orm\FetchType;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ManyToOne extends MappableOrmRelationAttribute {
@@ -11,6 +13,7 @@ class ManyToOne extends MappableOrmRelationAttribute {
 			throw new \InvalidArgumentException('Maximum parameter number for AnnoManyToOne is 3.');
 		}
 
-		parent::__construct($targetEntity, null, $cascade, $fetch);
+		parent::__construct($targetEntity, null, $cascade ?? CascadeType::NONE,
+				$fetchType ?? FetchType::LAZY);
 	}
 }

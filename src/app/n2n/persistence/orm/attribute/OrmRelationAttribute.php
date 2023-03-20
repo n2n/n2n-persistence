@@ -10,7 +10,7 @@ abstract class OrmRelationAttribute {
 	private $orphanRemoval = false;
 
 	public function __construct(private ?string $targetEntity = null,
-			private ?int $cascade = CascadeType::NONE, private ?string $fetch = FetchType::LAZY) {
+			private int $cascade = CascadeType::NONE, private string $fetch = FetchType::LAZY) {
 
 		ArgUtils::valEnum($this->fetch, FetchType::getValues(), null, true, 'fetchType');
 	}

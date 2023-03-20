@@ -69,6 +69,13 @@ class EntityModelManager {
 		return $this->entityClasses;
 	}
 
+	/**
+	 * @return EntityModel[]
+	 */
+	function getInitializedEntityModels(): array {
+		return $this->entityModels;
+	}
+
 	public function getEntityModelByClass(string|\ReflectionClass $classP): EntityModel {
 		$className = null;
 		$class = null;
