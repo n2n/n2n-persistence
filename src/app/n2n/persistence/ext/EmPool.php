@@ -66,7 +66,7 @@ class EmPool {
 
 	function clear() {
 		$entityManagerFactories = $this->entityManagerFactories;
-		$this->entityManagerFactory = [];
+		$this->entityManagerFactories = [];
 
 		foreach ($entityManagerFactories as $entityManagerFactory) {
 			$entityManagerFactory->clear();
