@@ -112,7 +112,6 @@ class Pdo {
 	function close(): void {
 		$this->disconnect();
 
-		$this->transactionManager?->unregisterResource($this->pdoTransactionalResource);
 		$this->transactionManager = null;
 		$this->metaData = null;
 		$this->dialect = null;
