@@ -14,6 +14,6 @@ class ManyToOne extends MappableOrmRelationAttribute {
 		}
 
 		parent::__construct($targetEntity, null, $cascade ?? CascadeType::NONE,
-				$fetchType ?? FetchType::LAZY);
+				$fetch ?? FetchType::LAZY);
 	}
 }

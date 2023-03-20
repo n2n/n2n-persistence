@@ -6,8 +6,8 @@ abstract class MappableOrmRelationAttribute extends OrmRelationAttribute {
 	private $mappedBy = null;
 
 	public function __construct(string $targetEntity = null, string $mappedBy = null,
-			int $cascade = null, string $fetchType = null) {
-		parent::__construct($targetEntity, $cascade, $fetchType);
+			int $cascade = null, string $fetch = null) {
+		parent::__construct($targetEntity, $cascade, $fetch);
 
 		if ($mappedBy !== null) {
 			if (is_numeric($mappedBy)) {
