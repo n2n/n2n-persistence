@@ -100,6 +100,7 @@ class PdoPool {
 //		$this->dbhPoolListeners = []
 
 		foreach ($pdos as $pdo) {
+			var_dump('here!');
 			$pdo->close();
 		}
 	}

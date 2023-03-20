@@ -106,6 +106,8 @@ class Pdo {
 	}
 
 	function close(): void {
+		$this->release();
+
 		$this->transactionManager?->unregisterResource($this->pdoTransactionalResource);
 		$this->transactionManager = null;
 		$this->metaData = null;
