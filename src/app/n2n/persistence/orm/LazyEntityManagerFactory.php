@@ -78,7 +78,7 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 	 * @see \n2n\persistence\orm\EntityManagerFactory::create()
 	 */
 	public function create(bool $clearOnResourcesRelease) {
-		return new LazyEntityManager($this->persistenceUnitName, $this->emPool, false, false);
+		return new LazyEntityManager($this->persistenceUnitName, $this->emPool, false, $clearOnResourcesRelease);
 	}
 
 	function clear(): void {
