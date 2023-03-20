@@ -86,6 +86,10 @@ class Pdo {
 			throw new IllegalStateException('Can not release connection while in transaction.');
 		}
 
+		$this->disconnect();
+	}
+
+	private function disconnect(): void {
 		$this->pdo = null;
 		$this->transactionManager?->unregisterResource($this->pdoTransactionalResource);
 	}
@@ -106,7 +110,7 @@ class Pdo {
 	}
 
 	function close(): void {
-		$this->release();
+		$this->disconnect();
 
 		$this->transactionManager?->unregisterResource($this->pdoTransactionalResource);
 		$this->transactionManager = null;
@@ -127,7 +131,7 @@ class Pdo {
 				. ').');
 	}
 
-	private function pdo() {
+	private function pdo(): ?\PDO {
 		if ($this->pdo === null) {
 			$this->reconnect();
 		}
