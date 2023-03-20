@@ -136,9 +136,9 @@ class PersistSupplyJob extends SupplyJobAdapter {
 			$property->supplyPersistAction($this->entityAction, $this->getValue($propertyString), $valueHash, $oldValueHash);
 		}
 
-		foreach ($entityModel->getActionDependencies() as $actionDependency) {
-			$actionDependency->persistActionSupplied($this->entityAction);
-		}
+//		foreach ($entityModel->getActionDependencies() as $actionDependency) {
+//			$actionDependency->persistActionSupplied($this->entityAction);
+//		}
 		
 		$that = $this;
 		$this->entityAction->executeAtEnd(function () use ($that) {

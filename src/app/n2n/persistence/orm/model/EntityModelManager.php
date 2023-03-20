@@ -36,6 +36,7 @@ use n2n\reflection\ReflectionUtils;
 class EntityModelManager {
 	private $entityClasses = null;
 	private $entityModels = array();
+	private bool $eagerInited = false;
 
 	public function __construct(private array $registeredClassNames, private EntityModelFactory $entityModelFactory) {
 		ArgUtils::valArray($registeredClassNames, 'string', false, 'registeredClassNames');
@@ -67,6 +68,23 @@ class EntityModelManager {
 			$this->entityClasses[$entityClass->getName()] = $entityClass;
 		}
 		return $this->entityClasses;
+	}
+
+	function eagerInit(): void {
+		if ($this->eagerInited) {
+			return;
+		}
+
+		$this->eagerInited = true;
+
+		foreach ($this->getEntityClasses() as $entityClass) {
+			$entityModel = $this->getEntityModelByClass($entityClass);
+			$entityModel->ensureInit();
+
+			foreach ($entityModel->getLevelEntityProperties() as $entityProperty) {
+				$entityProperty->ensureInit();
+			}
+		}
 	}
 
 	/**
@@ -137,6 +155,10 @@ class EntityModelManager {
 			foreach ($subClasses as $subClass) {
 				$this->getEntityModelByClass($subClass);
 			}
+		});
+
+		$entityModel->setActionDependenciesAccessCallback(function () {
+			$this->eagerInit();
 		});
 	}
 		

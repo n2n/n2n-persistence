@@ -322,7 +322,10 @@ class EntityModel implements EntityPropertyCollection {
 				. '. Requested entity property is defined in super class: ' 
 				. TypeUtils::prettyClassPropName($superEntityProperty->getEntityModel()->getClass(), $name));
 	}
-	
+
+	/**
+	 * @return EntityProperty[]
+	 */
 	public function getLevelEntityProperties(): array {
 		$this->ensureInit();
 
