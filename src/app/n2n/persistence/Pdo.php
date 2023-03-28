@@ -38,6 +38,8 @@ class Pdo {
 	private ?MetaData $metaData = null;
 	private array $listeners = array();
 
+	private PdoTransactionalResource $pdoTransactionalResource;
+
 	public function __construct(private PersistenceUnitConfig $persistenceUnitConfig,
 			private ?TransactionManager $transactionManager = null, ?float $slowQueryTime = null,
 			?N2nMonitor $n2nMonitor = null) {
