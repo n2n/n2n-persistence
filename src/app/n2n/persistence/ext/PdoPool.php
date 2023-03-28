@@ -49,7 +49,6 @@ class PdoPool {
 	function __construct(private array $persistenceUnitConfigs, private TransactionManager $transactionManager,
 			private ?float $slowQueryTime, private ?N2nMonitor $n2nMonitor) {
 		ArgUtils::valArray($this->persistenceUnitConfigs, PersistenceUnitConfig::class);
-		$this->entityProxyManager = EntityProxyManager::getInstance();
 	}
 
 
