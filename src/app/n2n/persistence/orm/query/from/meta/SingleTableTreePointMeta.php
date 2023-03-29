@@ -36,6 +36,7 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 	private $discriminatorColumnName;
 	private $discriminatorAlias;
 	private $discriminatedEntityModels = [];
+	private array $queryColumns = [];
 	
 	public function __construct(QueryState $queryState, EntityModel $entityModel) {
 		parent::__construct($queryState, $entityModel);
