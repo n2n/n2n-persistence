@@ -39,21 +39,12 @@ class PersistenceN2nExtensionTest extends TestCase {
 	function setUp(): void {
 
 		$this->appConfig = new AppConfig(
-				$this->createMock(GeneralConfig::class),
-				$this->createMock(WebConfig::class),
-				$this->createMock(MailConfig::class),
-				$this->createMock(IoConfig::class),
-				$this->createMock(FilesConfig::class),
-				$this->createMock(ErrorConfig::class),
-				new DbConfig([
+				dbConfig: new DbConfig([
 					new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
 							'SERIALIZABLE', DialectMock::class,
 							false, null)
 				]),
-				new OrmConfig([PseudoEntityMock::class], []),
-				$this->createMock(N2nLocaleConfig::class),
-				$this->createMock(L10nConfig::class),
-				$this->createMock(PseudoL10nConfig::class));
+				ormConfig: new OrmConfig([PseudoEntityMock::class], []));
 
 
 		$this->persistenceN2nExtension = new PersistenceN2nExtension($this->appConfig, new EphemeralAppCache());
