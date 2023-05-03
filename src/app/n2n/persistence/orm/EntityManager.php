@@ -73,9 +73,10 @@ interface EntityManager {
 	public function createNqlCriteria(string $nql, array $params = array()): Criteria;
 
 	/**
-	 * @param ReflectionClass $class
+	 * @template T
+	 * @param class-string<T>|ReflectionClass $class
 	 * @param mixed $id
-	 * @return mixed
+	 * @return T|null
 	 */
 	public function find(string|ReflectionClass $class, mixed $id): mixed;
 
