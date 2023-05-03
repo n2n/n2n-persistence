@@ -74,7 +74,7 @@ class Criteria {
 	}
 	/**
 	 * @param string $distinct
-	 * @return \n2n\persistence\orm\criteria\Criteria
+	 * @return Criteria
 	 */
 	public function distinct($distinct = true) {
 		$this->distinct = $distinct;
@@ -115,13 +115,20 @@ class Criteria {
 		
 		return $this;
 	}
+
+	function clearSelect(): static {
+		$this->unnamedSelectCriteriaItems = [];
+		$this->namedSelectCriteriaItems = [];
+		return $this;
+	}
+
 	/**
 	 * @param string|ReflectionClass $entityClass
 	 * @param string $alias
-	 * @param string $fetch
-	 * @return \n2n\persistence\orm\criteria\Criteria
+	 * @param bool $fetch
+	 * @return Criteria
 	 */
-	public function from(string|ReflectionClass $entityClass, string $alias, bool $fetch = false) {
+	public function from(string|ReflectionClass $entityClass, string $alias, bool $fetch = false): static {
 		$this->validateAlias($alias);
 		$this->treeModClosures[] = function (QueryModel $queryModel, QueryState $queryState) 
 				use ($entityClass, $alias, $fetch) {
@@ -138,7 +145,7 @@ class Criteria {
 	/**
 	 * @param Criteria $criteria
 	 * @param string $alias
-	 * @return \n2n\persistence\orm\criteria\Criteria
+	 * @return Criteria
 	 */
 	public function fromCriteria(Criteria $criteria, string $alias) {
 		$this->validateAlias($alias);
@@ -174,7 +181,7 @@ class Criteria {
 	 * @param string $alias
 	 * @param string $joinType
 	 * @param bool $fetch
-	 * @return \n2n\persistence\orm\criteria\Criteria
+	 * @return Criteria
 	 */
 	public function joinProperty($propertyExpression, string $alias, string $joinType = JoinType::INNER, 
 			bool $fetch = false) {
@@ -306,7 +313,7 @@ class Criteria {
 	/**
 	 * @param int $limit
 	 * @param int $num
-	 * @return \n2n\persistence\orm\criteria\Criteria
+	 * @return Criteria
 	 */
 	public function limit(int $limit = null, int $num = null) {
 		$this->limit = $limit;

@@ -19,6 +19,8 @@ class EmPool {
 
 	function __construct(private PdoPool $pdoPool, private EntityModelManager $entityModelManager,
 			private MagicContext $magicContext) {
+
+		$this->entityProxyManager = EntityProxyManager::getInstance();
 	}
 
 	function getPdoPool(): PdoPool {
@@ -64,7 +66,7 @@ class EmPool {
 
 	function clear() {
 		$entityManagerFactories = $this->entityManagerFactories;
-		$this->entityManagerFactory = [];
+		$this->entityManagerFactories = [];
 
 		foreach ($entityManagerFactories as $entityManagerFactory) {
 			$entityManagerFactory->clear();

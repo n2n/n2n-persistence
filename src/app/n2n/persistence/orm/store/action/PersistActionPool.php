@@ -151,7 +151,7 @@ class PersistActionPool {
 		
 			case EntityInfo::STATE_MANAGED:
 				if (!$entityInfo->hasId()) {
-					throw new IllegalStateException('Unable to update entity with unkown id: '
+					throw new IllegalStateException('Unable to update entity with unknown id: '
 							. $entityInfo->toEntityString());
 				}
 				$persistAction = new UpdatePersistAction($this->actionQueue, $entityModel, $entityInfo->getId(), 
@@ -161,7 +161,7 @@ class PersistActionPool {
 		
 			case EntityInfo::STATE_REMOVED:
 				if (!$entityInfo->hasId()) {
-					throw new IllegalStateException('Unable to update entity with unkown id: '
+					throw new IllegalStateException('Unable to update entity with unknown id: '
 							. $entityInfo->toEntityString());
 				}
 				$persistAction = new UpdatePersistAction($this->actionQueue, $entityModel, $entityInfo->getId(),

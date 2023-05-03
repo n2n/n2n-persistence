@@ -76,7 +76,7 @@ interface EntityManager {
 	 * @template T
 	 * @param class-string<T>|ReflectionClass $class
 	 * @param mixed $id
-	 * @return T|null
+	 * @return T|mixed
 	 */
 	public function find(string|ReflectionClass $class, mixed $id): mixed;
 

@@ -131,6 +131,8 @@ interface EntityProperty {
 	public function hasTargetEntityModel(): bool;
 	
 	public function getTargetEntityModel(): EntityModel;
+
+	function ensureInit(): void;
 	
 	public function __toString(): string;
 }

@@ -25,10 +25,10 @@ use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\store\action\RemoveAction;
 
 interface ActionDependency {
-	/**
-	 * @param PersistAction $persistAction
-	 */
-	public function persistActionSupplied(PersistAction $persistAction);
+//	/**
+//	 * @param PersistAction $persistAction
+//	 */
+//	public function persistActionSupplied(PersistAction $persistAction);
 	/**
 	 * @param RemoveAction $removeAction
 	*/

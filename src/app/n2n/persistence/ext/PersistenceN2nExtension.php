@@ -39,8 +39,12 @@ class PersistenceN2nExtension implements N2nExtension {
 		$this->pdoPoolsMaps = new \SplObjectStorage();
 	}
 
+	function getActivePdoPoolsNum(): int {
+		return $this->pdoPoolsMaps->count();
+	}
+
 	private function obtainPdoPool(TransactionManager $transactionManager, ?N2nMonitor $n2NMonitor): PdoPoolUsage {
-		if ($this->pdoPoolsMaps->offsetExists($transactionManager)) {
+		if (!$this->pdoPoolsMaps->offsetExists($transactionManager)) {
 			$this->pdoPoolsMaps->offsetSet($transactionManager, new PdoPoolUsage(new PdoPool(
 					$this->persistenceUnitConfigs, $transactionManager, $this->slowQueryTime, $n2NMonitor)));
 		}

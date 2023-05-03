@@ -109,7 +109,7 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 		}
 		
 		$pdo = $this->emPool->getPdoPool()->getPdo($this->dataSourceName);
-		$this->bindPdo($pdo, $this->emPool->getTransactionManager());
+		$this->bindPdo($pdo, $this->emPool->getPdoPool()->getTransactionManager());
 		return $pdo;
 	}
 	/**

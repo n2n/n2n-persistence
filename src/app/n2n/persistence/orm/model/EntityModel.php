@@ -322,7 +322,10 @@ class EntityModel implements EntityPropertyCollection {
 				. '. Requested entity property is defined in super class: ' 
 				. TypeUtils::prettyClassPropName($superEntityProperty->getEntityModel()->getClass(), $name));
 	}
-	
+
+	/**
+	 * @return EntityProperty[]
+	 */
 	public function getLevelEntityProperties(): array {
 		$this->ensureInit();
 
@@ -415,13 +418,38 @@ class EntityModel implements EntityPropertyCollection {
 	
 	public function equals($obj) {
 		return $obj instanceof EntityModel && $this->getClass()->getName() == $obj->getClass()->getName();
-	} 
-	
+	}
+
+	private ?\Closure $actionDependenciesAccessCallback = null;
+
+	function setActionDependenciesAccessCallback(\Closure $closure) {
+		$this->actionDependenciesAccessCallback = $closure;
+	}
+
+	function ensureActionDependenciesInit(): void {
+		if ($this->actionDependenciesAccessCallback === null) {
+			return;
+		}
+
+		$closure = $this->actionDependenciesAccessCallback;
+		$this->actionDependenciesAccessCallback = null;
+		try {
+			$closure();
+		} catch (\Throwable $e) {
+			$this->actionDependenciesAccessCallback = $closure;
+			throw $e;
+		}
+	}
+
 	public function registerActionDependency(ActionDependency $actionDependency) {
 		$this->actionDependencies[spl_object_hash($actionDependency)]	= $actionDependency;
 	}
-	
-	public function getActionDependencies() {
+
+	/**
+	 * @return ActionDependency[]
+	 */
+	public function getActionDependencies(): array {
+		$this->ensureActionDependenciesInit();
 		return $this->actionDependencies;
 	}
 }

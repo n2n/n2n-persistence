@@ -195,4 +195,8 @@ class EntityPropertyMock implements BasicEntityProperty {
 	public function createRepresentingQueryItem(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		// TODO: Implement createRepresentingQueryItem() method.
 	}
+
+	function ensureInit(): void {
+		// TODO: Implement ensureInit() method.
+	}
 }
