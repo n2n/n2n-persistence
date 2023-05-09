@@ -30,10 +30,10 @@ class CascadeType {
   	const DETACH = 16;
   	const NONE = 0;
   	
-  	public static function buildString($cascadeType) {
-  		if ($cascadeType & self::ALL) {
-  			return 'all';
-  		}
+  	public static function buildString(int $cascadeType): string {
+		if (($cascadeType & self::ALL) === self::ALL) {
+			return 'all';
+		}
   		
   		$cascadeStrings = array();
 
