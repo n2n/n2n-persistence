@@ -122,7 +122,7 @@ class RemoveActionPool {
 		$id = $entityInfo->getId();
 
 		if (!$entityInfo->hasId()) {
-			throw new IllegalStateException('Unable to remove entity with unkown id: '
+			throw new IllegalStateException('Unable to remove entity with unknown id: '
 					. $entityInfo->toEntityString());
 		}
 

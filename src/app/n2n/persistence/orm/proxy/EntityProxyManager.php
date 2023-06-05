@@ -28,6 +28,7 @@ use \InvalidArgumentException;
 use ReflectionClass;
 use n2n\util\ex\IllegalStateException;
 use n2n\util\type\ArgUtils;
+use n2n\util\type\TypeUtils;
 
 class EntityProxyManager {
 	const PROXY_NAMESPACE_PREFIX = 'n2n\\persistence\\orm\\proxy\\entities';
@@ -248,8 +249,8 @@ class EntityProxyManager {
 		return implode('|', $typeStrs);
 	}
 
-	private function buildNamedTypeStr(\ReflectionNamedType $namedType) {
-		if ($namedType->isBuiltin()) {
+	private function buildNamedTypeStr(\ReflectionNamedType $namedType): string {
+		if (TypeUtils::isTypeNsFree($namedType)) {
 			return $namedType->getName();
 		}
 
