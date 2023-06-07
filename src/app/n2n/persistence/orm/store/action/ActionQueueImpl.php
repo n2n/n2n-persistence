@@ -158,8 +158,10 @@ class ActionQueueImpl implements ActionQueue {
 		return true;
 	}
 
-	public function flush() {
-		IllegalStateException::assertTrue(!$this->flushing);
+	public function flush(): void {
+		IllegalStateException::assertTrue(
+				!$this->persistActionPool->isFrozend() && !$this->removeActionPool->isFrozend(),
+					'ActionQueue is already flushing and in a too advanced state to be further modified.');
 		$this->flushing = true;
 
 		$this->triggerAtStartClosures();
@@ -169,7 +171,7 @@ class ActionQueueImpl implements ActionQueue {
 				$this->persistActionPool->prepareSupplyJobs();
 			} while ($this->removeActionPool->prepareSupplyJobs() || $this->triggerAtPrepareCycleEndClosures());
 		} while ($this->triggerPreFinilizeAttempt()
-		&& ($this->persistActionPool->prepareSupplyJobs() || $this->removeActionPool->prepareSupplyJobs()));
+				&& ($this->persistActionPool->prepareSupplyJobs() || $this->removeActionPool->prepareSupplyJobs()));
 
 		$this->persistActionPool->freeze();
 		$this->removeActionPool->freeze();
@@ -199,14 +201,14 @@ class ActionQueueImpl implements ActionQueue {
 		$this->em->getPersistenceContext()->detachNotManagedEntityObjs();
 	}
 
-	public function clear() {
+	public function clear(): void {
 		$this->removeActionPool->clear();
 		$this->persistActionPool->clear();
 		$this->actionJobs = [];
 		$this->entityListenersMap = new \WeakMap();
 	}
 
-	public function announceLifecycleEvent(LifecycleEvent $event) {
+	public function announceLifecycleEvent(LifecycleEvent $event): bool {
 		switch ($event->getType()) {
 			case LifecycleEvent::PRE_PERSIST:
 			case LifecycleEvent::PRE_REMOVE:

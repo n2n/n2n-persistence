@@ -131,7 +131,7 @@ class PersistActionPool {
 		return $this->createPersistAction($entity, $entityInfo);
 	}
 	
-	private function registerPersistAction($entity, PersistAction $persistAction) {
+	private function registerPersistAction($entity, PersistAction $persistAction): void {
 		$objHash = spl_object_hash($entity);
 		$this->persistActions[$objHash] = $persistAction;
 		$this->unsuppliedPersistActions[$objHash] = $persistAction;
@@ -177,6 +177,8 @@ class PersistActionPool {
 				throw new PersistenceOperationException('Can not persist detached entity: '
 						. $entityInfo->toEntityString());
 		}
+
+		throw new IllegalStateException('Illegal state: ' . $entityInfo->getState());
 	}
 	
 	private function createActionMeta(EntityModel $entityModel, EntityInfo $entityInfo) {
@@ -192,12 +194,9 @@ class PersistActionPool {
 		return $this->persistActions;
 	}
 	
-	private function manage(PersistActionAdapter $persistAction, LifecycleEvent &$prePersistEvent = null) {
+	private function manage(PersistActionAdapter $persistAction, LifecycleEvent &$prePersistEvent = null): void {
 		$entityModel = $persistAction->getEntityModel();
 		$entity = $persistAction->getEntityObj();
-		
-		$this->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::PRE_PERSIST, $entity, 
-				$entityModel, $persistAction->getId()));
 		
 		$persistenceContext = $this->actionQueue->getEntityManager()->getPersistenceContext();
 		$persistenceContext->manageEntityObj($entity, $entityModel);
@@ -217,8 +216,12 @@ class PersistActionPool {
 			$that->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::POST_PERSIST, 
 					$persistAction->getEntityObj(), $persistAction->getEntityModel(), $persistAction->getId()));
 		});
-		
-		return $entity;
+
+		// Moved down so the entity has already the state managed when the external listener is called. This is to avoid
+		// problems if the called listener is flushing the EntityManager or persists the same entity again.
+		$this->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::PRE_PERSIST, $entity,
+				$entityModel, $persistAction->getId()));
+
 	}
 	
 	public function isFrozend() {
@@ -257,7 +260,7 @@ class PersistActionPool {
 		$this->persistSupplyJobs = array();
 	}
 
-	public function prepareSupplyJobs() {
+	public function prepareSupplyJobs(): bool {
 		IllegalStateException::assertTrue(!$this->frozen);
 		
 		if (empty($this->unsuppliedPersistActions)) return false;
@@ -354,7 +357,7 @@ class PersistActionPool {
 		$supplyJob->prepare();
 	}
 	
-	private function announceUpdateLifecylcEvents(array $persistActions) {
+	private function announceUpdateLifecylcEvents(array $persistActions): bool {
 		$callbacksInvoked = false;
 		
 		foreach ($persistActions as $persistAction) {
