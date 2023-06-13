@@ -74,7 +74,20 @@ class OrmUtils {
 // 			}
 // 		}
 // 	}
-	
+
+	public static function initializeProxyObj(EntityManager $em, object $obj): void {
+		if ($obj instanceof EntityProxy) {
+			$em->getPersistenceContext()->getEntityProxyManager()
+					->initializeProxy($obj);
+		}
+	}
+
+	/**
+	 * @param EntityManager $em
+	 * @param $obj
+	 * @return void
+	 * @deprecated use {@link self::initializeProxyObj()}
+	 */
 	public static function initializeProxy(EntityManager $em, $obj) {
 		if ($obj instanceof EntityProxy) {
 			$em->getPersistenceContext()->getEntityProxyManager()

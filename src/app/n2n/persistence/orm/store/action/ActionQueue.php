@@ -48,26 +48,26 @@ interface ActionQueue {
 	/**
 	 * @param object $object
 	 */
-	public function containsPersistAction($object);
+	public function containsPersistAction($entity);
 	/**
 	 * @param $entity
 	 * @return RemoveAction returns null if object already removed or has state new
 	 */
-	public function getRemoveAction($object);
+	public function getRemoveAction($entity);
 	/**
 	 * @param $entity
 	 * @return RemoveAction returns null if object already removed or has state new
 	 */
-	public function getOrCreateRemoveAction($object);
+	public function getOrCreateRemoveAction($entity);
 	/**
 	 * @param object $object
 	 */
-	public function containsRemoveAction($object);
+	public function containsRemoveAction($entity);
 	/**
 	 * @param object $entity
 	 * @param string $type
 	 */
-	public function announceLifecycleEvent(LifecycleEvent $e);
+	public function announceLifecycleEvent(LifecycleEvent $event);
 
 	/**
 	 * @param LifecycleListener $listener

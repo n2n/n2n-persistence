@@ -84,9 +84,6 @@ class RemoveActionPool {
 		$this->unsuppliedRemoveActions[$objHash] = $removeAction;
 		$this->actionQueue->add($removeAction, true);
 		
-		$this->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::PRE_REMOVE, $entity,
-				$removeAction->getEntityModel(), $removeAction->getId()));
-		
 		$this->actionQueue->getEntityManager()->getPersistenceContext()->removeEntityObj($entity);
 		
 		$that = $this;
@@ -94,6 +91,11 @@ class RemoveActionPool {
 			$that->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::POST_REMOVE,
 					$removeAction->getEntityObj(), $removeAction->getEntityModel(), $removeAction->getId()));
 		});
+
+		// Moved down so the entity has already the state removed when the external listener is called. This is to avoid
+		// problems if the called listener is flushing the EntityManager or persists the same entity again.
+		$this->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::PRE_REMOVE, $entity,
+				$removeAction->getEntityModel(), $removeAction->getId()));
 
 		return $removeAction;
 	}
