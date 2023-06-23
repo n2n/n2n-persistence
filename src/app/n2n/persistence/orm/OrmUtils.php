@@ -25,6 +25,7 @@ use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\criteria\item\CriteriaProperty;
 use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
+use n2n\persistence\orm\proxy\EntityProxyManager;
 
 class OrmUtils {	
 // 	public static function extractId($entity, EntityModel $entityModel = null) {
@@ -75,6 +76,18 @@ class OrmUtils {
 // 		}
 // 	}
 
+	static function initialize(object $proxy): void {
+		if ($proxy instanceof EntityProxy) {
+			EntityProxyManager::getInstance()->initializeProxy($proxy);
+		}
+	}
+
+	/**
+	 * @param EntityManager $em
+	 * @param object $obj
+	 * @return void
+	 * @deprecated use {@link self::initialize()}
+	 */
 	public static function initializeProxyObj(EntityManager $em, object $obj): void {
 		if ($obj instanceof EntityProxy) {
 			$em->getPersistenceContext()->getEntityProxyManager()
@@ -86,7 +99,7 @@ class OrmUtils {
 	 * @param EntityManager $em
 	 * @param $obj
 	 * @return void
-	 * @deprecated use {@link self::initializeProxyObj()}
+	 * @deprecated use {@link self::initialize()}
 	 */
 	public static function initializeProxy(EntityManager $em, $obj) {
 		if ($obj instanceof EntityProxy) {
