@@ -30,10 +30,14 @@ use n2n\context\LookupManager;
 use n2n\persistence\Pdo;
 use n2n\persistence\PdoTransactionalResource;
 use n2n\persistence\orm\LazyEntityManager;
+use n2n\core\N2nApplication;
+use n2n\core\cache\AppCache;
+use n2n\util\io\fs\FsPath;
 
 class PersistenceN2nExtensionTest extends TestCase {
 
 	private AppConfig $appConfig;
+	private N2nApplication $n2nApplication;
 	private PersistenceN2nExtension $persistenceN2nExtension;
 
 	function setUp(): void {
@@ -46,18 +50,21 @@ class PersistenceN2nExtensionTest extends TestCase {
 				]),
 				ormConfig: new OrmConfig([PseudoEntityMock::class], []));
 
+		$this->n2nApplication = new N2nApplication($this->createMock(VarStore::class),
+				$this->createMock(ModuleManager::class),
+				new EphemeralAppCache(),
+				$this->appConfig, null);
 
-		$this->persistenceN2nExtension = new PersistenceN2nExtension($this->appConfig, new EphemeralAppCache());
+		$this->persistenceN2nExtension = new PersistenceN2nExtension($this->n2nApplication);
 	}
 
 	function testIf() {
 
 		$tm = new TransactionManager();
 
-		$n2nContext1 = new AppN2nContext($tm, new ModuleManager(), new EphemeralAppCache(),
-				$this->createMock(VarStore::class), $this->appConfig);
+		$n2nContext1 = new AppN2nContext($tm, $this->n2nApplication);
 
-		$this->persistenceN2nExtension->setUp($n2nContext1);
+		$this->persistenceN2nExtension->applyToN2nContext($n2nContext1);
 
 		$addonContexts = $n2nContext1->getAddonContexts();
 		$this->assertCount(1, $addonContexts);
@@ -86,9 +93,8 @@ class PersistenceN2nExtensionTest extends TestCase {
 		$this->assertEquals(1, $this->persistenceN2nExtension->getActivePdoPoolsNum());
 
 
-		$n2nContext2 = new AppN2nContext($tm, new ModuleManager(), new EphemeralAppCache(),
-				$this->createMock(VarStore::class), $this->appConfig);
-		$this->persistenceN2nExtension->setUp($n2nContext2);
+		$n2nContext2 = new AppN2nContext($tm, $this->n2nApplication);
+		$this->persistenceN2nExtension->applyToN2nContext($n2nContext2);
 
 
 		$resources = array_values($tm->getResources());
