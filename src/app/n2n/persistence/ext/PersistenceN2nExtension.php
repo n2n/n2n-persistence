@@ -12,8 +12,10 @@ use n2n\core\config\PersistenceUnitConfig;
 use n2n\core\ext\N2nMonitor;
 use n2n\util\ex\IllegalStateException;
 use n2n\core\cache\AppCache;
+use n2n\core\N2nApplication;
+use n2n\core\ext\ConfigN2nExtension;
 
-class PersistenceN2nExtension implements N2nExtension {
+class PersistenceN2nExtension implements ConfigN2nExtension {
 	/**
 	 * @var PersistenceUnitConfig[] $persistenceUnitConfigs;
 	 */
@@ -23,7 +25,8 @@ class PersistenceN2nExtension implements N2nExtension {
 
 	private ?float $slowQueryTime;
 
-	public function __construct(AppConfig $appConfig, AppCache $appCache) {
+	public function __construct(N2nApplication $n2nApplication) {
+		$appConfig = $n2nApplication->getAppConfig();
 		$ormConfig = $appConfig->orm();
 
 		$this->slowQueryTime = $appConfig->error()->getMonitorSlowQueryTime();
@@ -63,7 +66,7 @@ class PersistenceN2nExtension implements N2nExtension {
 		$this->pdoPoolsMaps->offsetUnset($pdoPoolUsage->pdoPool->getTransactionManager());
 	}
 
-	function setUp(AppN2nContext $appN2nContext): void {
+	function applyToN2nContext(AppN2nContext $appN2nContext): void {
 		$pdoPoolUsage = $this->obtainPdoPool($appN2nContext->getTransactionManager(), $appN2nContext->getMonitor());
 
 		$persistenceAddOnContext = new PersistenceAddOnContext(

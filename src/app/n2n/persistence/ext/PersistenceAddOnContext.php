@@ -45,14 +45,14 @@ class PersistenceAddOnContext implements AddOnContext {
 		throw new IllegalStateException(self::class . ' already finalized.');
 	}
 
-//	function copyTo(AppN2nContext $appN2NContext): void {
-//		if ($appN2NContext->getTransactionManager() === $this->pdoPool->getTransactionManager()) {
-//			$pdoPool = $this->pdoPool->fork($appN2NContext);
+//	function copyTo(AppN2nContext $appN2nContext): void {
+//		if ($appN2nContext->getTransactionManager() === $this->pdoPool->getTransactionManager()) {
+//			$pdoPool = $this->pdoPool->fork($appN2nContext);
 //		} else {
-//			$pdoPool = PdoPool::createFromAppN2nContext($appN2NContext);
+//			$pdoPool = PdoPool::createFromAppN2nContext($appN2nContext);
 //		}
 //
-//		$appN2NContext->addAddonContext(new PersistenceAddOnContext($pdoPool));
+//		$appN2nContext->addAddonContext(new PersistenceAddOnContext($pdoPool));
 //	}
 
 	function finalize(): void {
