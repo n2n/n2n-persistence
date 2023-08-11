@@ -23,7 +23,7 @@ namespace n2n\persistence\orm\model;
 
 interface EntityPropertyCollection {
 
-	public function containsEntityPropertyName($name): bool;
+	public function containsEntityPropertyName(string $name): bool;
 	
 	/**
 	 * @return \n2n\persistence\orm\property\EntityProperty[] key is the property name
