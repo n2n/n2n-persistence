@@ -22,22 +22,36 @@
 namespace n2n\persistence\orm\model;
 
 interface EntityPropertyCollection {
-	/**
-	 * @return boolean
-	 */
-	public function containsEntityPropertyName($name);
+
+	public function containsEntityPropertyName($name): bool;
 	
 	/**
 	 * @return \n2n\persistence\orm\property\EntityProperty[] key is the property name
 	 */
-	public function getEntityProperties();
+	public function getEntityProperties(): array;
 	
 	/**
 	 * @param string $name
 	 * @return \n2n\persistence\orm\property\EntityProperty
 	 * @throws UnknownEntityPropertyException
 	 */
-	public function getEntityPropertyByName($name);
-	
+	public function getEntityPropertyByName(string $name): \n2n\persistence\orm\property\EntityProperty;
+
+
+	public function containsLevelEntityPropertyName(string $name): bool;
+
+	/**
+	 * @return \n2n\persistence\orm\property\EntityProperty[] key is the property name
+	 */
+	public function getLevelEntityProperties(): array;
+
+	/**
+	 * @param string $name
+	 * @return \n2n\persistence\orm\property\EntityProperty
+	 * @throws UnknownEntityPropertyException
+	 */
+	public function getLevelEntityPropertyByName(string $name): \n2n\persistence\orm\property\EntityProperty;
+
+
 	public function getClass(): \ReflectionClass;
 }

@@ -262,7 +262,7 @@ class EntityModel implements EntityPropertyCollection {
 		$this->properties[$property->getName()] = $property;
 	}
 	
-	public function containsEntityPropertyName($name) {
+	public function containsEntityPropertyName($name): bool {
 		$this->ensureInit();
 
 		if  (isset($this->properties[$name])) return true;
@@ -273,7 +273,7 @@ class EntityModel implements EntityPropertyCollection {
 	/**
 	 * @return EntityProperty[] key is NOT the property name
 	 */
-	public function getEntityProperties() {
+	public function getEntityProperties(): array {
 		$this->ensureInit();
 
 		if ($this->superEntityModel === null) {
@@ -286,7 +286,7 @@ class EntityModel implements EntityPropertyCollection {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\model\EntityPropertyCollection::getEntityPropertyByName()
 	 */
-	public function getEntityPropertyByName($name) {
+	public function getEntityPropertyByName(string $name): EntityProperty {
 		$this->ensureInit();
 
 		if (!$this->containsEntityPropertyName($name)) {
