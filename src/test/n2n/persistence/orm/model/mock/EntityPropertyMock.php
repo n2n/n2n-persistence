@@ -7,7 +7,6 @@ use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\property\AccessProxy;
 use n2n\util\ex\IllegalStateException;
-use n2n\reflection\ReflectionException;
 use n2n\persistence\orm\EntityDataException;
 use n2n\util\type\TypeUtils;
 use n2n\persistence\orm\property\BasicEntityProperty;
@@ -21,6 +20,7 @@ use n2n\persistence\Pdo;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\store\action\RemoveAction;
+use n2n\reflection\property\PropertyAccessException;
 
 class EntityPropertyMock implements BasicEntityProperty {
 	private $entityModel;
@@ -93,7 +93,7 @@ class EntityPropertyMock implements BasicEntityProperty {
 	public function readValue($object) {
 		try {
 			return $this->accessProxy->getValue($object);
-		} catch (ReflectionException $e) {
+		} catch (PropertyAccessException $e) {
 			throw new EntityDataException('Failed to read value of ' . $this, 0, $e);
 		}
 	}
