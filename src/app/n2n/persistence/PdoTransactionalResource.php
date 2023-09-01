@@ -51,15 +51,14 @@ class PdoTransactionalResource implements TransactionalResource {
 	public function prepareCommit(Transaction $transaction): void {
 		$this->prepareCommitClosure->invoke($transaction);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\core\container\TransactionalResource::commit()
-	 */
+
+	public function requestCommit(Transaction $transaction): void {
+	}
+
 	public function commit(Transaction $transaction): void {
 		$this->commitClosure->invoke($transaction);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\core\container\TransactionalResource::rollBack()
-	 */
+
 	public function rollBack(Transaction $transaction): void {
 		$this->rollBackClosure->invoke($transaction);
 	}

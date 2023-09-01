@@ -141,6 +141,9 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 		$this->actionQueue->commit();
 	}
 
+	public function requestCommit(Transaction $transaction): void {
+	}
+
 	public function commit(Transaction $transaction): void {
 		if ($this->transactionalScoped) {
 			$this->close();
