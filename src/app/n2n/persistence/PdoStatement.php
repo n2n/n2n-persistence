@@ -21,21 +21,18 @@
  */
 namespace n2n\persistence;
 
-class PdoStatement extends \PDOStatement {
-	private $logger;
+class PdoStatement {
+	private ?PdoLogger $logger;
 	private $boundValues = array();
 
-	private function __construct() {
+	function __construct(private \PDOStatement $stmt) {
 	}
 	
 	public function getBindedValues() {
 		return $this->boundValues;
 	}
-	
-	/**
-	 * @param PdoLogger $logger
-	 */
-	public function setLogger(PdoLogger $logger) {
+
+	public function setLogger(?PdoLogger $logger): void {
 		$this->logger = $logger;
 	}
 	
@@ -46,9 +43,9 @@ class PdoStatement extends \PDOStatement {
 	public function bindValue($parameter, $value, $dataType = null): bool {
 		$this->boundValues[$parameter] = $value;
 		if ($dataType !== null) {
-			return parent::bindValue($parameter, $value, $dataType);
+			return $this->stmt->bindValue($parameter, $value, $dataType);
 		} else {
-			return parent::bindValue($parameter, $value);
+			return $this->stmt->bindValue($parameter, $value);
 		}
 	}
 	
@@ -70,7 +67,7 @@ class PdoStatement extends \PDOStatement {
 	 */
 	public function bindParam($parameter, &$variable, $data_type = \PDO::PARAM_STR, $length = null, $driver_options = null): bool {
 		$this->boundValues[$parameter] = $variable;
-		return parent::bindParam($parameter, $variable, $data_type, $length, $driver_options);
+		return $this->stmt->bindParam($parameter, $variable, $data_type, $length, $driver_options);
 	}
 	
 	private $boundParams = array();
@@ -82,7 +79,7 @@ class PdoStatement extends \PDOStatement {
 			$this->shareBoundParams[$column] = array();
 			
 			$this->boundParams[$column] = null;
-			$this->bindColumn($column, $this->boundParams[$column]);
+			$this->stmt->bindColumn($column, $this->boundParams[$column]);
 		}
 		
 		$this->shareBoundParams[$column][] = &$param;
@@ -104,9 +101,9 @@ class PdoStatement extends \PDOStatement {
 		
 		try {
 			$mtime = microtime(true);
-			$return = parent::execute($input_parameters);
+			$return = $this->stmt->execute($input_parameters);
 			if (isset($this->logger)) {
-				$this->logger->addPreparedExecution($this->queryString, $this->boundValues, (microtime(true) - $mtime));
+				$this->logger->addPreparedExecution($this->stmt->queryString, $this->boundValues, (microtime(true) - $mtime));
 			}
 			
 			if (!$return) {
@@ -116,7 +113,7 @@ class PdoStatement extends \PDOStatement {
 			
 			return $return;
 		} catch (\PDOException $e) {
-			throw new PdoPreparedExecutionException($e, $this->queryString, $this->boundValues);
+			throw new PdoPreparedExecutionException($e, $this->stmt->queryString, $this->boundValues);
 		}
 	}
 	
@@ -130,12 +127,16 @@ class PdoStatement extends \PDOStatement {
 	
 
 	public function fetch(int $fetch_style = \PDO::FETCH_BOTH, int $cursor_orientation = \PDO::FETCH_ORI_NEXT, int $cursor_offset = 0): mixed {
-		$return = parent::fetch($fetch_style, $cursor_orientation, $cursor_offset);
+		$return = $this->stmt->fetch($fetch_style, $cursor_orientation, $cursor_offset);
 		
 		if ($fetch_style == \PDO::FETCH_BOUND) {
 			$this->supplySharedBounds();
 		}
 		
 		return $return;
+	}
+
+	function fetchAll(int $mode = \PDO::FETCH_DEFAULT, ...$args): array {
+		return $this->stmt->fetchAll($mode, ...$args);
 	}
 }

@@ -14,6 +14,7 @@ use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\meta\data\DeleteStatementBuilder;
 use n2n\persistence\meta\data\Importer;
 use n2n\persistence\meta\OrmDialectConfig;
+use n2n\util\ex\UnsupportedOperationException;
 
 class DialectMock implements Dialect {
 
@@ -21,62 +22,64 @@ class DialectMock implements Dialect {
 	}
 
 	public function getName(): string {
-		// TODO: Implement getName() method.
+		throw new UnsupportedOperationException();
 	}
 
 	function createPDO(PersistenceUnitConfig $persistenceUnitConfig): \PDO {
-		return new \PDO($persistenceUnitConfig->getDsnUri(), $persistenceUnitConfig->getUser(), $persistenceUnitConfig->getPassword());
+		$pdo = new \PDO($persistenceUnitConfig->getDsnUri(), $persistenceUnitConfig->getUser(), $persistenceUnitConfig->getPassword(),
+				[\PDO::ATTR_PERSISTENT => $persistenceUnitConfig->isPersistent()]);
+		return $pdo;
 	}
 
 	public function createMetaManager(Pdo $dbh): MetaManager {
-		// TODO: Implement createMetaManager() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function quoteField(string $str): string {
-		// TODO: Implement quoteField() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function escapeLikePattern(string $pattern): string {
-		// TODO: Implement escapeLikePattern() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function getLikeEscapeCharacter(): string {
-		// TODO: Implement getLikeEscapeCharacter() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createSelectStatementBuilder(Pdo $dbh): SelectStatementBuilder {
-		// TODO: Implement createSelectStatementBuilder() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createUpdateStatementBuilder(Pdo $dbh): UpdateStatementBuilder {
-		// TODO: Implement createUpdateStatementBuilder() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createInsertStatementBuilder(Pdo $dbh): InsertStatementBuilder {
-		// TODO: Implement createInsertStatementBuilder() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createDeleteStatementBuilder(Pdo $dbh): DeleteStatementBuilder {
-		// TODO: Implement createDeleteStatementBuilder() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createImporter(Pdo $dbh, InputStream $inputStream): Importer {
-		// TODO: Implement createImporter() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function getOrmDialectConfig(): OrmDialectConfig {
-		// TODO: Implement getOrmDialectConfig() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function isLastInsertIdSupported(): bool {
-		// TODO: Implement isLastInsertIdSupported() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function generateSequenceValue(Pdo $dbh, string $sequenceName): ?string {
-		// TODO: Implement generateSequenceValue() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function applyIdentifierGeneratorToColumn(Pdo $dbh, Column $column, string $sequenceName) {
-		// TODO: Implement applyIdentifierGeneratorToColumn() method.
+		throw new UnsupportedOperationException();
 	}
 }

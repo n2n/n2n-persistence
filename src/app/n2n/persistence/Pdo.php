@@ -25,7 +25,7 @@ use n2n\persistence\meta\MetaData;
 use n2n\reflection\ReflectionUtils;
 use n2n\core\container\TransactionManager;
 use n2n\core\container\Transaction;
-use n2n\core\container\CommitFailedException;
+use n2n\core\container\err\CommitFailedException;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\meta\Dialect;
 use n2n\core\config\PersistenceUnitConfig;
@@ -75,6 +75,10 @@ class Pdo {
 				});
 	}
 
+	function __destruct() {
+		$this->disconnect();
+	}
+
 //	function fork(): Pdo {
 //		$pdo = new Pdo($this->persistenceUnitConfig, $this->transactionManager, $this->slowQueryTime, $this->n2nMonitor);
 //		$pdo->pdo = $this->pdo;
@@ -92,6 +96,10 @@ class Pdo {
 	}
 
 	private function disconnect(): void {
+		if ($this->pdo !== null && $this->pdo->inTransaction()) {
+			$this->pdo->rollBack();
+		}
+
 		$this->pdo = null;
 		$this->transactionManager?->unregisterResource($this->pdoTransactionalResource);
 	}
@@ -102,7 +110,10 @@ class Pdo {
 		$this->pdo = $this->dialect->createPDO($this->persistenceUnitConfig);
 
 		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-		$this->pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('n2n\persistence\PdoStatement', array()));
+
+		if ($this->pdo->inTransaction()) {
+			$this->pdo->rollBack();
+		}
 
 		$this->transactionManager?->registerResource($this->pdoTransactionalResource);
 	}
@@ -177,11 +188,11 @@ class Pdo {
 	 *
 	 * @return PdoStatement
 	 */
-	public function prepare($statement, $driverOptions = array()) {
+	public function prepare($statement, $driverOptions = array()): PdoStatement {
 		try {
 			$mtime = microtime(true);
 
-			$stmt = $this->pdo()->prepare($statement, $driverOptions);
+			$stmt = new PdoStatement($this->pdo()->prepare($statement, $driverOptions));
 
 			$this->logger->addPreparation($statement, (microtime(true) - $mtime));
 			$stmt->setLogger($this->logger);
