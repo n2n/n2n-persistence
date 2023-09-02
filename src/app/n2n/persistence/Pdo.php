@@ -111,9 +111,9 @@ class Pdo {
 
 		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-		if ($this->pdo->inTransaction()) {
-			$this->pdo->rollBack();
-		}
+//		if ($this->pdo->inTransaction()) {
+//			$this->pdo->rollBack();
+//		}
 
 		$this->transactionManager?->registerResource($this->pdoTransactionalResource);
 	}
