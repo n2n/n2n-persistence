@@ -26,9 +26,8 @@ class DialectMock implements Dialect {
 	}
 
 	function createPDO(PersistenceUnitConfig $persistenceUnitConfig): \PDO {
-		$pdo = new \PDO($persistenceUnitConfig->getDsnUri(), $persistenceUnitConfig->getUser(), $persistenceUnitConfig->getPassword(),
+		return new \PDO($persistenceUnitConfig->getDsnUri(), $persistenceUnitConfig->getUser(), $persistenceUnitConfig->getPassword(),
 				[\PDO::ATTR_PERSISTENT => $persistenceUnitConfig->isPersistent()]);
-		return $pdo;
 	}
 
 	public function createMetaManager(Pdo $dbh): MetaManager {
