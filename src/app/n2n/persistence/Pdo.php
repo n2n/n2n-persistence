@@ -198,7 +198,7 @@ class Pdo {
 			$stmt->setLogger($this->logger);
 
 			return $stmt;
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 			throw new PdoStatementException($e, $statement);
 		}
 	}
