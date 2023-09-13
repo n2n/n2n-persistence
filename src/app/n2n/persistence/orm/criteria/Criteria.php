@@ -324,7 +324,13 @@ class Criteria {
 		return $this;
 	}
 
-	function lock(?LockMode $lockMode): static {
+	function lock(LockMode|bool|null $lockMode): static {
+		if ($lockMode === true) {
+			$this->lockMode = LockMode::PESSIMISTIC_WRITE;
+		} elseif ($lockMode === false) {
+			$this->lockMode = null;
+		}
+
 		$this->lockMode = $lockMode;
 		return $this;
 	}
