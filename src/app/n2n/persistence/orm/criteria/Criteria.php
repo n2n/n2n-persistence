@@ -42,6 +42,7 @@ use n2n\persistence\orm\criteria\compare\ComparatorCriteria;
 use n2n\persistence\orm\criteria\compare\SelectColumnComparable;
 use n2n\util\type\TypeUtils;
 use ReflectionClass;
+use n2n\persistence\meta\data\LockMode;
 
 class Criteria {
 	const ORDER_DIRECTION_ASC = OrderDirection::ASC;
@@ -65,6 +66,8 @@ class Criteria {
 	
 	private $limit;
 	private $num;
+
+	private ?LockMode $lockMode = null;
 	/**
 	 * 
 	 */
@@ -315,9 +318,14 @@ class Criteria {
 	 * @param int $num
 	 * @return Criteria
 	 */
-	public function limit(int $limit = null, int $num = null) {
+	public function limit(int $limit = null, int $num = null): static {
 		$this->limit = $limit;
 		$this->num = $num;
+		return $this;
+	}
+
+	function lock(?LockMode $lockMode): static {
+		$this->lockMode = $lockMode;
 		return $this;
 	}
 	
@@ -387,6 +395,7 @@ class Criteria {
 		
 		$queryModel->setLimit($this->limit);
 		$queryModel->setNum($this->num);
+		$queryModel->setLockMode($this->lockMode);
 		
 		return $queryModel;
 	}

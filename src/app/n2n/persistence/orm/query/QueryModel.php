@@ -25,6 +25,7 @@ use n2n\persistence\orm\query\from\Tree;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\meta\data\QueryItem;
+use n2n\persistence\meta\data\LockMode;
 
 class QueryModel {
 	private $distinct;
@@ -42,7 +43,9 @@ class QueryModel {
 	private $havingQueryComparator;
 	private $limit;
 	private $num;
-	
+
+	private ?LockMode $lockMode = null;
+
 	public function __construct(Tree $tree, QueryItemSelect $queryItemSelect) {
 		$this->tree = $tree;
 		$this->queryItemSelect = $queryItemSelect;;	
@@ -118,6 +121,10 @@ class QueryModel {
 	public function setNum($num) {
 		$this->num = $num;
 	}
+
+	function setLockMode(?LockMode $lockMode): void {
+		$this->lockMode = $lockMode;
+	}
 	
 	public function apply(SelectStatementBuilder $selectBuilder) {
 		$selectBuilder->setDistinct($this->distinct);
@@ -138,5 +145,7 @@ class QueryModel {
 		$selectBuilder->getHavingComparator()->andGroup($this->havingQueryComparator);
 		
 		$selectBuilder->setLimit($this->limit, $this->num);
+
+		$selectBuilder->setLockMode($this->lockMode);
 	}
 }
