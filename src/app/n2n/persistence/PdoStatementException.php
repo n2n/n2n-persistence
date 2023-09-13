@@ -27,7 +27,7 @@ class PdoStatementException extends \PDOException implements QueryStumble {
 	private ?string $statementString;
 	
 	public function __construct(\PDOException $e, string $statementString) {
-		parent::__construct($e->getMessage() . ' Query: ' . $statementString,
+		parent::__construct($e->getMessage() . ' ' . PHP_EOL . 'Query: ' . PHP_EOL . $statementString,
 				0, $e);
 		$this->code = $e->getCode();
 		$this->errorInfo = $e->errorInfo;
