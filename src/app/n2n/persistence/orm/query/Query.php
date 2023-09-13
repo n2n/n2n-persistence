@@ -109,7 +109,7 @@ class ResultBuilder {
 		$this->hiddenSelections = $hiddenSelections;
 	}
 	
-	public function buildRow() {
+	public function buildRow(): void {
 		foreach ($this->hiddenSelections as $selection) {
 			$this->hiddenValueBuilders[] = $selection->createValueBuilder();
 		}
@@ -121,7 +121,7 @@ class ResultBuilder {
 		$this->resultValueBuilderRows[] = $resultValueBuilders;
 	}
 	
-	public function buildResult() {
+	public function buildResult(): array {
 		foreach ($this->hiddenValueBuilders as $hiddenValueBuilder) {
 			$hiddenValueBuilder->buildValue();
 		}

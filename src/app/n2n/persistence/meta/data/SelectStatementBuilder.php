@@ -43,6 +43,9 @@ interface SelectStatementBuilder {
 	 */
 	public function getHavingComparator();
 	public function setLimit($limit, $num = null);
+
+	function setLockMode(?LockMode $lockMode): void;
+
 	public function toSqlString();
 	/**
 	 * @return QueryResult

@@ -36,20 +36,21 @@ use n2n\persistence\Pdo;
 use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\meta\data\OrderDirection;
 use n2n\persistence\meta\data\StatementQueryResult;
+use n2n\persistence\meta\data\LockMode;
 
 class CommonSelectStatementBuilder implements SelectStatementBuilder {
 	const COLUMN_SEPARATOR = ',';
-	
+
 	/**
 	 * @var \n2n\persistence\Pdo
 	 */
 	private $dbh;
-	
+
 	/**
 	 * @var \n2n\persistence\meta\data\common\QueryFragmentBuilderFactory
 	 */
 	private $fragmentBuilderFactory;
-	
+
 	private $selectColumns = array();
 	private $fromQueryResults = array();
 	private $joins = array();
@@ -60,26 +61,28 @@ class CommonSelectStatementBuilder implements SelectStatementBuilder {
 	private $limit;
 	private $num;
 	private $distinct;
-	
-	public function __construct(Pdo $dbh, QueryFragmentBuilderFactory $fragmentBuilderFactory) {
+	private ?LockMode $lockMode = null;
+
+	public function __construct(Pdo $dbh, QueryFragmentBuilderFactory $fragmentBuilderFactory,
+			private ?SelectLockBuilder $selectLockBuilder) {
 		$this->dbh = $dbh;
 		$this->whereComparator = new QueryComparator();
 		$this->havingComparator = new QueryComparator();
 		$this->fragmentBuilderFactory = $fragmentBuilderFactory;
 	}
-	
+
 	public function setDistinct($distinct) {
 		$this->distinct = $distinct;
 	}
-	
+
 	public function addSelectColumn(QueryItem $queryItem, $asName = null) {
 		$this->selectColumns[] = array('queryItem' => $queryItem, 'asName' => $asName);
 	}
-	
+
 	public function addFrom(QueryResult $queryResult, $alias = null) {
 		$this->fromQueryResults[] = array('queryResult' => $queryResult, 'alias' => $alias);
 	}
-	
+
 	public function addJoin($joinType, QueryResult $queryResult, $alias = null, QueryComparator $onComparator = null) {
 		ArgUtils::valEnum($joinType, JoinType::getValues());
 		if ($onComparator === null) {
@@ -88,58 +91,63 @@ class CommonSelectStatementBuilder implements SelectStatementBuilder {
 		$this->joins[] = array('type' => $joinType, 'queryResult' => $queryResult, 'alias' => $alias, 'onSelector' => $onComparator);
 		return $onComparator;
 	}
-	
+
 	public function getWhereComparator() {
 		return $this->whereComparator;
 	}
-	
+
 	public function addGroup(QueryItem $queryColumn) {
 		$this->groupColumns[] = $queryColumn;
 	}
-	
+
 	public function getHavingComparator() {
 		return $this->havingComparator;
 	}
-	
+
 	public function setHaving(QueryComparator $queryComparator) {
 		$this->havingComparator = $queryComparator;
 	}
-	
+
 	public function addOrderBy(QueryItem $queryItem, $direction) {
 		ArgUtils::valEnum($direction, OrderDirection::getValues());
 		$this->orders[] = array('queryItem' => $queryItem, 'direction' => $direction);
 	}
-	
+
 	public function setLimit($limit, $num = null) {
 		$this->limit = $limit;
 		$this->num = $num;
 	}
 
+	function setLockMode(?LockMode $lockMode): void {
+		$this->lockMode = $lockMode;
+	}
+
 	public function toQueryResult() {
 		return new StatementQueryResult($this->toSqlString());
 	}
-	
+
 	public function toFromQueryResult(): QueryResult {
 		return new StatementQueryResult($this->buildFromSql(false) . $this->buildJoinSql());
 	}
-	
+
 	public function toSqlString() {
 		return $this->buildSelectSql() . $this->buildFromSql() . $this->buildJoinSql() . $this->buildWhereSql()
-				. $this->buildGroupSql() .	$this->buildHavingSql() . $this->buildOrderSql() . $this->buildLimitSql();
+				. $this->buildGroupSql() . $this->buildHavingSql() . $this->buildOrderSql() . $this->buildLimitSql()
+				. $this->buildLockModeSql();
 	}
-	
+
 	private function buildSelectSql() {
 		$sql = 'SELECT';
-	
+
 		if (!sizeof($this->selectColumns)) {
 			$sql .= ' *';
 			return $sql;
 		}
-		
+
 		if ($this->distinct) {
 			$sql .= ' DISTINCT';
 		}
-	
+
 		$itemSqlArr = array();
 		foreach ($this->selectColumns as $selectColumn) {
 			$fragmentBuilder = $this->fragmentBuilderFactory->create();
@@ -147,28 +155,32 @@ class CommonSelectStatementBuilder implements SelectStatementBuilder {
 			if (isset($selectColumn['asName'])) {
 				$fragmentBuilder->addFieldAlias($selectColumn['asName']);
 			}
-				
+
 			$itemSqlArr[] = $fragmentBuilder->toSql();
 		}
-	
+
 		return $sql . implode(self::COLUMN_SEPARATOR, $itemSqlArr);
 	}
-	
+
 	private function buildFromSql(bool $includeFromKeyword = true) {
 		if (!sizeof($this->fromQueryResults)) return '';
-	
+
 		$sqlArr = array();
 		foreach ($this->fromQueryResults as $fromQueryResult) {
 			$fragmentBuilder = $this->fragmentBuilderFactory->create();
 			$fromQueryResult['queryResult']->buildItem($fragmentBuilder);
-			$sqlArr[] =  $fragmentBuilder->toSql() . (isset($fromQueryResult['alias']) ? ' ' 
-					. $this->dbh->quoteField($fromQueryResult['alias']) : '');	
+			$sqlArr[] =  $fragmentBuilder->toSql() . (isset($fromQueryResult['alias']) ? ' '
+							. $this->dbh->quoteField($fromQueryResult['alias']) : '');
 		}
-		
-		return ($includeFromKeyword ? ' FROM ' : ''). implode(self::COLUMN_SEPARATOR . ' ', $sqlArr);
+
+		return ($includeFromKeyword ? ' FROM ' : '') . implode(self::COLUMN_SEPARATOR . ' ', $sqlArr);
 	}
-	
-	private function buildJoinSql() {
+
+	private function buildJoinSql(): string {
+		if (empty($this->joins)) {
+			return '';
+		}
+
 		$sqlArr = array();
 		foreach ($this->joins as $join) {
 			$fragmentBuilder = $this->fragmentBuilderFactory->create();
@@ -177,18 +189,18 @@ class CommonSelectStatementBuilder implements SelectStatementBuilder {
 			if (isset($join['alias'])) {
 				$sqlPart .= ' ' . $this->dbh->quoteField($join['alias']);
 			}
-				
+
 			if (!$join['onSelector']->isEmpty()) {
 				$fragmentBuilder = $this->fragmentBuilderFactory->create();
 				$join['onSelector']->buildQueryFragment($fragmentBuilder);
 				$sqlPart .= ' ON' . $fragmentBuilder->toSql();
 			}
-				
+
 			$sqlArr[] = $sqlPart;
 		}
 		return ' ' . implode(' ', $sqlArr);
 	}
-	
+
 	private function buildWhereSql() {
 		if (is_null($this->whereComparator) || $this->whereComparator->isEmpty()) {
 			return '';
@@ -197,12 +209,12 @@ class CommonSelectStatementBuilder implements SelectStatementBuilder {
 		$this->whereComparator->buildQueryFragment($fragmentBuilder);
 		return ' WHERE' . $fragmentBuilder->toSql();
 	}
-	
+
 	private function buildGroupSql() {
 		if (!sizeof($this->groupColumns)) {
 			return '';
 		}
-	
+
 		$sqlArr = array();
 		foreach ($this->groupColumns as $groupColumn) {
 			$fragmentBuilder = $this->fragmentBuilderFactory->create();
@@ -211,7 +223,7 @@ class CommonSelectStatementBuilder implements SelectStatementBuilder {
 		}
 		return ' GROUP BY' . implode(self::COLUMN_SEPARATOR, $sqlArr);
 	}
-	
+
 	private function buildHavingSql() {
 		if (is_null($this->havingComparator) || $this->havingComparator->isEmpty()) {
 			return '';
@@ -220,12 +232,12 @@ class CommonSelectStatementBuilder implements SelectStatementBuilder {
 		$this->havingComparator->buildQueryFragment($fragmentBuilder);
 		return ' HAVING' . $fragmentBuilder->toSql();
 	}
-	
+
 	private function buildOrderSql() {
 		if (!sizeof($this->orders)) {
 			return '';
 		}
-	
+
 		$sqlArr = array();
 		foreach ($this->orders as $order) {
 			$fragementBuilder = $this->fragmentBuilderFactory->create();
@@ -233,17 +245,30 @@ class CommonSelectStatementBuilder implements SelectStatementBuilder {
 			$fragementBuilder->addOperator($order['direction']);
 			$sqlArr[] = $fragementBuilder->toSql();
 		}
-	
+
 		return ' ORDER BY ' . implode(self::COLUMN_SEPARATOR, $sqlArr);
 	}
-	
+
 	private function buildLimitSql() {
 		if (is_null($this->limit)) return '';
-	
+
 		$sql = ' LIMIT ' . intval($this->limit);
 		if (isset($this->num)) {
 			$sql .= self::COLUMN_SEPARATOR . ' ' . intval($this->num);
 		}
 		return $sql;
+	}
+
+	private function buildLockModeSql(): string {
+		if ($this->lockMode === null || $this->selectLockBuilder === null) {
+			return '';
+		}
+
+		$sql = $this->selectLockBuilder->buildStatementEndSql($this->lockMode);
+		if ($sql === null) {
+			return '';
+		}
+
+		return  ' ' . $sql;
 	}
 }

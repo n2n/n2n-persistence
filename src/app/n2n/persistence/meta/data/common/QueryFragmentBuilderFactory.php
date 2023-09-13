@@ -21,9 +21,9 @@
  */
 namespace n2n\persistence\meta\data\common;
 
+use n2n\persistence\meta\data\QueryFragmentBuilder;
+
 interface QueryFragmentBuilderFactory {
-	/**
-	 * @return \n2n\persistence\meta\data\QueryFragmentBuilder
-	 */
-	public function create();
+
+	public function create(): QueryFragmentBuilder;
 }
