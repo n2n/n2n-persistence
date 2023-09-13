@@ -111,9 +111,10 @@ class Pdo {
 
 		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-//		if ($this->pdo->inTransaction()) {
+		if ($this->pdo->inTransaction()) {
+			throw new IllegalStateException('PDO has already an open transaction after connecting.');
 //			$this->pdo->rollBack();
-//		}
+		}
 
 		$this->transactionManager?->registerResource($this->pdoTransactionalResource);
 	}
