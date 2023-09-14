@@ -28,6 +28,8 @@ class CommonSelectLockBuilder implements SelectLockBuilder {
 	function buildStatementEndSql(LockMode $lockMode): ?string {
 		return match ($lockMode) {
 			LockMode::PESSIMISTIC_WRITE => 'FOR UPDATE',
+			LockMode::PESSIMISTIC_WRITE_NOWAIT => 'FOR UPDATE NOWAIT',
+			LockMode::PESSIMISTIC_WRITE_SKIP_LOCKED => 'FOR UPDATE SKIP LOCKED',
 			default => '',
 		};
 	}
