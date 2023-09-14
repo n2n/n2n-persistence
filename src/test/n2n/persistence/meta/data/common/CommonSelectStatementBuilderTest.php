@@ -21,9 +21,9 @@ class CommonSelectStatementBuilderTest extends TestCase {
 
 	function testWithLock(): void {
 		$builderMock = $this->createMock(QueryFragmentBuilder::class);
-		$builderMock->expects($this->once())->method('addTable')
+		$builderMock->expects($this->exactly(3))->method('addTable')
 				->with('holeradio');
-		$builderMock->expects($this->once())->method('toSql')
+		$builderMock->expects($this->exactly(3))->method('toSql')
 				->willReturn('"holeradio"');
 
 		$factoryMock = $this->createMock(QueryFragmentBuilderFactory::class);
@@ -31,8 +31,14 @@ class CommonSelectStatementBuilderTest extends TestCase {
 
 		$builder = new CommonSelectStatementBuilder($this->createPdo(), $factoryMock, new CommonSelectLockBuilder());
 		$builder->addFrom(new QueryTable('holeradio'));
-		$builder->setLockMode(LockMode::PESSIMISTIC_WRITE);
 
+		$builder->setLockMode(LockMode::PESSIMISTIC_WRITE);
 		$this->assertEquals('SELECT * FROM "holeradio" FOR UPDATE', $builder->toSqlString());
+
+		$builder->setLockMode(LockMode::PESSIMISTIC_WRITE_NOWAIT);
+		$this->assertEquals('SELECT * FROM "holeradio" FOR UPDATE NOWAIT', $builder->toSqlString());
+
+		$builder->setLockMode(LockMode::PESSIMISTIC_WRITE_SKIP_LOCKED);
+		$this->assertEquals('SELECT * FROM "holeradio" FOR UPDATE SKIP LOCKED', $builder->toSqlString());
 	}
 }
