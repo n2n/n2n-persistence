@@ -23,8 +23,11 @@ namespace n2n\persistence;
 
 class PdoException extends \PdoException {
 	public function __construct(\PDOException $e) {
-		parent::__construct($e->getMessage(), $e->getCode(), $e->getPrevious());
+		parent::__construct($e->getMessage(), previous: $e->getPrevious());
 
+		// because getCode() could also return a string and code param of parent constructor
+		// only allowes string
+		$this->code = $e->getCode();
 		$this->errorInfo = $e->errorInfo;
 	}
 }
