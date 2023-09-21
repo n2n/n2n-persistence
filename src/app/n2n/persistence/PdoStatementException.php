@@ -23,17 +23,14 @@ namespace n2n\persistence;
 
 use n2n\util\ex\QueryStumble;
 
-class PdoStatementException extends \PDOException implements QueryStumble {
+class PdoStatementException extends PdoException implements QueryStumble {
 	private ?string $statementString;
 	
 	public function __construct(\PDOException $e, string $statementString) {
-		parent::__construct($e->getMessage() . ' ' . PHP_EOL . 'Query: ' . PHP_EOL . $statementString,
-				0, $e);
-		$this->code = $e->getCode();
-		$this->errorInfo = $e->errorInfo;
+		parent::__construct($e);
+
 		$this->statementString = $statementString;
 	}
-	
 	
 	public function getQueryString() {
 		return $this->statementString;
