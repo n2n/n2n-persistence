@@ -53,13 +53,13 @@ interface EntityManager {
 	public function createCriteria(): Criteria;
 
 	/**
-	 *
-	 * @param string|ReflectionClass $class
+	 * @template T
+	 * @param class-string<T>|ReflectionClass $class
 	 * @param array|null $matches
 	 * @param array|null $order
 	 * @param int|null $limit
 	 * @param int|null $num
-	 * @return Criteria
+	 * @return Criteria<T>
 	 */
 	public function createSimpleCriteria(string|ReflectionClass $class, array $matches = null,
 			array $order = null, int $limit = null, int $num = null): Criteria;

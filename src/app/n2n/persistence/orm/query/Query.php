@@ -26,6 +26,9 @@ use n2n\persistence\Pdo;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\LoadingQueue;
 
+/**
+ * @template T
+ */
 class Query {
 	private $loadingQueue;
 	private $stmt;
@@ -58,7 +61,11 @@ class Query {
 		
 		unset($this->unboundParameterNames[$name]);
 	}
-	
+
+	/**
+	 * @param array $parameters
+	 * @return T|null
+	 */
 	public function fetchSingle(array $parameters = array()) {
 		$resultRows = $this->fetchArray($parameters);
 		
@@ -70,7 +77,11 @@ class Query {
 						. count($resultRows));
 		}
 	}
-	
+
+	/**
+	 * @param array $parameters
+	 * @return T[]
+	 */
 	public function fetchArray(array $parameters = array()) {
 		foreach ($parameters as $name => $value) {
 			$this->setParameter($name, $value);

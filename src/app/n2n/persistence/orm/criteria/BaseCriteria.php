@@ -24,6 +24,7 @@ namespace n2n\persistence\orm\criteria;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\query\QueryFactory;
+use n2n\persistence\orm\query\Query;
 
 class BaseCriteria extends Criteria {
 	private $em;
@@ -35,7 +36,7 @@ class BaseCriteria extends Criteria {
 		$this->em = $entityManager;
 	}
 	
-	public function toQuery() {		
+	public function toQuery(): Query {
 		$queryState = new QueryState($this->em);
 		$queryModel = $this->createQueryModel($queryState);
 		

@@ -44,6 +44,9 @@ use n2n\util\type\TypeUtils;
 use ReflectionClass;
 use n2n\persistence\meta\data\LockMode;
 
+/**
+ * @template T
+ */
 class Criteria {
 	const ORDER_DIRECTION_ASC = OrderDirection::ASC;
 	const ORDER_DIRECTION_DESC = OrderDirection::DESC;
@@ -410,9 +413,9 @@ class Criteria {
 		return $queryModel;
 	}
 	/**
-	 * @return Query
+	 * @return Query<T>
 	 */
-	public function toQuery() {
+	public function toQuery(): Query {
 		throw new UnsupportedOperationException('Only base criterias can be converted to Query.');
 	}
 }

@@ -33,6 +33,7 @@ use n2n\persistence\orm\query\QueryModel;
 use n2n\persistence\meta\data\QueryItem;
 use n2n\util\type\CastUtils;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\orm\query\Query;
 
 class ComparatorCriteria extends Criteria implements CriteriaItem {
 
@@ -45,7 +46,7 @@ class ComparatorCriteria extends Criteria implements CriteriaItem {
 				$this->createQueryModel($queryState, $queryPointResolver), $queryState);
 	}
 	
-	public function toQuery() {
+	public function toQuery(): Query {
 		throw new UnsupportedOperationException(
 				'ComparatorCriteria must be used in CriteriaComparator and can not be converted to Query');
 	}
