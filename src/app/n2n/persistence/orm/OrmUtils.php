@@ -76,7 +76,7 @@ class OrmUtils {
 // 		}
 // 	}
 
-	static function initialize(object $proxy): void {
+	static function initialize(?object $proxy): void {
 		if ($proxy instanceof EntityProxy) {
 			EntityProxyManager::getInstance()->initializeProxy($proxy);
 		}
