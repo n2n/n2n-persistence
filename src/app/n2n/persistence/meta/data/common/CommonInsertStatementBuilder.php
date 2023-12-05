@@ -28,17 +28,17 @@ use n2n\persistence\Pdo;
 use n2n\persistence\meta\data\QueryColumn;
 
 class CommonInsertStatementBuilder implements InsertStatementBuilder {
-	
+
 	/**
 	 * @var \n2n\persistence\meta\data\common\QueryFragmentBuilderFactory
 	 */
 	private $fragmentBuilderFactory;
-	
+
 	/**
 	 * @var \n2n\persistence\Pdo
 	 */
 	private $dbh;
-	
+
 	private $tableName;
 	private $columns;
 	private $whereSelector;
@@ -60,9 +60,9 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 	}
 
 	public function toSqlString() {
-		return $this->buildInsertIntoSql() . $this->buildColumnSql();
+		return $this->buildInsertIntoSql() . ' ' . $this->buildColumnSql();
 	}
-	
+
 	public function createAdditionalValueGroup() {
 		$valueGroup = new InsertValueGroup();
 		$this->additionalValueGroups[] = $valueGroup;
@@ -83,10 +83,39 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 			$valuesSqlArr[] = $queryFragmentBuilder->toSql();
 		}
 
-		$sqlString = ' (' . implode(', ', $namesSqlArr) . ') ' . PHP_EOL;
-		 
-		return $sqlString . 'VALUES (' . implode(', ', $valuesSqlArr) . ')' . $this->buildAdditionalValueGroupSql();
+		if (empty($namesSqlArr)) {
+			$sqlString = $this->buildEmptyNamesSql();
+		} else {
+			$sqlString = $this->buildNamesSql($namesSqlArr);
+		}
+
+		$sqlString .= PHP_EOL;
+
+		if (empty($valuesSqlArr)) {
+			$sqlString .= $this->buildEmptyValuesSql();
+		} else {
+			$sqlString .= $this->buildValuesSql($valuesSqlArr);
+		}
+
+		return $sqlString . $this->buildAdditionalValueGroupSql();
 	}
+
+	protected function buildNamesSql(array $namesSqlArr): string {
+		return '(' . implode(', ', $namesSqlArr) . ')';
+	}
+
+	protected function buildEmptyNamesSql(): string {
+		return $this->buildNamesSql([]);
+	}
+
+	protected function buildValuesSql(array $valuesSqlArr): string {
+		return 'VALUES (' . implode(', ', $valuesSqlArr) . ')';
+	}
+
+	protected function buildEmptyValuesSql(): string {
+		return $this->buildValuesSql([]);
+	}
+
 
 	private function buildWhereSql() {
 		if (is_null($this->whereSelector) || $this->whereSelector->isEmpty()) {
@@ -97,12 +126,12 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 		$this->whereSelector->buildQueryFragment($fragmentBuilder);
 		return ' WHERE' . $fragmentBuilder->toSql();
 	}
-	
+
 	private function buildAdditionalValueGroupSql() {
 		if (sizeof($this->additionalValueGroups) == 0) {
 			return '';
 		}
-		
+
 		$sqlString = '';
 		foreach ($this->additionalValueGroups as $valueGroup) {
 			$sqlString .= ',' . PHP_EOL . '(';
