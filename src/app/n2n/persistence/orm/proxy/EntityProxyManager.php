@@ -242,7 +242,7 @@ class EntityProxyManager {
 			throw new InvalidArgumentException('ReflectionNamedType or ReflectionUnionType expected.');
 		}
 
-		if (!$isMixed && $type->allowsNull()) {
+		if (!$isMixed && $type->allowsNull() && !in_array('null', $typeStrs)) {
 			$typeStrs[] = 'null';
 		}
 
