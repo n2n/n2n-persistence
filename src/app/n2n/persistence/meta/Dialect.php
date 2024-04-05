@@ -49,6 +49,8 @@ interface Dialect {
 	 */
 	function createPDO(PersistenceUnitConfig $persistenceUnitConfig): \PDO;
 
+	function beginTransaction(\PDO $pdo, string $transactionIsolationLevel = null, bool $readOnly = false): void;
+
 	/**
 	 * @param Pdo $dbh
 	 * @return MetaManager

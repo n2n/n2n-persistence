@@ -81,4 +81,13 @@ class DialectMock implements Dialect {
 	public function applyIdentifierGeneratorToColumn(Pdo $dbh, Column $column, string $sequenceName) {
 		throw new UnsupportedOperationException();
 	}
+
+	public array $beginTransactionCalls = [];
+
+	function beginTransaction(\PDO $pdo, string $transactionIsolationLevel = null, bool $readOnly = false): void {
+		$this->beginTransactionCalls[] = ['method' => 'beginTransaction',
+				'transactionIsolationLevel' => $transactionIsolationLevel, 'readOnly' => $readOnly];
+
+		$pdo->beginTransaction();
+	}
 }

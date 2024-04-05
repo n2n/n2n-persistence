@@ -86,7 +86,7 @@ class MetaData {
 	/**
 	 * @return \n2n\persistence\meta\Dialect
 	 */
-	public function getDialect() {
+	public function getDialect(): Dialect {
 		return $this->dialect;
 	}
 }

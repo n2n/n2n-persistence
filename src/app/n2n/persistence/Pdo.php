@@ -30,6 +30,7 @@ use n2n\util\ex\IllegalStateException;
 use n2n\persistence\meta\Dialect;
 use n2n\core\config\PersistenceUnitConfig;
 use n2n\core\ext\N2nMonitor;
+use n2n\util\type\TypeUtils;
 
 class Pdo {
 	private ?\PDO $pdo = null;
@@ -50,7 +51,7 @@ class Pdo {
 			throw new \InvalidArgumentException('Dialect class must implement n2n\\persistence\\meta\\Dialect: '
 					. $dialectClass->getName());
 		}
-		$this->dialect = $dialectClass->newInstance();
+		IllegalStateException::try(fn () => $this->dialect = $dialectClass->newInstance());
 		$this->metaData = new MetaData($this, $this->dialect);
 
 		$this->pdoTransactionalResource = new PdoTransactionalResource(
@@ -164,6 +165,7 @@ class Pdo {
 	public function getDataSourceName() {
 		return $this->persistenceUnitConfig->getName();
 	}
+
 	/**
 	 * @return PdoLogger
 	 */
@@ -232,9 +234,9 @@ class Pdo {
 	 * (non-PHPdoc)
 	 * @see PDO::beginTransaction()
 	 */
-	public function beginTransaction() {
+	public function beginTransaction(bool $readOnly = false): void {
 		if ($this->transactionManager === null) {
-			$this->performBeginTransaction();
+			$this->performBeginTransaction(null, $readOnly);
 			return;
 		}
 
@@ -246,10 +248,11 @@ class Pdo {
 	 * (non-PHPdoc)
 	 * @see PDO::commit()
 	 */
-	public function commit() {
+	public function commit(): void {
 		if ($this->transactionManager === null) {
 			$this->prepareCommit();
 			$this->performCommit();
+			return;
 		}
 
 		if ($this->transactionManager->hasOpenTransaction()) {
@@ -272,10 +275,26 @@ class Pdo {
 	}
 
 
-	private function performBeginTransaction(Transaction $transaction = null) {
+	private function performBeginTransaction(Transaction $transaction = null, bool $readOnly = false): void {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_BEGIN, $transaction);
 		$mtime = microtime(true);
-		$this->pdo()->beginTransaction();
+//		$this->pdo()->beginTransaction();
+
+		IllegalStateException::assertTrue(!$this->pdo()->inTransaction(),
+				'Illegal call, pdo already in transaction.');
+
+		$transactionIsolationLevel = ($readOnly
+				? $this->persistenceUnitConfig->getReadOnlyTransactionIsolationLevel()
+				: $this->persistenceUnitConfig->getReadWriteTransactionIsolationLevel());
+
+		$this->dialect->beginTransaction($this->pdo(), $transactionIsolationLevel, $readOnly);
+
+		if (!$this->pdo()->inTransaction()) {
+			throw new IllegalStateException('Dialect call '
+					. TypeUtils::prettyMethName(get_class($this->dialect), 'beginTransaction')
+					. ' did not start a transaction.');
+		}
+
 		$this->logger->addTransactionBegin(microtime(true) - $mtime);
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_BEGAN, $transaction);
 	}
