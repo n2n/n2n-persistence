@@ -64,6 +64,7 @@ interface Dialect {
 	 * @return MetaManager
 	 */
 	public function createMetaManager(Pdo $dbh): MetaManager;
+
 	/**
 	 * @param string $str
 	 */

@@ -5,6 +5,7 @@ namespace n2n\persistence;
 use n2n\core\config\PersistenceUnitConfig;
 use PHPUnit\Framework\TestCase;
 use n2n\persistence\ext\mock\DialectMock;
+use n2n\core\container\TransactionManager;
 
 class PdoTest extends TestCase {
 
@@ -27,9 +28,11 @@ class PdoTest extends TestCase {
 		return (new DialectMock($this->createPersistenceUnitConfig($persistent)))->createPDO();
 	}
 
-	private function createPdo(bool $persistent, string $readOnlyTransactionIsolationLevel = null): Pdo {
+	private function createPdo(bool $persistent, string $readOnlyTransactionIsolationLevel = null,
+			TransactionManager $transactionManager = null): Pdo {
 		return PdoFactory::createFromPersistenceUnitConfig(
-				$this->createPersistenceUnitConfig($persistent, $readOnlyTransactionIsolationLevel));
+				$this->createPersistenceUnitConfig($persistent, $readOnlyTransactionIsolationLevel),
+				$transactionManager);
 	}
 
 	function testPersistent() {
@@ -130,6 +133,34 @@ class PdoTest extends TestCase {
 		$this->assertEquals(false, $dialectMock->beginTransactionCalls[1]['readOnly']);
 
 		$pdo->commit();
+
+		$pdo->close();
+	}
+
+	function testWithTransactionManager(): void {
+		$tm = new TransactionManager();
+		$pdo = $this->createPdo(false,PersistenceUnitConfig::TIL_REPEATABLE_READ, $tm);
+
+		$dialectMock = $pdo->getMetaData()->getDialect();
+		assert($dialectMock instanceof DialectMock);
+
+		$pdo->reconnect();
+
+		$this->assertCount(0, $dialectMock->beginTransactionCalls);
+
+		$tx = $tm->createTransaction(true);
+
+		$this->assertCount(1, $dialectMock->beginTransactionCalls);
+		$this->assertEquals(true, $dialectMock->beginTransactionCalls[0]['readOnly']);
+
+		$tx->commit();
+
+		$tx = $tm->createTransaction(false);
+
+		$this->assertCount(2, $dialectMock->beginTransactionCalls);
+		$this->assertEquals(false, $dialectMock->beginTransactionCalls[1]['readOnly']);
+
+		$tx->commit();
 
 		$pdo->close();
 	}

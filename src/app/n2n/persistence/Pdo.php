@@ -51,7 +51,7 @@ class Pdo {
 
 		$this->pdoTransactionalResource = new PdoTransactionalResource(
 				function(Transaction $transaction) {
-					$this->performBeginTransaction($transaction);
+					$this->performBeginTransaction($transaction, $transaction->isReadOnly());
 				},
 				function(Transaction $transaction) {
 					return $this->prepareCommit($transaction);
