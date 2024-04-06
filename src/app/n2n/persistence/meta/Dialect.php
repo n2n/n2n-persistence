@@ -36,19 +36,26 @@ interface Dialect {
 	/**
 	 * 
 	 */
-	public function __construct();
+	public function __construct(PersistenceUnitConfig $persistenceUnitConfig);
+
 	/**
 	 * @return string
 	 */
 	public function getName(): string;
 
 	/**
-	 * @param PersistenceUnitConfig $persistenceUnitConfig
 	 * @return \PDO
 	 * @throws \PDOException
 	 */
-	function createPDO(PersistenceUnitConfig $persistenceUnitConfig): \PDO;
+	function createPDO(): \PDO;
 
+	/**
+	 * @param \PDO $pdo
+	 * @param string|null $transactionIsolationLevel If provided the isolation level must be applied for
+	 * 		this and only this transaction.
+	 * @param bool $readOnly If true and the database engine supports it the transaction must be specified as read only.
+	 * @return void
+	 */
 	function beginTransaction(\PDO $pdo, string $transactionIsolationLevel = null, bool $readOnly = false): void;
 
 	/**

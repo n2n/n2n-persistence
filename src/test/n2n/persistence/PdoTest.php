@@ -24,7 +24,7 @@ class PdoTest extends TestCase {
 	}
 
 	private function createNativePdo(bool $persistent): \PDO {
-		return (new DialectMock())->createPDO($this->createPersistenceUnitConfig($persistent));
+		return (new DialectMock($this->createPersistenceUnitConfig($persistent)))->createPDO();
 	}
 
 	private function createPdo(bool $persistent, string $readOnlyTransactionIsolationLevel = null): Pdo {
@@ -129,8 +129,7 @@ class PdoTest extends TestCase {
 
 		$this->assertCount(2, $dialectMock->beginTransactionCalls);
 		$this->assertEquals(false, $dialectMock->beginTransactionCalls[1]['readOnly']);
-		$this->assertEquals(PersistenceUnitConfig::TIL_SERIALIZABLE,
-				$dialectMock->beginTransactionCalls[1]['transactionIsolationLevel']);
+		$this->assertNull($dialectMock->beginTransactionCalls[1]['transactionIsolationLevel']);
 
 		$pdo->commit();
 
@@ -157,8 +156,7 @@ class PdoTest extends TestCase {
 
 		$this->assertCount(2, $dialectMock->beginTransactionCalls);
 		$this->assertEquals(false, $dialectMock->beginTransactionCalls[1]['readOnly']);
-		$this->assertEquals(PersistenceUnitConfig::TIL_SERIALIZABLE,
-				$dialectMock->beginTransactionCalls[1]['transactionIsolationLevel']);
+		$this->assertNull($dialectMock->beginTransactionCalls[1]['transactionIsolationLevel']);
 
 		$pdo->commit();
 

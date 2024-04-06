@@ -18,16 +18,18 @@ use n2n\util\ex\UnsupportedOperationException;
 
 class DialectMock implements Dialect {
 
-	public function __construct() {
+
+	public function __construct(private PersistenceUnitConfig $persistenceUnitConfig) {
 	}
 
 	public function getName(): string {
 		throw new UnsupportedOperationException();
 	}
 
-	function createPDO(PersistenceUnitConfig $persistenceUnitConfig): \PDO {
-		return new \PDO($persistenceUnitConfig->getDsnUri(), $persistenceUnitConfig->getUser(), $persistenceUnitConfig->getPassword(),
-				[\PDO::ATTR_PERSISTENT => $persistenceUnitConfig->isPersistent()]);
+	function createPDO(): \PDO {
+		return new \PDO($this->persistenceUnitConfig->getDsnUri(), $this->persistenceUnitConfig->getUser(),
+				$this->persistenceUnitConfig->getPassword(),
+				[\PDO::ATTR_PERSISTENT => $this->persistenceUnitConfig->isPersistent()]);
 	}
 
 	public function createMetaManager(Pdo $dbh): MetaManager {

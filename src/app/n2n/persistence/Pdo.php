@@ -51,7 +51,7 @@ class Pdo {
 			throw new \InvalidArgumentException('Dialect class must implement n2n\\persistence\\meta\\Dialect: '
 					. $dialectClass->getName());
 		}
-		IllegalStateException::try(fn () => $this->dialect = $dialectClass->newInstance());
+		IllegalStateException::try(fn () => $this->dialect = $dialectClass->newInstance($persistenceUnitConfig));
 		$this->metaData = new MetaData($this, $this->dialect);
 
 		$this->pdoTransactionalResource = new PdoTransactionalResource(
@@ -283,9 +283,12 @@ class Pdo {
 		IllegalStateException::assertTrue(!$this->pdo()->inTransaction(),
 				'Illegal call, pdo already in transaction.');
 
-		$transactionIsolationLevel = ($readOnly
-				? $this->persistenceUnitConfig->getReadOnlyTransactionIsolationLevel()
-				: $this->persistenceUnitConfig->getReadWriteTransactionIsolationLevel());
+		$transactionIsolationLevel = null;
+
+		if ($readOnly && $this->persistenceUnitConfig->getReadOnlyTransactionIsolationLevel()
+				!== $this->persistenceUnitConfig->getReadWriteTransactionIsolationLevel()) {
+			$transactionIsolationLevel = $this->persistenceUnitConfig->getReadOnlyTransactionIsolationLevel();
+		}
 
 		$this->dialect->beginTransaction($this->pdo(), $transactionIsolationLevel, $readOnly);
 
