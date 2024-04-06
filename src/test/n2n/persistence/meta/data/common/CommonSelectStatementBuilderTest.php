@@ -9,14 +9,16 @@ use PHPUnit\Framework\TestCase;
 use n2n\persistence\meta\data\QueryTable;
 use n2n\persistence\meta\data\LockMode;
 use n2n\persistence\meta\data\QueryFragmentBuilder;
+use n2n\persistence\PdoFactory;
 
 class CommonSelectStatementBuilderTest extends TestCase {
 
 
 
 	private function createPdo(): Pdo {
-		return new Pdo(new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
-				PersistenceUnitConfig::TIL_SERIALIZABLE, DialectMock::class));
+		return PdoFactory::createFromPersistenceUnitConfig(
+				new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
+						PersistenceUnitConfig::TIL_SERIALIZABLE, DialectMock::class));
 	}
 
 	function testWithLock(): void {

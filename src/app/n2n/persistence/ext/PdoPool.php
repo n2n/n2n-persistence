@@ -38,6 +38,9 @@ use n2n\persistence\PdoPoolListener;
 use n2n\core\container\TransactionManager;
 use n2n\core\container\impl\AppN2nContext;
 use n2n\core\ext\N2nMonitor;
+use n2n\reflection\ReflectionUtils;
+use n2n\util\ex\IllegalStateException;
+use n2n\persistence\PdoFactory;
 
 class PdoPool {
 	const DEFAULT_DS_NAME = 'default';
@@ -168,7 +171,8 @@ class PdoPool {
 	 * @return Pdo
 	 */
 	private function createPdo(PersistenceUnitConfig $persistenceUnitConfig): Pdo {
-		return new Pdo($persistenceUnitConfig, $this->transactionManager, $this->slowQueryTime, $this->n2nMonitor);
+		return PdoFactory::createFromPersistenceUnitConfig($persistenceUnitConfig, $this->transactionManager,
+				$this->slowQueryTime, $this->n2nMonitor);
 	}
 	
 

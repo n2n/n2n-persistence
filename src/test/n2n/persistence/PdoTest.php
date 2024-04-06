@@ -28,7 +28,8 @@ class PdoTest extends TestCase {
 	}
 
 	private function createPdo(bool $persistent, string $readOnlyTransactionIsolationLevel = null): Pdo {
-		return new Pdo($this->createPersistenceUnitConfig($persistent, $readOnlyTransactionIsolationLevel));
+		return PdoFactory::createFromPersistenceUnitConfig(
+				$this->createPersistenceUnitConfig($persistent, $readOnlyTransactionIsolationLevel));
 	}
 
 	function testPersistent() {
@@ -120,8 +121,6 @@ class PdoTest extends TestCase {
 
 		$this->assertCount(1, $dialectMock->beginTransactionCalls);
 		$this->assertEquals(true, $dialectMock->beginTransactionCalls[0]['readOnly']);
-		$this->assertEquals(PersistenceUnitConfig::TIL_REPEATABLE_READ,
-				$dialectMock->beginTransactionCalls[0]['transactionIsolationLevel']);
 
 		$pdo->commit();
 
@@ -129,34 +128,6 @@ class PdoTest extends TestCase {
 
 		$this->assertCount(2, $dialectMock->beginTransactionCalls);
 		$this->assertEquals(false, $dialectMock->beginTransactionCalls[1]['readOnly']);
-		$this->assertNull($dialectMock->beginTransactionCalls[1]['transactionIsolationLevel']);
-
-		$pdo->commit();
-
-		$pdo->close();
-	}
-
-	function testReadWriteAndNullReadOnlyTransactionIsolationLevel(): void {
-		$pdo = $this->createPdo(false,null);
-
-		$dialectMock = $pdo->getMetaData()->getDialect();
-		assert($dialectMock instanceof DialectMock);
-
-		$this->assertCount(0, $dialectMock->beginTransactionCalls);
-
-		$pdo->beginTransaction(true);
-
-		$this->assertCount(1, $dialectMock->beginTransactionCalls);
-		$this->assertEquals(true, $dialectMock->beginTransactionCalls[0]['readOnly']);
-		$this->assertNull($dialectMock->beginTransactionCalls[0]['transactionIsolationLevel']);
-
-		$pdo->commit();
-
-		$pdo->beginTransaction();
-
-		$this->assertCount(2, $dialectMock->beginTransactionCalls);
-		$this->assertEquals(false, $dialectMock->beginTransactionCalls[1]['readOnly']);
-		$this->assertNull($dialectMock->beginTransactionCalls[1]['transactionIsolationLevel']);
 
 		$pdo->commit();
 

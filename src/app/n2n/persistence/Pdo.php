@@ -34,25 +34,20 @@ use n2n\util\type\TypeUtils;
 
 class Pdo {
 	private ?\PDO $pdo = null;
-	private ?Dialect $dialect = null;
 	private PdoLogger $logger;
 	private ?MetaData $metaData = null;
+	private ?Dialect $dialect = null;
 	private array $listeners = array();
 
 	private PdoTransactionalResource $pdoTransactionalResource;
 
-	public function __construct(private PersistenceUnitConfig $persistenceUnitConfig,
+	public function __construct(private string $dataSourceName, Dialect $dialect,
 			private ?TransactionManager $transactionManager = null, ?float $slowQueryTime = null,
 			?N2nMonitor $n2nMonitor = null) {
 		$this->logger = new PdoLogger($this->getDataSourceName(), $slowQueryTime, $n2nMonitor);
 
-		$dialectClass = ReflectionUtils::createReflectionClass($persistenceUnitConfig->getDialectClassName());
-		if (!$dialectClass->implementsInterface('n2n\\persistence\\meta\\Dialect')) {
-			throw new \InvalidArgumentException('Dialect class must implement n2n\\persistence\\meta\\Dialect: '
-					. $dialectClass->getName());
-		}
-		IllegalStateException::try(fn () => $this->dialect = $dialectClass->newInstance($persistenceUnitConfig));
-		$this->metaData = new MetaData($this, $this->dialect);
+		$this->dialect = $dialect;
+		$this->metaData = new MetaData($this, $dialect);
 
 		$this->pdoTransactionalResource = new PdoTransactionalResource(
 				function(Transaction $transaction) {
@@ -108,7 +103,7 @@ class Pdo {
 	function reconnect(): void {
 		$this->release();
 
-		$this->pdo = $this->dialect->createPDO($this->persistenceUnitConfig);
+		$this->pdo = $this->dialect->createPDO();
 
 		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
@@ -163,7 +158,7 @@ class Pdo {
 	 * @return string
 	 */
 	public function getDataSourceName() {
-		return $this->persistenceUnitConfig->getName();
+		return $this->dataSourceName;
 	}
 
 	/**
@@ -283,14 +278,7 @@ class Pdo {
 		IllegalStateException::assertTrue(!$this->pdo()->inTransaction(),
 				'Illegal call, pdo already in transaction.');
 
-		$transactionIsolationLevel = null;
-
-		if ($readOnly && $this->persistenceUnitConfig->getReadOnlyTransactionIsolationLevel()
-				!== $this->persistenceUnitConfig->getReadWriteTransactionIsolationLevel()) {
-			$transactionIsolationLevel = $this->persistenceUnitConfig->getReadOnlyTransactionIsolationLevel();
-		}
-
-		$this->dialect->beginTransaction($this->pdo(), $transactionIsolationLevel, $readOnly);
+		$this->dialect->beginTransaction($this->pdo(), $readOnly);
 
 		if (!$this->pdo()->inTransaction()) {
 			throw new IllegalStateException('Dialect call '

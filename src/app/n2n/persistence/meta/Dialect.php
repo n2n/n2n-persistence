@@ -50,13 +50,14 @@ interface Dialect {
 	function createPDO(): \PDO;
 
 	/**
+	 * Starts a new transaction and applies necessary Transaction Isolation Level or/and Access Mode for this transaction.
+	 * The statement should not affect any settings provided at session level.
+	 *
 	 * @param \PDO $pdo
-	 * @param string|null $transactionIsolationLevel If provided the isolation level must be applied for
-	 * 		this and only this transaction.
-	 * @param bool $readOnly If true and the database engine supports it the transaction must be specified as read only.
+	 * @param bool $readOnly
 	 * @return void
 	 */
-	function beginTransaction(\PDO $pdo, string $transactionIsolationLevel = null, bool $readOnly = false): void;
+	function beginTransaction(\PDO $pdo, bool $readOnly): void;
 
 	/**
 	 * @param Pdo $dbh

@@ -86,9 +86,8 @@ class DialectMock implements Dialect {
 
 	public array $beginTransactionCalls = [];
 
-	function beginTransaction(\PDO $pdo, string $transactionIsolationLevel = null, bool $readOnly = false): void {
-		$this->beginTransactionCalls[] = ['method' => 'beginTransaction',
-				'transactionIsolationLevel' => $transactionIsolationLevel, 'readOnly' => $readOnly];
+	function beginTransaction(\PDO $pdo, bool $readOnly): void {
+		$this->beginTransactionCalls[] = ['method' => 'beginTransaction', 'readOnly' => $readOnly];
 
 		$pdo->beginTransaction();
 	}

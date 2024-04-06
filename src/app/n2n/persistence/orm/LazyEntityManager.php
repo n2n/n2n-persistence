@@ -61,11 +61,6 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 	private $loadingQueue;
 	private $nqlParser;
 
-	/**
-	 * @param string $dataSourceName
-	 * @param PdoPool $emPool
-	 * @param $transactionalScoped
-	 */
 	public function __construct(private string $dataSourceName, EmPool $emPool, private bool $transactionalScoped,
 			private bool $clearOnResourcesRelease = false) {
 		$this->emPool = $emPool;
@@ -116,7 +111,7 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 	 * @param Pdo $pdo
 	 * @throws IllegalStateException
 	 */
-	public function bindPdo(Pdo $pdo, ?TransactionManager $tm) {
+	public function bindPdo(Pdo $pdo, ?TransactionManager $tm): void {
 		$this->ensureEntityManagerOpen();
 		
 		if ($this->pdo !== null) {
