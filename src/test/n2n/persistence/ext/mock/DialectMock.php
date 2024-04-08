@@ -15,6 +15,8 @@ use n2n\persistence\meta\data\DeleteStatementBuilder;
 use n2n\persistence\meta\data\Importer;
 use n2n\persistence\meta\OrmDialectConfig;
 use n2n\util\ex\UnsupportedOperationException;
+use n2n\persistence\PdoLogger;
+use n2n\persistence\PDOOperations;
 
 class DialectMock implements Dialect {
 
@@ -26,7 +28,7 @@ class DialectMock implements Dialect {
 		throw new UnsupportedOperationException();
 	}
 
-	function createPDO(): \PDO {
+	function createPDO(PdoLogger $pdoLogger = null): \PDO {
 		return new \PDO($this->persistenceUnitConfig->getDsnUri(), $this->persistenceUnitConfig->getUser(),
 				$this->persistenceUnitConfig->getPassword(),
 				[\PDO::ATTR_PERSISTENT => $this->persistenceUnitConfig->isPersistent()]);
@@ -86,9 +88,9 @@ class DialectMock implements Dialect {
 
 	public array $beginTransactionCalls = [];
 
-	function beginTransaction(\PDO $pdo, bool $readOnly): void {
+	function beginTransaction(\PDO $pdo, bool $readOnly, PdoLogger $pdoLogger = null): void {
 		$this->beginTransactionCalls[] = ['method' => 'beginTransaction', 'readOnly' => $readOnly];
 
-		$pdo->beginTransaction();
+		PDOOperations::beginTransaction($pdoLogger, $pdo);
 	}
 }

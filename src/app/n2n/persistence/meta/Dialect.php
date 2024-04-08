@@ -30,7 +30,12 @@ use n2n\persistence\meta\data\UpdateStatementBuilder;
 use n2n\persistence\meta\data\InsertStatementBuilder;
 use n2n\persistence\meta\data\DeleteStatementBuilder;
 use n2n\persistence\meta\data\Importer;
+use n2n\persistence\PdoLogger;
+use n2n\persistence\PDOOperations;
 
+/**
+ * - Use {@link PDOOperations} to interact with native PDO.
+ */
 interface Dialect {
 	const DEFAULT_ESCAPING_CHARACTER = '\\';
 	/**
@@ -44,10 +49,12 @@ interface Dialect {
 	public function getName(): string;
 
 	/**
+	 *
+	 *
 	 * @return \PDO
 	 * @throws \PDOException
 	 */
-	function createPDO(): \PDO;
+	function createPDO(PdoLogger $pdoLogger = null): \PDO;
 
 	/**
 	 * Starts a new transaction and applies necessary Transaction Isolation Level or/and Access Mode for this transaction.
@@ -57,7 +64,7 @@ interface Dialect {
 	 * @param bool $readOnly
 	 * @return void
 	 */
-	function beginTransaction(\PDO $pdo, bool $readOnly): void;
+	function beginTransaction(\PDO $pdo, bool $readOnly, PdoLogger $pdoLogger = null): void;
 
 	/**
 	 * @param Pdo $dbh

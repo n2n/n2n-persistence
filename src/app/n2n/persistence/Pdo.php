@@ -182,10 +182,6 @@ class Pdo {
 		return $this->pdo()->inTransaction();
 	}
 
-	/**
-	 *
-	 * @return PdoStatement
-	 */
 	public function prepare($statement, $driverOptions = array()): PdoStatement {
 		try {
 			$mtime = microtime(true);
@@ -211,24 +207,11 @@ class Pdo {
 			throw new PdoStatementException($e, $statement);
 		}
 	}
-	/**
-	 *
-	 * @return int
-	 */
-	public function exec(string $statement) {
-		try {
-			$mtime = microtime(true);
-			$stmt = $this->pdo()->exec($statement);
-			$this->logger->addExecution($statement, (microtime(true) - $mtime));
-			return $stmt;
-		} catch (\PDOException $e) {
-			throw new PdoStatementException($e, $statement);
-		}
+
+	public function exec(string $statement): false|int {
+		return PDOOperations::exec($this->logger, $this->pdo(), $statement);
 	}
-	/**
-	 * (non-PHPdoc)
-	 * @see PDO::beginTransaction()
-	 */
+
 	public function beginTransaction(bool $readOnly = false): void {
 		if ($this->transactionManager === null) {
 			$this->performBeginTransaction(null, $readOnly);
@@ -239,10 +222,7 @@ class Pdo {
 			$this->transactionManager->createTransaction();
 		}
 	}
-	/**
-	 * (non-PHPdoc)
-	 * @see PDO::commit()
-	 */
+
 	public function commit(): void {
 		if ($this->transactionManager === null) {
 			$this->prepareCommit();
@@ -254,11 +234,8 @@ class Pdo {
 			$this->transactionManager->getRootTransaction()->commit();
 		}
 	}
-	/**
-	 * (non-PHPdoc)
-	 * @see PDO::rollBack()
-	 */
-	public function rollBack() {
+
+	public function rollBack(): void {
 		if ($this->transactionManager === null) {
 			$this->performRollBack();
 			return;
@@ -269,16 +246,13 @@ class Pdo {
 		}
 	}
 
-
 	private function performBeginTransaction(Transaction $transaction = null, bool $readOnly = false): void {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_BEGIN, $transaction);
-		$mtime = microtime(true);
-//		$this->pdo()->beginTransaction();
 
 		IllegalStateException::assertTrue(!$this->pdo()->inTransaction(),
 				'Illegal call, pdo already in transaction.');
 
-		$this->dialect->beginTransaction($this->pdo(), $readOnly);
+		$this->dialect->beginTransaction($this->pdo(), $readOnly, $this->logger);
 
 		if (!$this->pdo()->inTransaction()) {
 			throw new IllegalStateException('Dialect call '
@@ -286,16 +260,15 @@ class Pdo {
 					. ' did not start a transaction.');
 		}
 
-		$this->logger->addTransactionBegin(microtime(true) - $mtime);
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_BEGAN, $transaction);
 	}
 
-	private function prepareCommit(Transaction $transaction = null) {
+	private function prepareCommit(Transaction $transaction = null): bool {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_COMMIT, $transaction);
 		return true;
 	}
 
-	private function performCommit(Transaction $transaction = null) {
+	private function performCommit(Transaction $transaction = null): void {
 		$mtime = microtime(true);
 
 		$preErr = error_get_last();
@@ -313,7 +286,7 @@ class Pdo {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_COMMITTED, $transaction);
 	}
 
-	private function performRollBack(Transaction $transaction = null) {
+	private function performRollBack(Transaction $transaction = null): void {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_ROLL_BACK, $transaction);
 		$mtime = microtime(true);
 		$this->pdo()->rollBack();
@@ -329,7 +302,7 @@ class Pdo {
 	 *
 	 * @param string $field
 	 */
-	public function quoteField($field) {
+	public function quoteField($field): string {
 		return $this->dialect->quoteField($field);
 	}
 
