@@ -161,10 +161,7 @@ class Pdo {
 		return $this->dataSourceName;
 	}
 
-	/**
-	 * @return PdoLogger
-	 */
-	public function getLogger() {
+	public function getLogger(): PdoLogger {
 		return $this->logger;
 	}
 	/**

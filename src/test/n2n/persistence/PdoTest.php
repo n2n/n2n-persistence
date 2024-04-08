@@ -18,6 +18,7 @@ class PdoTest extends TestCase {
 		$pdo = null;
 	}
 
+
 	private function createPersistenceUnitConfig(bool $persistent,
 			string $readOnlyTransactionIsolationLevel = PersistenceUnitConfig::TIL_REPEATABLE_READ): PersistenceUnitConfig {
 		return new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',

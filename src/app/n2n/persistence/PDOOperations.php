@@ -5,9 +5,13 @@ namespace n2n\persistence;
 class PDOOperations {
 
 	static function beginTransaction(?PdoLogger $pdoLogger, \PDO $pdo): void {
-		$mtime = microtime(true);
-		$pdo->beginTransaction();
-		$pdoLogger->addTransactionBegin(microtime(true) - $mtime);
+		try {
+			$mtime = microtime(true);
+			$pdo->beginTransaction();
+			$pdoLogger?->addTransactionBegin(microtime(true) - $mtime);
+		} catch (\PDOException $e) {
+			throw new PdoException($e);
+		}
 	}
 
 	/**
@@ -20,7 +24,7 @@ class PDOOperations {
 		try {
 			$mtime = microtime(true);
 			$stmt = $pdo->exec($statement);
-			$pdoLogger->addExecution($statement, (microtime(true) - $mtime));
+			$pdoLogger?->addExecution($statement, (microtime(true) - $mtime));
 			return $stmt;
 		} catch (\PDOException $e) {
 			throw new PdoStatementException($e, $statement);
