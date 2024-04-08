@@ -18,7 +18,8 @@ class PdoTest extends TestCase {
 		$pdo = null;
 	}
 
-	private function createPersistenceUnitConfig(bool $persistent, string $readOnlyTransactionIsolationLevel = null): PersistenceUnitConfig {
+	private function createPersistenceUnitConfig(bool $persistent,
+			string $readOnlyTransactionIsolationLevel = PersistenceUnitConfig::TIL_REPEATABLE_READ): PersistenceUnitConfig {
 		return new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
 				PersistenceUnitConfig::TIL_SERIALIZABLE, DialectMock::class,
 				persistent: $persistent, readOnlyTransactionIsolationLevel: $readOnlyTransactionIsolationLevel);
@@ -28,7 +29,8 @@ class PdoTest extends TestCase {
 		return (new DialectMock($this->createPersistenceUnitConfig($persistent)))->createPDO();
 	}
 
-	private function createPdo(bool $persistent, string $readOnlyTransactionIsolationLevel = null,
+	private function createPdo(bool $persistent,
+			string $readOnlyTransactionIsolationLevel = PersistenceUnitConfig::TIL_REPEATABLE_READ,
 			TransactionManager $transactionManager = null): Pdo {
 		return PdoFactory::createFromPersistenceUnitConfig(
 				$this->createPersistenceUnitConfig($persistent, $readOnlyTransactionIsolationLevel),
