@@ -103,7 +103,7 @@ class Pdo {
 	function reconnect(): void {
 		$this->release();
 
-		$this->pdo = $this->dialect->createPDO();
+		$this->pdo = $this->dialect->createPDO($this->logger);
 
 		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
