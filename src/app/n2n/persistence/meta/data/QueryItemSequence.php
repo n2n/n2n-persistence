@@ -67,7 +67,7 @@ class QueryItemSequence implements QueryItem {
 				self::OPERATOR_SUB, self::OPERATOR_MUL, self::OPERATOR_DIV);
 	}
 	
-	public function equals($obj) {
+	public function equals($obj): bool {
 		if (!($obj instanceof QueryItemSequence)) return false;
 		
 		return $this->sequenceItem->equals($obj->getSequenceItem());
