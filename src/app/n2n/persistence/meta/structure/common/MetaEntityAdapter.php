@@ -21,9 +21,9 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\MetaEntity;
+use n2n\spec\dbo\meta\structure\MetaEntity;
 
-use n2n\persistence\meta\Database;
+use n2n\spec\dbo\meta\structure\Database;
 use n2n\reflection\ReflectionUtils;
 
 abstract class MetaEntityAdapter implements MetaEntity {
@@ -69,7 +69,7 @@ abstract class MetaEntityAdapter implements MetaEntity {
 		}
 	}
 	/** 
-	 * @return \n2n\persistence\meta\Database
+	 * @return \n2n\spec\dbo\meta\structure\Database
 	 */
 	public function getDatabase(): Database {
 		return $this->database;

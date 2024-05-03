@@ -21,11 +21,11 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\MetaEntity;
+use n2n\spec\dbo\meta\structure\MetaEntity;
 
 abstract class ChangeRequestAdapter implements ChangeRequest {
 	/**
-	 * @var \n2n\persistence\meta\structure\MetaEntity
+	 * @var \n2n\spec\dbo\meta\structure\MetaEntity
 	 */
 	private $metaEntity;
 	
@@ -34,7 +34,7 @@ abstract class ChangeRequestAdapter implements ChangeRequest {
 	}
 	
 	/**
-	 * @return \n2n\persistence\meta\structure\MetaEntity
+	 * @return \n2n\spec\dbo\meta\structure\MetaEntity
 	 */
 	public function getMetaEntity(): MetaEntity {
 		return $this->metaEntity;

@@ -21,9 +21,9 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 
-use n2n\persistence\meta\structure\EnumColumn;
+use n2n\spec\dbo\meta\structure\EnumColumn;
 
 class CommonEnumColumn extends ColumnAdapter implements EnumColumn {
 	private $values;

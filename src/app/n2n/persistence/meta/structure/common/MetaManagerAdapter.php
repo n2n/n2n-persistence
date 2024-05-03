@@ -21,10 +21,10 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\MetaManager;
+use n2n\spec\dbo\meta\structure\MetaManager;
 use n2n\persistence\Pdo;
-use n2n\persistence\meta\structure\MetaEntity;
-use n2n\persistence\meta\Database;
+use n2n\spec\dbo\meta\structure\MetaEntity;
+use n2n\spec\dbo\meta\structure\Database;
 
 abstract class MetaManagerAdapter implements MetaManager, DatabaseChangeListener {
 	protected $dbh;
@@ -42,7 +42,7 @@ abstract class MetaManagerAdapter implements MetaManager, DatabaseChangeListener
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \n2n\persistence\meta\MetaManager::createDatabase()
+	 * @see \n2n\spec\dbo\meta\structure\MetaManager::createDatabase()
 	 * @return Database
 	 */
 	public function createDatabase(): Database {

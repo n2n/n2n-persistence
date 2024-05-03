@@ -21,9 +21,9 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 
-use n2n\persistence\meta\structure\StringColumn;
+use n2n\spec\dbo\meta\structure\StringColumn;
 
 class CommonStringColumn extends ColumnAdapter implements StringColumn {
 	private $length;

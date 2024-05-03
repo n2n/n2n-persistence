@@ -21,9 +21,9 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 
-use n2n\persistence\meta\structure\TextColumn;
+use n2n\spec\dbo\meta\structure\TextColumn;;
 
 class CommonTextColumn extends ColumnAdapter implements TextColumn {
 	private $size;

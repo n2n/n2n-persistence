@@ -34,7 +34,7 @@ class MetaData {
 		$this->dialect = $dialect;
 	}
 	/**
-	 * @return \n2n\persistence\meta\MetaManager
+	 * @return \n2n\spec\dbo\meta\structure\MetaManager
 	 */
 	
 	public function getMetaManager() {
@@ -46,7 +46,7 @@ class MetaData {
 	}
 	
 	/**
-	 * @return \n2n\persistence\meta\Database
+	 * @return \n2n\spec\dbo\meta\structure\Database
 	 */
 	public function getDatabase() {
 		if (null === $this->database) {

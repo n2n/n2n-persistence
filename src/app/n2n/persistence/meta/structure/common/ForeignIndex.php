@@ -1,9 +1,9 @@
 <?php
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\Table;
-use n2n\persistence\meta\structure\IndexType;
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Table;
+use n2n\spec\dbo\meta\structure\IndexType;
+use n2n\spec\dbo\meta\structure\Column;
 
 class ForeignIndex extends IndexAdapter {
 	

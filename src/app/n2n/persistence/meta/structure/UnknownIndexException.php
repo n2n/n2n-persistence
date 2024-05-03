@@ -21,8 +21,8 @@
  */
 namespace n2n\persistence\meta\structure;
 
-use n2n\core\N2nRuntimeException;
+use n2n\spec\dbo\err\DboException;
 
-class UnknownIndexException extends N2nRuntimeException {
+class UnknownIndexException extends \RuntimeException implements DboException {
 	
 }

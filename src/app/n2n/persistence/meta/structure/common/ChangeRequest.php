@@ -22,7 +22,7 @@
 namespace n2n\persistence\meta\structure\common;
 
 use n2n\persistence\Pdo;
-use n2n\persistence\meta\structure\MetaEntity;
+use n2n\spec\dbo\meta\structure\MetaEntity;
 
 interface ChangeRequest {
 	/**

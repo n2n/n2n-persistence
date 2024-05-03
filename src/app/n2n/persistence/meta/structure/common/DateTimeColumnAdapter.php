@@ -21,9 +21,9 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 
-use n2n\persistence\meta\structure\DateTimeColumn;
+use n2n\spec\dbo\meta\structure\DateTimeColumn;
 
 abstract class DateTimeColumnAdapter extends ColumnAdapter implements DateTimeColumn {
 	protected $dateAvailable;

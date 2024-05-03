@@ -21,11 +21,11 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 use n2n\persistence\meta\structure\UnknownColumnException;
-use n2n\persistence\meta\structure\IndexType;
-use n2n\persistence\meta\structure\Index;
-use n2n\persistence\meta\structure\Table;
+use n2n\spec\dbo\meta\structure\IndexType;
+use n2n\spec\dbo\meta\structure\Index;
+use n2n\spec\dbo\meta\structure\Table;
 use n2n\persistence\meta\MetaRuntimeException;
 use n2n\util\type\CastUtils;
 use n2n\persistence\meta\structure\DuplicateMetaElementException;
@@ -47,7 +47,7 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 
 	/**
 	 * {@inheritDoc}
-	 * @see \n2n\persistence\meta\structure\Table::getColumns()
+	 * @see \n2n\spec\dbo\meta\structure\Table::getColumns()
 	 * @return Column[]
 	 */
 	public function getColumns(): array {
@@ -100,7 +100,7 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 
 	/**
 	 * {@inheritDoc}
-	 * @see \n2n\persistence\meta\structure\Table::getPrimaryKey()
+	 * @see \n2n\spec\dbo\meta\structure\Table::getPrimaryKey()
 	 * @return Index
 	 */
 	public function getPrimaryKey(): ?Index {
@@ -121,7 +121,7 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 
 	/**
 	 * {@inheritDoc}
-	 * @see \n2n\persistence\meta\structure\Table::getIndexes()
+	 * @see \n2n\spec\dbo\meta\structure\Table::getIndexes()
 	 */
 	public function getIndexes(): array {
 		return $this->indexes;
@@ -226,7 +226,7 @@ abstract class TableAdapter extends MetaEntityAdapter implements Table, ColumnCh
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \n2n\persistence\meta\structure\Table::createIndex()
+	 * @see \n2n\spec\dbo\meta\structure\Table::createIndex()
 	 */
 	public function createIndex(string $type, array $columnNames, ?string $name = null,
 			?Table $refTable = null, ?array $refColumnNames = null): Index {

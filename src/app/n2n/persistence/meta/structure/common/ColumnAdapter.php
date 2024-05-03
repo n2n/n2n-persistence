@@ -21,9 +21,9 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\Table;
+use n2n\spec\dbo\meta\structure\Table;
 
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 
 abstract class ColumnAdapter implements Column, CommonColumn {
 	private $name;

@@ -21,9 +21,9 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 
-use n2n\persistence\meta\structure\FixedPointColumn;
+use n2n\spec\dbo\meta\structure\FixedPointColumn;;
 
 class CommonFixedPointColumn extends ColumnAdapter implements FixedPointColumn {
 	private $numIntegerDigits;

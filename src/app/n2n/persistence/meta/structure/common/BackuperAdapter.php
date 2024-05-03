@@ -27,9 +27,9 @@ use n2n\util\io\stream\OutputStream;
 
 use n2n\persistence\Pdo;
 
-use n2n\persistence\meta\Database;
+use n2n\spec\dbo\meta\structure\Database;
 
-use n2n\persistence\meta\structure\Backuper;
+use n2n\spec\dbo\meta\structure\Backuper;
 
 abstract class BackuperAdapter implements Backuper {
 /**
@@ -74,7 +74,7 @@ abstract class BackuperAdapter implements Backuper {
 
 	/**
 	 * {@inheritDoc}
-	 * @see \n2n\persistence\meta\structure\Backuper::getMetaEntities()
+	 * @see \n2n\spec\dbo\meta\structure\Backuper::getMetaEntities()
 	 */
 	public function getMetaEntities() {
 		return $this->metaEntities;

@@ -22,9 +22,9 @@
 namespace n2n\persistence\meta\structure\common;
 
 use n2n\persistence\meta\structure\DuplicateMetaElementException;
-use n2n\persistence\meta\structure\MetaEntity;
+use n2n\spec\dbo\meta\structure\MetaEntity;
 use n2n\persistence\meta\structure\UnknownMetaEntityException;
-use n2n\persistence\meta\Database;
+use n2n\spec\dbo\meta\structure\Database;
 use n2n\util\type\CastUtils;
 use n2n\util\type\ArgUtils;
 
@@ -54,7 +54,7 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 
 	/**
 	 * {@inheritDoc}
-	 * @see \n2n\persistence\meta\Database::getName()
+	 * @see \n2n\spec\dbo\meta\structure\Database::getName()
 	 */
 	public function getName(): string {
 		return $this->name;
@@ -62,7 +62,7 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \n2n\persistence\meta\Database::getCharset()
+	 * @see \n2n\spec\dbo\meta\structure\Database::getCharset()
 	 */
 	public function getCharset(): string {
 		return $this->charset;
@@ -70,7 +70,7 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \n2n\persistence\meta\Database::getAttrs()
+	 * @see \n2n\spec\dbo\meta\structure\Database::getAttrs()
 	 */
 	public function getAttrs(): array {
 		return $this->attrs;
@@ -78,7 +78,7 @@ abstract class DatabaseAdapter implements Database, MetaEntityChangeListener {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \n2n\persistence\meta\Database::getMetaEntities()
+	 * @see \n2n\spec\dbo\meta\structure\Database::getMetaEntities()
 	 */
 	public function getMetaEntities(): array {
 		return $this->metaEntities;

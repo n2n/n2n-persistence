@@ -4,9 +4,9 @@ namespace n2n\persistence\ext\mock;
 
 use n2n\persistence\meta\Dialect;
 use n2n\core\config\PersistenceUnitConfig;
-use n2n\persistence\meta\MetaManager;
+use n2n\spec\dbo\meta\structure\MetaManager;
 use n2n\spec\dbo\meta\data\UpdateStatementBuilder;
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 use n2n\util\io\stream\InputStream;
 use n2n\spec\dbo\meta\data\InsertStatementBuilder;
 use n2n\persistence\Pdo;

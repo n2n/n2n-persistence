@@ -21,9 +21,9 @@
  */
 namespace n2n\persistence\meta;
 
-use n2n\persistence\meta\structure\MetaEntity;
+use n2n\spec\dbo\meta\structure\MetaEntity;
 use n2n\persistence\meta\structure\UnknownMetaEntityException;
-use n2n\persistence\meta\structure\MetaEntityFactory;
+use n2n\spec\dbo\meta\structure\MetaEntityFactory;
 
 interface Database {
 	/**

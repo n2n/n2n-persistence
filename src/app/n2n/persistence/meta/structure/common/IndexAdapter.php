@@ -1,20 +1,17 @@
 <?php
 namespace n2n\persistence\meta\structure\common;
 
-use n2n\persistence\meta\structure\Index;
+use n2n\spec\dbo\meta\structure\Index;
 use n2n\persistence\meta\structure\UnknownColumnException;
-use n2n\persistence\meta\structure\IndexType;
-use n2n\persistence\meta\structure\Column;
-use n2n\persistence\meta\structure\Table;
+use n2n\spec\dbo\meta\structure\IndexType;
+use n2n\spec\dbo\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Table;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\structure\DuplicateMetaElementException;
 
 abstract class IndexAdapter implements Index {
 	private $name;
 	private $type;
-	/**
-	 * @var \n2n\persistence\meta\structure\Table
-	 */
 	private $table;
 	private $columns = [];
 	private $attrs = [];
