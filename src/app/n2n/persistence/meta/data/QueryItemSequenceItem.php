@@ -21,6 +21,8 @@
  */
 namespace n2n\persistence\meta\data;
 
+use n2n\spec\dbo\meta\data\QueryItem;
+
 class QueryItemSequenceItem implements SequenceItem {
 	private $queryItem;
 	private $sequenceOperator;
@@ -41,15 +43,12 @@ class QueryItemSequenceItem implements SequenceItem {
 	public function setSquenceOperator(SequenceOperator $sequenceOperator) {
 		$this->sequenceOperator = $sequenceOperator;
 	}
-	/**
-	 * (non-PHPdoc)
-	 * @see n2n\persistence\meta.SequenceItem::getSequenceOperator()
-	 */
+
 	public function getSequenceOperator() {
 		return $this->sequenceOperator;
 	}
 	
-	public function equals($obj) {
+	public function equals($obj): bool {
 		return $obj instanceof QueryItemSequenceItem
 				&& $this->sequenceOperator == $obj->getSequenceOperator()
 				&& $this->queryItem->equals($obj->getQueryItem());
