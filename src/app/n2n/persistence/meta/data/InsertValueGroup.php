@@ -21,6 +21,8 @@
  */
 namespace n2n\persistence\meta\data;
 
+use n2n\spec\dbo\meta\data\QueryItem;
+
 class InsertValueGroup {
 	private $values = array();
 	
