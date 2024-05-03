@@ -36,7 +36,7 @@ use n2n\persistence\PdoStatement;
 use n2n\persistence\orm\query\QueryConflictException;
 use n2n\util\ex\NotYetImplementedException;
 use n2n\util\ex\IllegalStateException;
-use n2n\persistence\meta\data\QueryResult;
+use n2n\spec\dbo\meta\data\QueryResult;
 
 class QueryComparatorBuilder {
 	private $queryState;
