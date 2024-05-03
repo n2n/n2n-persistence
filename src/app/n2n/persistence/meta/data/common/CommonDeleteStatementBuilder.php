@@ -25,7 +25,8 @@ use n2n\persistence\meta\data\QueryComparator;
 
 use n2n\persistence\Pdo;
 
-use n2n\persistence\meta\data\DeleteStatementBuilder;
+use n2n\spec\dbo\meta\data\DeleteStatementBuilder;
+use n2n\spec\dbo\meta\data\ComparisonBuilder;
 
 class CommonDeleteStatementBuilder implements DeleteStatementBuilder {
 	
@@ -46,19 +47,20 @@ class CommonDeleteStatementBuilder implements DeleteStatementBuilder {
 		$this->fragmentBuilderFactory = $fragmentBuilderFactory;
 	}
 	
-	public function setTable($tableName, $tableAlias = null) {
+	public function setTable($tableName, $tableAlias = null): static {
 		$this->table = array('tableName' => $tableName, 'tableAlias' => $tableAlias);
+		return $this;
 	}
 	
-	public function getWhereComparator() {
+	public function getWhereComparator(): ComparisonBuilder {
 		return $this->whereSelector;
 	}
 	
-	public function toSqlString() {
+	public function toSqlString(): string {
 		return $this->buildDeleteSql() . $this->buildWhereSql();
 	}
 	
-	private function buildDeleteSql() {
+	private function buildDeleteSql(): string {
 		$sql = 'DELETE FROM ' . $this->dbh->quoteField($this->table['tableName']);
 	
 		if (isset($this->table['tableAlias'])) {
@@ -68,7 +70,7 @@ class CommonDeleteStatementBuilder implements DeleteStatementBuilder {
 		return $sql;
 	}
 	
-	private function buildWhereSql() {
+	private function buildWhereSql(): string {
 		if (is_null($this->whereSelector) || $this->whereSelector->isEmpty()) {
 			return '';
 		}

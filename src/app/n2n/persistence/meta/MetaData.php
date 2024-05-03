@@ -77,7 +77,7 @@ class MetaData {
 		return $this->dialect->createUpdateStatementBuilder($this->dbh);
 	}
 	/**
-	 * @return \n2n\persistence\meta\data\DeleteStatementBuilder
+	 * @return \n2n\spec\dbo\meta\data\DeleteStatementBuilder
 	 */
 	public function createDeleteStatementBuilder() {
 		return $this->dialect->createDeleteStatementBuilder($this->dbh);

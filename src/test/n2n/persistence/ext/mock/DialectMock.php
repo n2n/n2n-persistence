@@ -11,7 +11,7 @@ use n2n\util\io\stream\InputStream;
 use n2n\spec\dbo\meta\data\InsertStatementBuilder;
 use n2n\persistence\Pdo;
 use n2n\spec\dbo\meta\data\SelectStatementBuilder;
-use n2n\persistence\meta\data\DeleteStatementBuilder;
+use n2n\spec\dbo\meta\data\DeleteStatementBuilder;
 use n2n\persistence\meta\data\Importer;
 use n2n\persistence\meta\OrmDialectConfig;
 use n2n\util\ex\UnsupportedOperationException;
