@@ -23,7 +23,8 @@ namespace n2n\persistence\orm\query;
 
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\query\select\Selection;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryPart;
 
 interface QueryPoint extends QueryPointResolver {
 	/**
@@ -37,8 +38,8 @@ interface QueryPoint extends QueryPointResolver {
 	 */
 	public function requestSelection(): Selection;
 	/**
-	 * @return \n2n\persistence\meta\data\QueryItem
+	 * @return \n2n\spec\dbo\meta\data\QueryItem
 	 * @throws \n2n\persistence\orm\query\QueryConflictException
 	 */
-	public function requestRepresentableQueryItem(): QueryItem;
+	public function requestRepresentableQueryItem(): QueryPart;
 }

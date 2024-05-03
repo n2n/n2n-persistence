@@ -21,6 +21,10 @@
  */
 namespace n2n\persistence\meta\data;
 
+use n2n\spec\dbo\meta\data\QueryPart;
+use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
+
 class QueryPartGroup implements QueryItem {
 	protected $queryParts = array();
 	
@@ -38,21 +42,21 @@ class QueryPartGroup implements QueryItem {
 		return $this->queryParts;
 	}
 
-	public function buildItem(QueryFragmentBuilder $itemBuilder) {
+	public function buildItem(QueryFragmentBuilder $fragmentBuilder): void {
 		// removed for empty IN and NOT IN groups. For example he.email NOT IN ()
 		// if (empty($this->queryParts)) return;
 		
-		$itemBuilder->openGroup();
+		$fragmentBuilder->openGroup();
 		foreach ($this->queryParts as $key => $queryPart) {
 			if ($key > 0) {
-				$itemBuilder->addSeparator();
+				$fragmentBuilder->addSeparator();
 			}
-			$queryPart->buildItem($itemBuilder);
+			$queryPart->buildItem($fragmentBuilder);
 		}
-		$itemBuilder->closeGroup();
+		$fragmentBuilder->closeGroup();
 	}
 	
-	public function equals($obj) {
+	public function equals($obj): bool {
 		return $obj instanceof QueryPartGroup && $this->queryParts === $obj->queryParts;
 	}
 }

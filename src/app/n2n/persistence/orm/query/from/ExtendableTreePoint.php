@@ -27,7 +27,7 @@ use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\persistence\orm\property\QueryItemRepresentableEntityProperty;
 use n2n\persistence\orm\property\ColumnComparableEntityProperty;
@@ -215,7 +215,7 @@ abstract class ExtendableTreePoint extends MetaTreePointAdapter {
 		if ($entityProperty instanceof QueryItemRepresentableEntityProperty) {
 			try {
 				$queryItem = $entityProperty->createRepresentingQueryItem($this, $this->queryState);
-				ArgUtils::valTypeReturn($queryItem, 'n2n\persistence\meta\data\QueryItem',
+				ArgUtils::valTypeReturn($queryItem, 'n2n\spec\dbo\meta\data\QueryItem',
 						$entityProperty, 'createRepresentingQueryItem');
 				return $queryItem;
 			} catch (UnsupportedOperationException $e) {

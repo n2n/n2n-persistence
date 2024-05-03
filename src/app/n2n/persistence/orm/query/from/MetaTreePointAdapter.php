@@ -39,7 +39,7 @@ abstract class MetaTreePointAdapter implements MetaTreePoint {
 
 // namespace n2n\persistence\orm\query\from\meta;
 
-// use n2n\persistence\meta\data\SelectStatementBuilder;
+// use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 
 // abstract class TreePoint {
 // 	private $queryPoint;

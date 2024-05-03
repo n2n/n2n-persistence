@@ -21,15 +21,15 @@
  */
 namespace n2n\persistence\meta\data\common;
 
-use n2n\persistence\meta\data\LockMode;
+use n2n\spec\dbo\meta\data\QueryLockMode;
 
 class CommonSelectLockBuilder implements SelectLockBuilder {
 
-	function buildStatementEndSql(LockMode $lockMode): ?string {
+	function buildStatementEndSql(QueryLockMode $lockMode): ?string {
 		return match ($lockMode) {
-			LockMode::PESSIMISTIC_WRITE => 'FOR UPDATE',
-			LockMode::PESSIMISTIC_WRITE_NOWAIT => 'FOR UPDATE NOWAIT',
-			LockMode::PESSIMISTIC_WRITE_SKIP_LOCKED => 'FOR UPDATE SKIP LOCKED',
+			QueryLockMode::FOR_UPDATE => 'FOR UPDATE',
+			QueryLockMode::FOR_UPDATE_NOWAIT => 'FOR UPDATE NOWAIT',
+			QueryLockMode::FOR_UPDATE_SKIP_LOCKED => 'FOR UPDATE SKIP LOCKED',
 			default => '',
 		};
 	}

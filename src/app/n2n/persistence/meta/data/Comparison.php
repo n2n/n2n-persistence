@@ -21,6 +21,8 @@
  */
 namespace n2n\persistence\meta\data;
 
+use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
+
 abstract class Comparison implements SequenceItem {
 	private $sequenceOperator;
 	

@@ -38,7 +38,7 @@ interface QueryPointResolver {
 	public function requestPropertySelection(TreePath $treePath);
 	/**
 	 * @param TreePath $treePath
-	 * @return \n2n\persistence\meta\data\QueryItem
+	 * @return \n2n\spec\dbo\meta\data\QueryItem
 	 * @throws \n2n\persistence\orm\query\QueryConflictException
 	 */
 	public function requestPropertyRepresentableQueryItem(TreePath $treePath);

@@ -22,10 +22,10 @@
 namespace n2n\persistence\meta\data\common;
 
 use n2n\persistence\meta\data\InsertValueGroup;
-use n2n\persistence\meta\data\InsertStatementBuilder;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\InsertStatementBuilder;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\Pdo;
-use n2n\persistence\meta\data\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
 
 class CommonInsertStatementBuilder implements InsertStatementBuilder {
 
@@ -51,29 +51,31 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 		$this->fragmentBuilderFactory = $fragmentBuilderFactory;
 	}
 
-	public function setTable($tableName) {
+	public function setTable(string $tableName): static {
 		$this->tableName = $tableName;
+		return $this;
 	}
 
-	public function addColumn(QueryColumn $column, QueryItem $value) {
+	public function addColumn(QueryItem $column, QueryItem $value): static {
 		$this->columns[] = array('column' => $column, 'value' => $value);
+		return $this;
 	}
 
-	public function toSqlString() {
+	public function toSqlString(): string {
 		return $this->buildInsertIntoSql() . ' ' . $this->buildColumnSql();
 	}
 
-	public function createAdditionalValueGroup() {
+	public function createAdditionalValueGroup(): InsertValueGroup {
 		$valueGroup = new InsertValueGroup();
 		$this->additionalValueGroups[] = $valueGroup;
 		return $valueGroup;
 	}
 
-	private function buildInsertIntoSql() {
+	private function buildInsertIntoSql(): string {
 		return 'INSERT INTO ' . $this->dbh->quoteField($this->tableName);
 	}
 
-	private function buildColumnSql() {
+	private function buildColumnSql(): string {
 		$namesSqlArr = array();
 		$valuesSqlArr = array();
 		foreach ($this->columns as $column) {
@@ -117,7 +119,7 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 	}
 
 
-	private function buildWhereSql() {
+	private function buildWhereSql(): string {
 		if (is_null($this->whereSelector) || $this->whereSelector->isEmpty()) {
 			return '';
 		}

@@ -21,14 +21,15 @@
  */
 namespace n2n\persistence\orm\query\from\meta;
 
-use n2n\persistence\meta\data\QueryTable;
-use n2n\persistence\meta\data\QueryConstant;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\model\EntityModel;
-use n2n\persistence\meta\data\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
+use n2n\spec\dbo\meta\data\impl\QueryConstant;
+use n2n\util\ex\IllegalStateException;
 
 class SingleTableTreePointMeta extends TreePointMetaAdapter {
 	private $tableAlias;
@@ -88,7 +89,7 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 
 	public function getQueryColumnByName(EntityModel $entityModel, $columnName) {
 		if (!isset($this->queryColumns[$columnName])) {
-			throw $this->queryState->createIllegalStateException();
+			throw new IllegalStateException();
 		}
 
 		return $this->queryColumns[$columnName];
@@ -103,18 +104,18 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 // 				$this->discriminatorAlias);
 	}
 
-	public function applyAsFrom(SelectStatementBuilder $selectBuilder) {
-		$this->applySelection($selectBuilder);
-		$selectBuilder->addFrom(new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias);
+	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder): void {
+		$this->applySelection($selectStatementBuilder);
+		$selectStatementBuilder->addFrom(new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias);
 
 		if ($this->entityModel->hasSuperEntityModel()) {
-			$this->assembleDiscrComparator($selectBuilder->getWhereComparator()->andGroup());
+			$this->assembleDiscrComparator($selectStatementBuilder->getWhereComparator()->andGroup());
 		}
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectBuilder, $joinType, QueryComparator $onComparator = null) {
-		$this->applySelection($selectBuilder);
-		$onQueryComparator = $selectBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)), 
+	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, QueryComparator $onComparator = null) {
+		$this->applySelection($selectStatementBuilder);
+		$onQueryComparator = $selectStatementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)),
 				$this->tableAlias, $onComparator);
 
 		if ($this->entityModel->hasSuperEntityModel()) {

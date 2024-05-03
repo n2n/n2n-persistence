@@ -25,7 +25,7 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\query\QueryState;
 
 abstract class TreePointMetaAdapter implements TreePointMeta {
-	protected $queryState;
+	protected QueryState $queryState;
 	protected $entityModel;
 	protected $idColumnName;
 	

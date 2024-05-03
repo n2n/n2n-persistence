@@ -21,6 +21,8 @@
  */
 namespace n2n\persistence\meta\data;
 
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
+
 class SelectStatementSequenceItem implements SequenceItem {
 	private $selectStatement;
 	private $sequenceOperator;

@@ -23,9 +23,9 @@ namespace n2n\persistence\orm\query;
 
 use n2n\persistence\orm\query\from\Tree;
 use n2n\persistence\meta\data\QueryComparator;
-use n2n\persistence\meta\data\SelectStatementBuilder;
-use n2n\persistence\meta\data\QueryItem;
-use n2n\persistence\meta\data\LockMode;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryLockMode;
 
 class QueryModel {
 	private $distinct;
@@ -44,7 +44,7 @@ class QueryModel {
 	private $limit;
 	private $num;
 
-	private ?LockMode $lockMode = null;
+	private ?QueryLockMode $lockMode = null;
 
 	public function __construct(Tree $tree, QueryItemSelect $queryItemSelect) {
 		$this->tree = $tree;
@@ -122,7 +122,7 @@ class QueryModel {
 		$this->num = $num;
 	}
 
-	function setLockMode(?LockMode $lockMode): void {
+	function setLockMode(?QueryLockMode $lockMode): void {
 		$this->lockMode = $lockMode;
 	}
 	

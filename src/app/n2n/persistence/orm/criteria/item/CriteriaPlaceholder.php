@@ -25,12 +25,12 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryPoint;
 use n2n\util\ex\NotYetImplementedException;
-use n2n\persistence\meta\data\QueryPlaceMarker;
+use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\query\select\Selection;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 class CriteriaPlaceholder implements CriteriaItem {
 	private $name;

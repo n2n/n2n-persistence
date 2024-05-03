@@ -21,6 +21,10 @@
  */
 namespace n2n\persistence\meta\data;
 
+use n2n\spec\dbo\meta\data\QueryResult;
+use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
+
 class StatementQueryResult implements QueryResult, QueryItem {
 	private $sqlString;
 	
@@ -32,13 +36,13 @@ class StatementQueryResult implements QueryResult, QueryItem {
 		return $this->sqlString;
 	}
 	
-	public function buildItem(QueryFragmentBuilder $fragmentBuilder) {
+	public function buildItem(QueryFragmentBuilder $fragmentBuilder): void {
 		$fragmentBuilder->openGroup();
 		$fragmentBuilder->addRawString($this->sqlString);
 		$fragmentBuilder->closeGroup();
 	}
 	
-	public function equals($obj) {
+	public function equals($obj): bool {
 		return $obj instanceof StatementQueryResult && $this->sqlString === $obj->sqlString;
 	}
 }

@@ -57,21 +57,21 @@ class MetaData {
 	}
 	
 	/**
-	 * @return \n2n\persistence\meta\data\SelectStatementBuilder
+	 * @return \n2n\spec\dbo\meta\data\SelectStatementBuilder
 	 */
 	public function createSelectStatementBuilder() {
 		return $this->dialect->createSelectStatementBuilder($this->dbh);
 	}
 	
 	/**
-	 * @return \n2n\persistence\meta\data\InsertStatementBuilder
+	 * @return \n2n\spec\dbo\meta\data\InsertStatementBuilder
 	 */
 	public function createInsertStatementBuilder() {
 		return $this->dialect->createInsertStatementBuilder($this->dbh);
 	}
 	
 	/**
-	 * @return \n2n\persistence\meta\data\UpdateStatementBuilder
+	 * @return \n2n\spec\dbo\meta\data\UpdateStatementBuilder
 	 */
 	public function createUpdateStatementBuilder() {
 		return $this->dialect->createUpdateStatementBuilder($this->dbh);

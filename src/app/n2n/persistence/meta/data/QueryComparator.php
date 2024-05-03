@@ -21,26 +21,31 @@
  */
 namespace n2n\persistence\meta\data;
 
-class QueryComparator {
-	const OPERATOR_EQUAL = '=';
-	const OPERATOR_NOT_EQUAL = '!=';
-	const OPERATOR_LARGER_THAN = '>';
-	const OPERATOR_LARGER_THAN_OR_EQUAL_TO = '>=';
-	const OPERATOR_SMALLER_THAN = '<';
-	const OPERATOR_SMALLER_THAN_OR_EQUAL_TO = '<=';
-	const OPERATOR_LIKE = 'LIKE';
-	const OPERATOR_NOT_LIKE = 'NOT LIKE';
-	const OPERATOR_IS = 'IS';
-	const OPERATOR_IS_NOT = 'IS NOT';
-	const OPERATOR_IN = 'IN';
-	const OPERATOR_NOT_IN = 'NOT IN';
-	
-	const OPERATOR_EXISTS = 'EXISTS';
-	const OPERATOR_NOT_EXISTS = 'NOT EXISTS';
-	
-	const LIKE_WILDCARD_ONE_CHAR = '_';
-	const LIKE_WILDCARD_MANY_CHARS = '%';
-	
+use n2n\spec\dbo\meta\data\ComparisonBuilder;
+use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryResult;
+use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
+
+class QueryComparator implements ComparisonBuilder {
+//	const OPERATOR_EQUAL = '=';
+//	const OPERATOR_NOT_EQUAL = '!=';
+//	const OPERATOR_LARGER_THAN = '>';
+//	const OPERATOR_LARGER_THAN_OR_EQUAL_TO = '>=';
+//	const OPERATOR_SMALLER_THAN = '<';
+//	const OPERATOR_SMALLER_THAN_OR_EQUAL_TO = '<=';
+//	const OPERATOR_LIKE = 'LIKE';
+//	const OPERATOR_NOT_LIKE = 'NOT LIKE';
+//	const OPERATOR_IS = 'IS';
+//	const OPERATOR_IS_NOT = 'IS NOT';
+//	const OPERATOR_IN = 'IN';
+//	const OPERATOR_NOT_IN = 'NOT IN';
+//
+//	const OPERATOR_EXISTS = 'EXISTS';
+//	const OPERATOR_NOT_EXISTS = 'NOT EXISTS';
+//
+//	const LIKE_WILDCARD_ONE_CHAR = '_';
+//	const LIKE_WILDCARD_MANY_CHARS = '%';
+//
 	const SEQ_OPERATOR_AND = 'AND';
 	const SEQ_OPERATOR_OR = 'OR';
 	
@@ -52,7 +57,7 @@ class QueryComparator {
 		$this->parentSelector = $parentSelector;
 	}
 	
-	public function isEmpty() {
+	public function isEmpty(): bool {
 		if (is_null($this->firstComparison)) {
 			return true;
 		}
@@ -71,53 +76,57 @@ class QueryComparator {
 		return true;
 	}
 	
-	public function match(QueryItem $queryItem1, $operator, QueryItem $queryItem2, $useAnd = true) { 
+	public function match(QueryItem $queryItem1, $operator, QueryItem $queryItem2, $useAnd = true): static {
 		$this->addComparison($useAnd, new ItemComparison($queryItem1, $operator, $queryItem2));
 		return $this;
 	}
 	
-	public function andMatch(QueryItem $queryItem1, $operator, QueryItem $queryItem2) {
+	public function andMatch(QueryItem $queryItem1, $operator, QueryItem $queryItem2): static {
 		$this->match($queryItem1, $operator, $queryItem2, true);
 		return $this;
 	}
 	
-	public function orMatch(QueryItem $queryItem1, $operator, QueryItem $queryItem2) { 
+	public function orMatch(QueryItem $queryItem1, $operator, QueryItem $queryItem2): static {
 		$this->match($queryItem1, $operator, $queryItem2, false);
 		return $this;
 	}
 	
-	public function test($operator, QueryResult $queryResult, $useAnd = true) {
+	public function test($operator, QueryResult $queryResult, $useAnd = true): static {
 		$this->addComparison($useAnd, new TestComparison($operator, $queryResult));
 		return $this;
 	}
 	
-	public function andTest($operator, QueryResult $queryResult) {
+	public function andTest($operator, QueryResult $queryResult): static {
 		$this->test($operator, $queryResult, true);
 		return $this;
 	}
 	
-	public function orTest($operator, QueryResult $queryResult) {
+	public function orTest($operator, QueryResult $queryResult): static {
 		$this->test($operator, $queryResult, false);
 		return $this;
 	}
 	
-	public function group(QueryComparator $queryComparator = null) {
-		return $this->andGroup($queryComparator);
+	public function group(ComparisonBuilder $queryComparator = null, bool $useAnd = true): ComparisonBuilder {
+		if ($useAnd) {
+			return $this->andGroup($queryComparator);
+		} else {
+			return $this->orGroup($queryComparator);
+		}
 	}
 	
-	public function andGroup(QueryComparator $queryComparator = null) {
+	public function andGroup(ComparisonBuilder $queryComparator = null): ComparisonBuilder {
 		if (is_null($queryComparator)) $queryComparator = new QueryComparator();
 		$this->addComparison(true, new ComparisonGroup($queryComparator));
 		return $queryComparator;
 	}
 	
-	public function orGroup(QueryComparator $queryComparator = null) {
+	public function orGroup(ComparisonBuilder $queryComparator = null): ComparisonBuilder {
 		if (is_null($queryComparator)) $queryComparator = new QueryComparator();
 		$this->addComparison(false, new ComparisonGroup($queryComparator));
 		return $queryComparator;
 	}
 	
-	private function addComparison($useAnd, Comparison $comparison) {
+	private function addComparison($useAnd, Comparison $comparison): void {
 		if (is_null($this->firstComparison)) {
 			$this->firstComparison = $comparison;
 			$this->lastComparison = $comparison;
@@ -129,7 +138,7 @@ class QueryComparator {
 		$this->lastComparison = $comparison;
 	}
 	
-	public function endGroup() {
+	public function endGroup(): ?ComparisonBuilder {
 		return $this->parentSelector;
 	}
 	
@@ -137,13 +146,13 @@ class QueryComparator {
 		return $this->firstComparison;
 	}
 	
-	public function buildQueryFragment(QueryFragmentBuilder $fragmentBuilder) {
+	public function buildQueryFragment(QueryFragmentBuilder $fragmentBuilder): void {
 		if ($this->firstComparison === null) return;
 
 		$this->buildQueryComparison($this->firstComparison, $fragmentBuilder);	
 	}
 	
-	private function buildQueryComparison(Comparison $comparison, QueryFragmentBuilder $fragmentBuilder) {
+	private function buildQueryComparison(Comparison $comparison, QueryFragmentBuilder $fragmentBuilder): void {
 		if (!$comparison->isToSkip()) {
 			$comparison->buildQueryComparison($fragmentBuilder);
 		}
@@ -162,7 +171,7 @@ class QueryComparator {
 	/**
 	 * @return array
 	 */
-	public static function getOperators() {
+	public static function getOperators(): array {
 		return array(self::OPERATOR_EQUAL, self::OPERATOR_NOT_EQUAL, self::OPERATOR_LARGER_THAN,
 				self::OPERATOR_LARGER_THAN_OR_EQUAL_TO, self::OPERATOR_SMALLER_THAN,
 				self::OPERATOR_SMALLER_THAN_OR_EQUAL_TO, self::OPERATOR_LIKE, self::OPERATOR_IS,

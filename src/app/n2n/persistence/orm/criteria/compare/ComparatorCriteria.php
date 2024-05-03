@@ -30,10 +30,12 @@ use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryPoint;
 use n2n\persistence\orm\query\QueryModel;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\util\type\CastUtils;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\query\Query;
+use n2n\spec\dbo\meta\data\QueryPart;
+use n2n\persistence\orm\query\from\TreePath;
 
 class ComparatorCriteria extends Criteria implements CriteriaItem {
 
@@ -106,7 +108,7 @@ class ComparatorCriteriaQueryPoint implements QueryPoint {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestRepresentableQueryItem()
 	 */
-	public function requestRepresentableQueryItem(): QueryItem {
+	public function requestRepresentableQueryItem(): QueryPart {
 		$selectBuilder  = $this->queryState->getPdo()->getMetaData()->createSelectStatementBuilder();
 		$this->queryModel->apply($selectBuilder);
 		
@@ -115,19 +117,19 @@ class ComparatorCriteriaQueryPoint implements QueryPoint {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPointResolver::requestPropertyComparisonStrategy()
 	 */
-	public function requestPropertyComparisonStrategy(\n2n\persistence\orm\query\from\TreePath $treePath) {
+	public function requestPropertyComparisonStrategy(TreePath $treePath) {
 		throw new UnsupportedOperationException();
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPointResolver::requestPropertySelection()
 	 */
-	public function requestPropertySelection(\n2n\persistence\orm\query\from\TreePath $treePath) {
+	public function requestPropertySelection(TreePath $treePath) {
 		throw new UnsupportedOperationException();
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPointResolver::requestPropertyRepresentableQueryItem()
 	 */
-	public function requestPropertyRepresentableQueryItem(\n2n\persistence\orm\query\from\TreePath $treePath) {
+	public function requestPropertyRepresentableQueryItem(TreePath $treePath) {
 		throw new UnsupportedOperationException();
 	}
 }
@@ -136,7 +138,7 @@ class CriteriaColumnComparable implements ColumnComparable {
 	private $queryItem;
 	private $columnComparable;
 	
-	public function __construct(QueryItem $queryItem, ColumnComparable $columnComparable) {
+	public function __construct(QueryPart $queryItem, ColumnComparable $columnComparable) {
 		$this->queryItem = $queryItem;
 		$this->columnComparable = $columnComparable;
 	}

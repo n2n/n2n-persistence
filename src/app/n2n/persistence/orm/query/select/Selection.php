@@ -26,7 +26,7 @@ use n2n\persistence\orm\CorruptedDataException;
 
 interface Selection {
 	/**
-	 * @return \n2n\persistence\meta\data\QueryItem[]
+	 * @return \n2n\spec\dbo\meta\data\QueryItem[]
 	 */
 	public function getSelectQueryItems();
 	/**

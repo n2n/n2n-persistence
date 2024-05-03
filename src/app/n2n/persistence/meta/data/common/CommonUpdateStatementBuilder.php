@@ -23,12 +23,13 @@ namespace n2n\persistence\meta\data\common;
 
 use n2n\persistence\meta\data\QueryComparator;
 
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 
-use n2n\persistence\meta\data\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
 
 use n2n\persistence\Pdo;
-use n2n\persistence\meta\data\UpdateStatementBuilder;
+use n2n\spec\dbo\meta\data\UpdateStatementBuilder;
+use n2n\spec\dbo\meta\data\ComparisonBuilder;
 
 class CommonUpdateStatementBuilder implements UpdateStatementBuilder {
 	
@@ -51,27 +52,29 @@ class CommonUpdateStatementBuilder implements UpdateStatementBuilder {
 		$this->fragmentBuilderFactory = $fragmentBuilderFactory;
 	}
 	
-	public function setTable($tableName) {
+	public function setTable($tableName): static {
 		$this->tableName = $tableName;
+		return $this;
 	}
 	
-	public function addColumn(QueryColumn $column, QueryItem $value) {
+	public function addColumn(QueryItem $column, QueryItem $value): static {
 		$this->setColumns[] = array('column' => $column, 'value' => $value);
+		return $this;
 	}
 	
-	public function getWhereComparator() {
+	public function getWhereComparator(): ComparisonBuilder {
 		return $this->whereSelector;
 	}
 	
-	public function toSqlString() {
+	public function toSqlString(): string {
 		return $this->buildUpdateSql() . $this->buildSetSql() . $this->buildWhereSql();
 	}
 	
-	private function buildUpdateSql() {
-		return 'UPDATE ' . $this->dbh->quoteField($this->tableName);;
+	private function buildUpdateSql(): string {
+		return 'UPDATE ' . $this->dbh->quoteField($this->tableName);
 	}
 	
-	private function buildSetSql() {
+	private function buildSetSql(): string {
 		$itemSqlArr = array();
 		foreach ($this->setColumns as $setColumn) {
 			$fragmentBuilder = $this->fragmentBuilderFactory->create();
@@ -85,7 +88,7 @@ class CommonUpdateStatementBuilder implements UpdateStatementBuilder {
 		return ' SET ' . implode(', ', $itemSqlArr);
 	}
 	
-	private function buildWhereSql() {
+	private function buildWhereSql(): string {
 		if (is_null($this->whereSelector) || $this->whereSelector->isEmpty()) {
 			return '';
 		}

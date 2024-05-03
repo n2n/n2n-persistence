@@ -29,7 +29,7 @@ interface QueryItemRepresentableEntityProperty extends EntityProperty {
 	/**
 	 * @param MetaTreePoint $metaTreePoint
 	 * @param QueryState $queryState
-	 * @return \n2n\persistence\meta\data\QueryItem
+	 * @return \n2n\spec\dbo\meta\data\QueryItem
 	 * @throws UnsupportedOperationException if the QueryItem is not representable by a QueryItem.
 	 */
 	public function createRepresentingQueryItem(MetaTreePoint $metaTreePoint, QueryState $queryState);

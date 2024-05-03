@@ -21,8 +21,8 @@
  */
 namespace n2n\persistence\meta\data\common;
 
-use n2n\persistence\meta\data\LockMode;
+use n2n\spec\dbo\meta\data\QueryLockMode;
 
 interface SelectLockBuilder {
-	function buildStatementEndSql(LockMode $lockMode): ?string;
+	function buildStatementEndSql(QueryLockMode $lockMode): ?string;
 }

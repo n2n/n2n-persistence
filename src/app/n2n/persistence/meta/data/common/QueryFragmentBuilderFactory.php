@@ -21,7 +21,8 @@
  */
 namespace n2n\persistence\meta\data\common;
 
-use n2n\persistence\meta\data\QueryFragmentBuilder;
+
+use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
 
 interface QueryFragmentBuilderFactory {
 

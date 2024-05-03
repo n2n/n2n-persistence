@@ -21,11 +21,11 @@
  */
 namespace n2n\persistence\orm\query\from\meta;
 
-use n2n\persistence\meta\data\QueryTable;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 
-use n2n\persistence\meta\data\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\meta\data\QueryComparator;
@@ -62,7 +62,7 @@ class SimpleTreePointMeta extends TreePointMetaAdapter {
 
 	public function getQueryColumnByName(EntityModel $entityModel, $columnName) {		
 		if (!isset($this->queryColumns[$columnName])) {
-			throw IllegalStateException::createDefault();
+			throw new IllegalStateException();
 		}
 
 		return $this->queryColumns[$columnName];
@@ -75,16 +75,16 @@ class SimpleTreePointMeta extends TreePointMetaAdapter {
 				$this->discriminatorAlias);
 	}
 
-	public function applyAsFrom(SelectStatementBuilder $selectBuilder) {
-		$this->applySelection($selectBuilder);
+	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder) {
+		$this->applySelection($selectStatementBuilder);
 
-		$selectBuilder->addFrom(new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias);
+		$selectStatementBuilder->addFrom(new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias);
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectBuilder, $joinType, QueryComparator $onComparator = null) {
-		$this->applySelection($selectBuilder);
+	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, QueryComparator $onComparator = null) {
+		$this->applySelection($selectStatementBuilder);
 
-		return $selectBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias, $onComparator);
+		return $selectStatementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias, $onComparator);
 	}
 	
 	public function createDiscriminatorSelection() {

@@ -25,7 +25,7 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\criteria\JoinType;
-use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\query\QueryModel;
 
 class JoinedSubCriteriaTreePoint extends SubCriteriaTreePoint implements JoinedTreePoint {

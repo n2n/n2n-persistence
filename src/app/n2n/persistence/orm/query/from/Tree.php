@@ -27,7 +27,7 @@ use n2n\persistence\orm\OrmException;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryConflictException;
-use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\query\QueryModel;
 use n2n\util\type\TypeUtils;

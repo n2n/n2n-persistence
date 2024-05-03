@@ -6,14 +6,12 @@ use n2n\core\config\PersistenceUnitConfig;
 use n2n\persistence\ext\mock\DialectMock;
 use n2n\persistence\Pdo;
 use PHPUnit\Framework\TestCase;
-use n2n\persistence\meta\data\QueryTable;
-use n2n\persistence\meta\data\LockMode;
-use n2n\persistence\meta\data\QueryFragmentBuilder;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 use n2n\persistence\PdoFactory;
+use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
+use n2n\spec\dbo\meta\data\QueryLockMode;
 
 class CommonSelectStatementBuilderTest extends TestCase {
-
-
 
 	private function createPdo(): Pdo {
 		return PdoFactory::createFromPersistenceUnitConfig(
@@ -34,13 +32,13 @@ class CommonSelectStatementBuilderTest extends TestCase {
 		$builder = new CommonSelectStatementBuilder($this->createPdo(), $factoryMock, new CommonSelectLockBuilder());
 		$builder->addFrom(new QueryTable('holeradio'));
 
-		$builder->setLockMode(LockMode::PESSIMISTIC_WRITE);
+		$builder->setLockMode(QueryLockMode::FOR_UPDATE);
 		$this->assertEquals('SELECT * FROM "holeradio" FOR UPDATE', $builder->toSqlString());
 
-		$builder->setLockMode(LockMode::PESSIMISTIC_WRITE_NOWAIT);
+		$builder->setLockMode(QueryLockMode::FOR_UPDATE_NOWAIT);
 		$this->assertEquals('SELECT * FROM "holeradio" FOR UPDATE NOWAIT', $builder->toSqlString());
 
-		$builder->setLockMode(LockMode::PESSIMISTIC_WRITE_SKIP_LOCKED);
+		$builder->setLockMode(QueryLockMode::FOR_UPDATE_SKIP_LOCKED);
 		$this->assertEquals('SELECT * FROM "holeradio" FOR UPDATE SKIP LOCKED', $builder->toSqlString());
 	}
 }

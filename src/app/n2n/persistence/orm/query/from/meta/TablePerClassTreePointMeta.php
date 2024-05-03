@@ -21,12 +21,12 @@
  */
 namespace n2n\persistence\orm\query\from\meta;
 
-use n2n\persistence\meta\data\QueryTable;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 use n2n\persistence\meta\data\SelectStatementSequence;
-use n2n\persistence\meta\data\QueryConstant;
-use n2n\persistence\meta\data\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryConstant;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\meta\data\QueryComparator;
@@ -85,7 +85,7 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 		$className = $entityModel->getClass()->getName();
 		
 		if (!isset($this->discriminatedColumnAliases[$className][$columnName])) {
-			throw IllegalStateException::createDefault();
+			throw new IllegalStateException();
 		}
 
 		return $this->discriminatedColumnAliases[$className][$columnName];
@@ -105,21 +105,21 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 		}
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectBuilder, $joinType, QueryComparator $onComparator = null) {
+	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, QueryComparator $onComparator = null) {
 		if (!$this->entityModel->hasSubEntityModels()) {
-			return $selectBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)), 
+			return $selectStatementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)),
 					$this->tableAlias, $onComparator);
 		}
 
-		return $selectBuilder->addJoin($joinType, $this->createSelectStatementSequence(), $this->tableAlias);
+		return $selectStatementBuilder->addJoin($joinType, $this->createSelectStatementSequence(), $this->tableAlias);
 	}
 
-	public function applyAsFrom(SelectStatementBuilder $selectBuilder) {
+	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder) {
 		if (!$this->entityModel->hasSubEntityModels()) {
-			return $selectBuilder->addFrom(new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias);
+			return $selectStatementBuilder->addFrom(new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias);
 		}
 		
-		$selectBuilder->addFrom($this->createSelectStatementSequence(), $this->tableAlias);
+		return $selectStatementBuilder->addFrom($this->createSelectStatementSequence(), $this->tableAlias);
 	}
 
 	private function createSelectStatementSequence() {
@@ -180,7 +180,7 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 	public function createDiscriminatorComparisonStrategy(QueryState $queryState) {
 		if (!$this->entityModel->hasSubEntityModels()) {
 			return new ComparisonStrategy(new SimpleDiscriminatorColumnComparable(
-					$this->entityModel->getClass(), $this->entityModel));
+					$this->entityModel->getClass(), $this->queryState));
 		}
 		
 		if ($this->discrColumnAlias === null) {
@@ -188,7 +188,8 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 		}
 		
 		return new ComparisonStrategy(new SingleTableDiscriminatorColumnComparable(
-				new QueryColumn($this->discrColumnAlias, $this->tableAlias), $this->discriminatedEntityModels));
+				new QueryColumn($this->discrColumnAlias, $this->tableAlias), $this->discriminatedEntityModels,
+						$this->queryState));
 	}
 	
 }

@@ -21,11 +21,11 @@
  */
 namespace n2n\persistence\orm\query\from\meta;
 
-use n2n\persistence\meta\data\QueryTable;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\criteria\JoinType;
-use n2n\persistence\meta\data\QueryColumn;
-use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\util\ex\IllegalStateException;
@@ -94,13 +94,13 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 		$tableAlias = $this->registerEntityModel($entityModel);
 		
 		if (!isset($this->queryColumns[$tableAlias][$columnName])) {
-			throw IllegalStateException::createDefault();
+			throw new IllegalStateException();
 		}
 
 		return $this->queryColumns[$tableAlias][$columnName];
 	}
 
-	public function applyAsFrom(SelectStatementBuilder $selectBuilder) {
+	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder): void {
 // 		$this->applySelection($selectBuilder);
 		
 		$baseTableAlias = null;
@@ -109,21 +109,21 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 			
 			if ($baseTableAlias === null) {
 				$baseTableAlias = $tableAlias;
-				$selectBuilder->addFrom(new QueryTable($tableName), $tableAlias);
+				$selectStatementBuilder->addFrom(new QueryTable($tableName), $tableAlias);
 				continue;
 			}
 			
-			$this->applyJoin($selectBuilder, $className, $baseTableAlias, $tableName, $tableAlias);
+			$this->applyJoin($selectStatementBuilder, $className, $baseTableAlias, $tableName, $tableAlias);
 		}
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectBuilder, $joinType, QueryComparator $onComparator = null) {
+	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, QueryComparator $onComparator = null) {
 // 		$this->applySelection($selectBuilder);
 		
 		if (count($this->tableAliases) == 1) {
 			foreach ($this->tableAliases as $className => $tableAlias) {
 				$tableName = $this->generateTableName($this->registeredEntityModels[$className]);
-				return $selectBuilder->addJoin($joinType, new QueryTable($tableName), $tableAlias, $onComparator);
+				return $selectStatementBuilder->addJoin($joinType, new QueryTable($tableName), $tableAlias, $onComparator);
 			}
 		}
 		
@@ -142,7 +142,7 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 			$this->applyJoin($joinBuilder, $className, $baseTableAlias, $tableName, $tableAlias);
 		}
 
-		return $selectBuilder->addJoin($joinType, $joinBuilder->toFromQueryResult(), null, $onComparator);
+		return $selectStatementBuilder->addJoin($joinType, $joinBuilder->toFromQueryResult(), null, $onComparator);
 	}
 	
 	

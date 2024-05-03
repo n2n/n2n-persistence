@@ -27,7 +27,7 @@ use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryPoint;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\query\select\Selection;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 class CriteriaProperty implements CriteriaItem {
 	private $propertyNames;

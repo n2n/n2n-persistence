@@ -22,7 +22,7 @@
 namespace n2n\persistence\orm\criteria\compare;
 
 use n2n\util\type\TypeConstraint;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 abstract class ColumnComparableAdapter implements ColumnComparable {
 	protected $availableOperators;

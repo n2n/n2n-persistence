@@ -22,7 +22,7 @@
 namespace n2n\persistence\orm\query\from;
 
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
-use n2n\persistence\meta\data\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\util\ex\UnsupportedOperationException;
@@ -32,7 +32,8 @@ use n2n\persistence\orm\query\QueryModel;
 use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryItemSelect;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\persistence\orm\query\QueryPoint;
 
 abstract class SubCriteriaTreePoint implements TreePoint {
 	protected $queryModel;
@@ -67,9 +68,9 @@ abstract class SubCriteriaTreePoint implements TreePoint {
 	/**
 	 * @param TreePath $treePath
 	 * @throws QueryConflictException
-	 * @return \n2n\persistence\orm\query\QueryPoint
+	 * @return QueryPoint
 	 */
-	private function findSelectedCriteriaItem(TreePath $treePath) {
+	private function findSelectedCriteriaItem(TreePath $treePath): QueryPoint {
 		$alias = $treePath->next();
 		
 		$namedSelectQueryPoints = $this->queryModel->getNamedSelectQueryPoints();

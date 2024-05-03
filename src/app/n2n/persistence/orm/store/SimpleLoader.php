@@ -26,7 +26,7 @@ use n2n\persistence\orm\query\select\EntityValuesSelection;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\query\select\EntityObjSelection;
-use n2n\persistence\meta\data\QueryPlaceMarker;
+use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 
 class SimpleLoader {
 	private $em;

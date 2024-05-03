@@ -25,15 +25,15 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\persistence\orm\query\QueryPoint;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
-use n2n\persistence\meta\data\QueryPlaceMarker;
+use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\persistence\orm\criteria\compare\ScalarColumnComparable;
 use n2n\persistence\orm\query\from\TreePath;
-use n2n\persistence\meta\data\QueryConstant;
+use n2n\spec\dbo\meta\data\impl\QueryConstant;
 use n2n\persistence\orm\query\select\SimpleSelection;
 use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\persistence\orm\query\select\Selection;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\util\type\TypeUtils;
 
 class CriteriaConstant implements CriteriaItem {

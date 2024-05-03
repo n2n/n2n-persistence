@@ -51,7 +51,7 @@ class EntityObjSelection implements Selection {
 // 				. '::$' . $entityProperty->getName();
 // 	}
 	/**
-	 * @return \n2n\persistence\meta\data\QueryItem[]
+	 * @return \n2n\spec\dbo\meta\data\QueryItem[]
 	 */
 	public function getSelectQueryItems() {
 		return $this->selectionGroup->getSelectQueryItems();

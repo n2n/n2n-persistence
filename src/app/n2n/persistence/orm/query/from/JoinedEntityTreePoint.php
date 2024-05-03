@@ -23,7 +23,7 @@ namespace n2n\persistence\orm\query\from;
 
 use n2n\persistence\meta\data\QueryComparator;
 
-use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\criteria\JoinType;

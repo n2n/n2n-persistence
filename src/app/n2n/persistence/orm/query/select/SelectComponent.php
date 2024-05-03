@@ -23,20 +23,21 @@ namespace n2n\persistence\orm\query\select;
 
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\orm\query\QueryPoint;
+use n2n\spec\dbo\meta\data\QueryPart;
 
 interface SelectComponent extends QueryPoint {
 	/**
 	 * @param TreePath $treePath
 	 * @return ComparisonStrategy
 	 */
-	public function requestCompararationStrategy(TreePath $treePath);
+	public function requestCompararationStrategy(TreePath $treePath): ComparisonStrategy;
 	/**
 	 * @param TreePath $treePath
 	 * @return QueryItem
 	 */
-	public function requestRepresentableQueryItem(TreePath $treePath);
+	public function requestRepresentableQueryItem(): QueryPart;
 	/**
 	 * @param TreePath $treePath
 	 * @return Selection

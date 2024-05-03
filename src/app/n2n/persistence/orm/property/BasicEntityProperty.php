@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm\property;
 
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\Pdo;
 

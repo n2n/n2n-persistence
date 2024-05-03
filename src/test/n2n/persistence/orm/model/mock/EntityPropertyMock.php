@@ -10,7 +10,7 @@ use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\EntityDataException;
 use n2n\util\type\TypeUtils;
 use n2n\persistence\orm\property\BasicEntityProperty;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\query\from\MetaTreePoint;
@@ -21,6 +21,7 @@ use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\reflection\property\PropertyAccessException;
+use n2n\util\ex\UnsupportedOperationException;
 
 class EntityPropertyMock implements BasicEntityProperty {
 	private $entityModel;
@@ -137,66 +138,66 @@ class EntityPropertyMock implements BasicEntityProperty {
 	}
 
 	public function valueToRep($value): string {
-		// TODO: Implement valueToRep() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function repToValue(string $rep) {
-		// TODO: Implement repToValue() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function parseValue($raw, Pdo $pdo) {
-		// TODO: Implement parseValue() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function buildRaw($value, Pdo $pdo) {
-		// TODO: Implement buildRaw() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
-		// TODO: Implement createSelectionFromQueryItem() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
-		// TODO: Implement createColumnComparableFromQueryItem() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		// TODO: Implement createColumnComparable() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function getColumnName() {
-		// TODO: Implement getColumnName() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createQueryColumn(TreePointMeta $treePointMeta) {
-		// TODO: Implement createQueryColumn() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		// TODO: Implement createSelection() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
-		// TODO: Implement mergeValue() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
-		// TODO: Implement supplyPersistAction() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
-		// TODO: Implement supplyRemoveAction() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createValueHash($value, EntityManager $em): ValueHash {
-		// TODO: Implement createValueHash() method.
+		throw new UnsupportedOperationException();
 	}
 
 	public function createRepresentingQueryItem(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		// TODO: Implement createRepresentingQueryItem() method.
+		throw new UnsupportedOperationException();
 	}
 
 	function ensureInit(): void {
-		// TODO: Implement ensureInit() method.
+		throw new UnsupportedOperationException();
 	}
 }

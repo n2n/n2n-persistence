@@ -32,7 +32,7 @@ use n2n\persistence\orm\query\QueryPointResolver;
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
-use n2n\persistence\meta\data\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\persistence\orm\query\QueryItemSelect;
 use n2n\persistence\meta\data\JoinType;
 use n2n\persistence\orm\query\Query;
@@ -42,7 +42,7 @@ use n2n\persistence\orm\criteria\compare\ComparatorCriteria;
 use n2n\persistence\orm\criteria\compare\SelectColumnComparable;
 use n2n\util\type\TypeUtils;
 use ReflectionClass;
-use n2n\persistence\meta\data\LockMode;
+use n2n\spec\dbo\meta\data\QueryLockMode;
 
 /**
  * @template T
@@ -408,7 +408,7 @@ class Criteria {
 		
 		$queryModel->setLimit($this->limit);
 		$queryModel->setNum($this->num);
-		$queryModel->setLockMode($this->lockMode);
+		$queryModel->setLockMode($this->lockMode?->toQueryLockMode());
 		
 		return $queryModel;
 	}

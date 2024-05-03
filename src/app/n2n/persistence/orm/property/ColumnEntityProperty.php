@@ -30,7 +30,7 @@ interface ColumnEntityProperty extends QueryItemRepresentableEntityProperty {
 	public function getColumnName();
 	/**
 	 * @param TreePointMeta $treePointMeta
-	 * @return \n2n\persistence\meta\data\QueryColumn
+	 * @return \n2n\spec\dbo\meta\data\impl\QueryColumn
 	 */
 	public function createQueryColumn(TreePointMeta $treePointMeta);
 }

@@ -22,6 +22,7 @@
 namespace n2n\persistence\meta\data;
 
 use n2n\util\type\ArgUtils;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 
 class SelectStatementSequence {
 	const OPERATOR_UNION = 'UNION';

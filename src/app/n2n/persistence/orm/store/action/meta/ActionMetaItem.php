@@ -22,9 +22,9 @@
 namespace n2n\persistence\orm\store\action\meta;
 
 use n2n\persistence\orm\model\EntityModel;
-use n2n\persistence\meta\data\PersistStatementBuilder;
-use n2n\persistence\meta\data\QueryColumn;
-use n2n\persistence\meta\data\QueryPlaceMarker;
+use n2n\spec\dbo\meta\data\PersistStatementBuilder;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\persistence\PdoStatement;
 
 class ActionMetaItem {

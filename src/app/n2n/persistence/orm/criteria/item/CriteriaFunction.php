@@ -23,7 +23,7 @@ namespace n2n\persistence\orm\criteria\item;
 
 use n2n\persistence\meta\data\QueryItemSequence;
 use n2n\util\type\ArgUtils;
-use n2n\persistence\meta\data\QueryFunction;
+use n2n\spec\dbo\meta\data\impl\QueryFunction;
 use n2n\persistence\orm\criteria\compare\ScalarColumnComparable;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryPointResolver;
@@ -34,7 +34,7 @@ use n2n\persistence\orm\query\select\SimpleSelection;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\query\select\Selection;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 class CriteriaFunction implements CriteriaItem {
 	const COUNT = QueryFunction::COUNT;

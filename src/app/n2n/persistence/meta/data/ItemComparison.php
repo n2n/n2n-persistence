@@ -22,6 +22,8 @@
 namespace n2n\persistence\meta\data;
 
 use n2n\util\type\ArgUtils;
+use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
 
 class ItemComparison extends Comparison {
 	private $queryItem1;
@@ -60,7 +62,7 @@ class ItemComparison extends Comparison {
 		return $this->queryItem2;
 	}
 	
-	public function buildQueryComparison(QueryFragmentBuilder $fragmentBuilder) {
+	public function buildQueryComparison(QueryFragmentBuilder $fragmentBuilder): void {
 		$this->queryItem1->buildItem($fragmentBuilder);
 		$fragmentBuilder->addOperator($this->operator);
 		$this->queryItem2->buildItem($fragmentBuilder);		

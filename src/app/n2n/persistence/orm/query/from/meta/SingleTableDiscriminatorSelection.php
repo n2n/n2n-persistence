@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm\query\from\meta;
 
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\orm\CorruptedDataException;
 use n2n\persistence\PdoStatement;
 use n2n\persistence\orm\query\select\EagerValueBuilder;

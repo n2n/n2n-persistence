@@ -21,7 +21,7 @@
  */
 namespace n2n\persistence\orm\query\from;
 
-use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 
 class BaseSubCriteriaTreePoint extends SubCriteriaTreePoint {
 	

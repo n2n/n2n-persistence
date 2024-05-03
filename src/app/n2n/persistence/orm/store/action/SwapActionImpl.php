@@ -21,8 +21,8 @@
  */
 // namespace n2n\persistence\orm\store;
 
-// use n2n\persistence\meta\data\QueryColumn;
-// use n2n\persistence\meta\data\QueryPlaceMarker;
+// use n2n\spec\dbo\meta\data\impl\QueryColumn;
+// use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 // use n2n\util\ex\IllegalStateException;
 // use n2n\persistence\meta\data\QueryComparator;
 // use n2n\persistence\orm\store\action\SwapAction;
