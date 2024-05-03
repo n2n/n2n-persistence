@@ -32,6 +32,7 @@ use n2n\spec\dbo\meta\data\DeleteStatementBuilder;
 use n2n\persistence\meta\data\Importer;
 use n2n\persistence\PdoLogger;
 use n2n\persistence\PDOOperations;
+use n2n\spec\dbo\meta\structure\MetaManager;
 
 /**
  * - Use {@link PDOOperations} to interact with native PDO.

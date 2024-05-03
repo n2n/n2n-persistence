@@ -31,8 +31,15 @@ use n2n\persistence\meta\Dialect;
 use n2n\core\config\PersistenceUnitConfig;
 use n2n\core\ext\N2nMonitor;
 use n2n\util\type\TypeUtils;
+use n2n\spec\dbo\Dbo;
+use n2n\spec\dbo\meta\structure\MetaManager;
+use n2n\spec\dbo\meta\data\UpdateStatementBuilder;
+use n2n\spec\dbo\meta\data\InsertStatementBuilder;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\DeleteStatementBuilder;
+use n2n\spec\dbo\DboStatement;
 
-class Pdo {
+class Pdo implements Dbo {
 	private ?\PDO $pdo = null;
 	private PdoLogger $logger;
 	private ?MetaData $metaData = null;
@@ -157,7 +164,7 @@ class Pdo {
 	/**
 	 * @return string
 	 */
-	public function getDataSourceName() {
+	public function getDataSourceName(): string {
 		return $this->dataSourceName;
 	}
 
@@ -194,15 +201,20 @@ class Pdo {
 		}
 	}
 
-	public function query(string $statement, ?int $fetchMode = null, ...$fetchModeArgs) {
+	public function query(string $statement, ?int $fetchMode = null, ...$fetchModeArgs): ?DboStatement {
 		try {
 			$mtime = microtime(true);
 			$query = $this->pdo()->query($statement, $fetchMode, $fetchModeArgs);
 			$this->logger->addQuery($statement, (microtime(true) - $mtime));
-			return $query;
 		} catch (\PDOException $e) {
 			throw new PdoStatementException($e, $statement);
 		}
+
+		if ($query === false) {
+			return null;
+		}
+
+		return new PdoStatement($query);
 	}
 
 	public function exec(string $statement): false|int {
@@ -291,8 +303,8 @@ class Pdo {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ROLLED_BACK, $transaction);
 	}
 
-	function quote(string $string, int $type = \PDO::PARAM_STR): string {
-		return $this->pdo()->quote($string, $type);
+	function quote(string|bool|int|float|null $value): string|null {
+		return $this->pdo()->quote($value);
 	}
 
 	/**
@@ -337,6 +349,26 @@ class Pdo {
 	 */
 	public function unregisterListener(PdoListener $listener) {
 		unset($this->listeners[spl_object_hash($listener)]);
+	}
+
+	function createMetaManager(): MetaManager {
+		return $this->getMetaData()->getDialect()->createMetaManager($this);
+	}
+
+	function createSelectStatementBuilder(): SelectStatementBuilder {
+		return $this->getMetaData()->getDialect()->createSelectStatementBuilder($this);
+	}
+
+	function createUpdateStatementBuilder(): UpdateStatementBuilder {
+		return $this->getMetaData()->getDialect()->createUpdateStatementBuilder($this);
+	}
+
+	function createInsertStatementBuilder(): InsertStatementBuilder {
+		return $this->getMetaData()->getDialect()->createInsertStatementBuilder($this);
+	}
+
+	function createDeleteStatementBuilder(): DeleteStatementBuilder {
+		return $this->getMetaData()->getDialect()->createDeleteStatementBuilder($this);
 	}
 }
 

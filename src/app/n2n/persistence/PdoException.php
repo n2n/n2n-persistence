@@ -21,7 +21,9 @@
  */
 namespace n2n\persistence;
 
-class PdoException extends \PDOException {
+use n2n\spec\dbo\err\DboException;
+
+class PdoException extends \PDOException implements DboException {
 	public function __construct(\PDOException $e) {
 		parent::__construct($e->getMessage(), previous: $e->getPrevious());
 

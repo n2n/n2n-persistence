@@ -21,7 +21,9 @@
  */
 namespace n2n\persistence;
 
-class PdoStatement {
+use n2n\spec\dbo\DboStatement;
+
+class PdoStatement implements DboStatement {
 	private ?PdoLogger $logger;
 	private $boundValues = array();
 
@@ -96,12 +98,12 @@ class PdoStatement {
 	 * (non-PHPdoc)
 	 * @see PDOStatement::execute()
 	 */
-	public function execute($input_parameters = null): bool {
-		if (is_array($input_parameters)) $this->boundValues = $input_parameters;
+	public function execute(array $params = null): bool {
+		if (is_array($params)) $this->boundValues = $params;
 		
 		try {
 			$mtime = microtime(true);
-			$return = $this->stmt->execute($input_parameters);
+			$return = $this->stmt->execute($params);
 			if (isset($this->logger)) {
 				$this->logger->addPreparedExecution($this->stmt->queryString, $this->boundValues, (microtime(true) - $mtime));
 			}
@@ -138,5 +140,9 @@ class PdoStatement {
 
 	function fetchAll(int $mode = \PDO::FETCH_DEFAULT, ...$args): array {
 		return $this->stmt->fetchAll($mode, ...$args);
+	}
+
+	function fetchNext(): mixed {
+		return $this->fetch(\PDO::FETCH_ASSOC);
 	}
 }
