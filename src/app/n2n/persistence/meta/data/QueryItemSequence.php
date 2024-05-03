@@ -22,6 +22,7 @@
 namespace n2n\persistence\meta\data;
 
 use n2n\util\type\ArgUtils;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 class QueryItemSequence implements QueryItem {
 	const OPERATOR_SEQ = ',';
