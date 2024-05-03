@@ -24,7 +24,6 @@ namespace n2n\persistence\meta\data;
 use n2n\util\type\ArgUtils;
 use n2n\spec\dbo\meta\data\QueryResult;
 use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
-use n2n\spec\dbo\meta\data\QueryItem;
 
 class TestComparison extends Comparison {
 	private $operator;
