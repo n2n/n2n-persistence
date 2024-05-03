@@ -126,23 +126,26 @@ class PdoStatement implements DboStatement {
 	public function unregisterListener(PdoStatementListener $listener) {
 		unset($this->listeners[spl_object_hash($listener)]);
 	}
-	
 
-	public function fetch(int $fetch_style = \PDO::FETCH_BOTH, int $cursor_orientation = \PDO::FETCH_ORI_NEXT, int $cursor_offset = 0): mixed {
+
+	/**
+	 * @param int $fetch_style
+	 * @param int $cursor_orientation
+	 * @param int $cursor_offset
+	 * @return mixed will return null and not false at end to implement {@link DboStatement} correctly.
+	 */
+	public function fetch(int $fetch_style = \PDO::FETCH_ASSOC, int $cursor_orientation = \PDO::FETCH_ORI_NEXT, int $cursor_offset = 0): mixed {
 		$return = $this->stmt->fetch($fetch_style, $cursor_orientation, $cursor_offset);
 		
 		if ($fetch_style == \PDO::FETCH_BOUND) {
 			$this->supplySharedBounds();
 		}
 		
-		return $return;
+		return $return === false ? null : $return;
 	}
 
-	function fetchAll(int $mode = \PDO::FETCH_DEFAULT, ...$args): array {
+	function fetchAll(int $mode = \PDO::FETCH_ASSOC, ...$args): array {
 		return $this->stmt->fetchAll($mode, ...$args);
 	}
 
-	function fetchNext(): mixed {
-		return $this->fetch(\PDO::FETCH_ASSOC);
-	}
 }
