@@ -23,6 +23,7 @@ namespace n2n\persistence\meta\data;
 
 use n2n\util\type\ArgUtils;
 use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
 
 class QueryItemSequence implements QueryItem {
 	const OPERATOR_SEQ = ',';
@@ -43,18 +44,18 @@ class QueryItemSequence implements QueryItem {
 		return $this->sequenceItem;
 	}
 	
-	public function add($operator, QueryItem $queryItem) {
+	public function add($operator, QueryItem $queryItem): void {
 		ArgUtils::valEnum($operator, self::getOperators());
 		$sequenceItem = new QueryItemSequenceItem($queryItem);
 		$this->lastSequenceItem->setSquenceOperator(new SequenceOperator($operator, $sequenceItem));
 		$this->lastSequenceItem = $sequenceItem;
 	}
 	
-	public function buildItem(QueryFragmentBuilder $itemBuilder) {
-		$this->buildSequenceItem($this->sequenceItem, $itemBuilder);
+	public function buildItem(QueryFragmentBuilder $fragmentBuilder): void {
+		$this->buildSequenceItem($this->sequenceItem, $fragmentBuilder);
 	}
 	
-	private function buildSequenceItem(QueryItemSequenceItem $sequenceItem, QueryFragmentBuilder $itemBuilder) {
+	private function buildSequenceItem(QueryItemSequenceItem $sequenceItem, QueryFragmentBuilder $itemBuilder): void {
 		$sequenceItem->getQueryItem()->buildItem($itemBuilder);
 		$sequenceOperator = $sequenceItem->getSequenceOperator();
 		if (is_null($sequenceOperator)) return;
