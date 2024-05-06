@@ -48,42 +48,42 @@ class Pdo implements Dbo {
 
 	public function __construct(private string $dataSourceName, Dialect $dialect,
 			private ?TransactionManager $transactionManager = null, ?float $slowQueryTime = null,
-			?N2nMonitor $n2nMonitor = null, PdoTransactionManagerBindMode $pdoTransactionManagerBindMode = PdoTransactionManagerBindMode::FULL) {
+			?N2nMonitor $n2nMonitor = null, private PdoTransactionManagerBindMode $bindMode = PdoTransactionManagerBindMode::FULL) {
 		$this->logger = new PdoLogger($this->getDataSourceName(), $slowQueryTime, $n2nMonitor);
 
 		$this->dialect = $dialect;
 		$this->metaData = new MetaData($this, $dialect);
 
-		if (!$pdoTransactionManagerBindMode->isTransactionIncluded()) {
+		if (!$bindMode->isTransactionIncluded()) {
 			$this->pdoTransactionalResource = new PdoReleasableResource(
-					function() use ($pdoTransactionManagerBindMode) {
+					function() use ($bindMode) {
 						$this->release();
 					});
 			return;
 		}
 
 		$this->pdoTransactionalResource = new PdoTransactionalResource(
-				function(Transaction $transaction) use ($pdoTransactionManagerBindMode) {
+				function(Transaction $transaction) use ($bindMode) {
 					$this->performBeginTransaction($transaction, $transaction->isReadOnly());
 				},
-				function(Transaction $transaction) use ($pdoTransactionManagerBindMode) {
-					if (!$pdoTransactionManagerBindMode->isTransactionIncluded()) {
+				function(Transaction $transaction) use ($bindMode) {
+					if (!$bindMode->isTransactionIncluded()) {
 						return true;
 					}
 
 					return $this->prepareCommit($transaction);
 				},
-				function(Transaction $transaction) use ($pdoTransactionManagerBindMode) {
+				function(Transaction $transaction) use ($bindMode) {
 					try {
 						$this->performCommit($transaction);
 					} catch (PdoCommitException $e) {
 						throw new CommitFailedException('Pdo commit failed. Reason: ' . $e->getMessage(), 0, $e);
 					}
 				},
-				function(Transaction $transaction) use ($pdoTransactionManagerBindMode){
+				function(Transaction $transaction) use ($bindMode){
 					$this->performRollBack($transaction);
 				},
-				function() use ($pdoTransactionManagerBindMode) {
+				function() use ($bindMode) {
 					$this->release();
 				});
 	}
@@ -232,7 +232,7 @@ class Pdo implements Dbo {
 	}
 
 	public function beginTransaction(bool $readOnly = false): void {
-		if ($this->transactionManager === null) {
+		if ($this->transactionManager === null || !$this->bindMode->isTransactionIncluded()) {
 			$this->performBeginTransaction(null, $readOnly);
 			return;
 		}
@@ -243,7 +243,7 @@ class Pdo implements Dbo {
 	}
 
 	public function commit(): void {
-		if ($this->transactionManager === null) {
+		if ($this->transactionManager === null || !$this->bindMode->isTransactionIncluded()) {
 			$this->prepareCommit();
 			$this->performCommit();
 			return;
@@ -255,7 +255,7 @@ class Pdo implements Dbo {
 	}
 
 	public function rollBack(): void {
-		if ($this->transactionManager === null) {
+		if ($this->transactionManager === null || !$this->bindMode->isTransactionIncluded()) {
 			$this->performRollBack();
 			return;
 		}
