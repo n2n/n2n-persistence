@@ -130,7 +130,7 @@ class PdoPool {
 		}
 		
 		if (!isset($this->persistenceUnitConfigs[$persistenceUnitName])) {
-			throw new UnknownPersistenceUnitException('Unknown persitence unit: ' . $persistenceUnitName);
+			throw new UnknownPersistenceUnitException('Unknown persistence unit: ' . $persistenceUnitName);
 		}
 		
 		if (!isset($this->dbhs[$persistenceUnitName])) {
@@ -172,6 +172,21 @@ class PdoPool {
 	 */
 	private function createPdo(PersistenceUnitConfig $persistenceUnitConfig): Pdo {
 		return PdoFactory::createFromPersistenceUnitConfig($persistenceUnitConfig, $this->transactionManager,
+				$this->slowQueryTime, $this->n2nMonitor);
+	}
+
+	function createStandalonePdo(string $persistenceUnitName = null, bool $bindToTransactionManager = false): Pdo {
+		if ($persistenceUnitName === null) {
+			$persistenceUnitName = self::DEFAULT_DS_NAME;
+		}
+
+		if (!isset($this->persistenceUnitConfigs[$persistenceUnitName])) {
+			throw new UnknownPersistenceUnitException('Unknown persistence unit: ' . $persistenceUnitName);
+		}
+
+		$persistenceUnitConfig = $this->persistenceUnitConfigs[$persistenceUnitName];
+		return PdoFactory::createFromPersistenceUnitConfig($persistenceUnitConfig,
+				($bindToTransactionManager ? $this->transactionManager : null),
 				$this->slowQueryTime, $this->n2nMonitor);
 	}
 	
