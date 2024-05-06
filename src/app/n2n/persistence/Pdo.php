@@ -44,7 +44,7 @@ class Pdo implements Dbo {
 	private ?Dialect $dialect = null;
 	private array $listeners = array();
 
-	private PdoTransactionalResource $pdoTransactionalResource;
+	private PdoTransactionalResource|PdoReleasableResource $pdoTransactionalResource;
 
 	public function __construct(private string $dataSourceName, Dialect $dialect,
 			private ?TransactionManager $transactionManager = null, ?float $slowQueryTime = null,
@@ -54,12 +54,16 @@ class Pdo implements Dbo {
 		$this->dialect = $dialect;
 		$this->metaData = new MetaData($this, $dialect);
 
+		if (!$pdoTransactionManagerBindMode->isTransactionIncluded()) {
+			$this->pdoTransactionalResource = new PdoReleasableResource(
+					function() use ($pdoTransactionManagerBindMode) {
+						$this->release();
+					});
+			return;
+		}
+
 		$this->pdoTransactionalResource = new PdoTransactionalResource(
 				function(Transaction $transaction) use ($pdoTransactionManagerBindMode) {
-					if (!$pdoTransactionManagerBindMode->isTransactionIncluded()) {
-						return;
-					}
-
 					$this->performBeginTransaction($transaction, $transaction->isReadOnly());
 				},
 				function(Transaction $transaction) use ($pdoTransactionManagerBindMode) {
@@ -70,10 +74,6 @@ class Pdo implements Dbo {
 					return $this->prepareCommit($transaction);
 				},
 				function(Transaction $transaction) use ($pdoTransactionManagerBindMode) {
-					if (!$pdoTransactionManagerBindMode->isTransactionIncluded()) {
-						return;
-					}
-
 					try {
 						$this->performCommit($transaction);
 					} catch (PdoCommitException $e) {
@@ -81,17 +81,9 @@ class Pdo implements Dbo {
 					}
 				},
 				function(Transaction $transaction) use ($pdoTransactionManagerBindMode){
-					if (!$pdoTransactionManagerBindMode->isTransactionIncluded()) {
-						return;
-					}
-
 					$this->performRollBack($transaction);
 				},
 				function() use ($pdoTransactionManagerBindMode) {
-					if (!$pdoTransactionManagerBindMode->isReleaseIncluded()) {
-						return;
-					}
-
 					$this->release();
 				});
 	}

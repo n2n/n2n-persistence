@@ -31,7 +31,7 @@ use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\property\PropertyInitializationException;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\property\ClassSetup;
-use n2n\persistence\orm\OrmErrorException;
+use n2n\persistence\orm\OrmError;
 use n2n\persistence\orm\property\IdDef;
 use n2n\persistence\orm\LifecycleUtils;
 use n2n\persistence\orm\attribute\MappedSuperclass;
@@ -217,7 +217,7 @@ class EntityModelInitializer {
 		$superEntityModel = $this->entityModel->getSuperEntityModel();
 		
 		if (null !== $superEntityModel && null == $superEntityModel->getInheritanceType()) {
-			throw OrmErrorException::create('No inheritance strategy defined in supreme class of'
+			throw OrmError::create('No inheritance strategy defined in supreme class of'
 							.  $this->entityModel->getClass()->getName(),  
 					array($this->entityModel->getSupremeEntityModel()->getClass()));
 		}
@@ -226,7 +226,7 @@ class EntityModelInitializer {
 		if (null === $inheritanceAttr) return;
 		
 		if ($superEntityModel !== null) {
-			throw OrmErrorException::create('Inheritance strategy of ' . $this->entityModel->getClass()->getName()
+			throw OrmError::create('Inheritance strategy of ' . $this->entityModel->getClass()->getName()
 							. 'has to be specified in supreme class', array($inheritanceAttr));
 		}
 
@@ -252,7 +252,7 @@ class EntityModelInitializer {
 		if ($discriminatorValueAttr === null) {
 			if ($this->entityModel->getInheritanceType() == InheritanceType::SINGLE_TABLE
 					&& !$this->entityModel->getClass()->isAbstract()) {
-				throw OrmErrorException::create('No discriminator value defined for entity: '
+				throw OrmError::create('No discriminator value defined for entity: '
 						. $this->entityModel->getClass()->getName(), array($discriminatorValueAttr));
 			}
 			
@@ -260,12 +260,12 @@ class EntityModelInitializer {
 		}
 		
 		if ($this->entityModel->getInheritanceType() != InheritanceType::SINGLE_TABLE) {
-			throw OrmErrorException::create('Discriminator value can only be defined for entities with inheritance type SINGLE_TABLE'
+			throw OrmError::create('Discriminator value can only be defined for entities with inheritance type SINGLE_TABLE'
 					. $this->entityModel->getClass()->getName(), array($discriminatorValueAttr));
 		}
 
 		if ($this->entityModel->getClass()->isAbstract()) {
-			throw OrmErrorException::create('Discriminator value must not be defined for abstract entity: '
+			throw OrmError::create('Discriminator value must not be defined for abstract entity: '
 					. $this->entityModel->getClass()->getName(), array($discriminatorValueAttr));
 		}
 			
@@ -286,7 +286,7 @@ class EntityModelInitializer {
 			return;
 		}
 		
-		throw OrmErrorException::create('No discriminator value defined for entity: '
+		throw OrmError::create('No discriminator value defined for entity: '
 				. $this->entityModel->getClass()->getName(), array($this->entityModel->getClass()));
 	}
 	/**
@@ -355,7 +355,7 @@ class EntityModelInitializer {
 	private function analyzeId() {
 		$idAttrs = $this->attributeSet->getPropertyAttributesByName(Id::class);
 		if (count($idAttrs) > 1) {
-			throw OrmErrorException::create('Multiple ids defined in Entity: ' 
+			throw OrmError::create('Multiple ids defined in Entity: '
 					. $this->entityModel->getClass()->getName(), $idAttrs);
 		} 
 		
@@ -371,7 +371,7 @@ class EntityModelInitializer {
 			if ($this->entityModel->hasSuperEntityModel()) return;
 		} else {
 			if ($this->entityModel->hasSuperEntityModel()) {
-				throw OrmErrorException::create(
+				throw OrmError::create(
 						'Id for ' . $this->entityModel->getClass()->getName() . ' already defined in super class '
 								. $this->entityModel->getSuperEntityModel()->getClass()->getName(),
 						array($idAttr));
@@ -380,7 +380,7 @@ class EntityModelInitializer {
 			$propertyName = $idAttr->getProperty()->getName();
 			$generatedValue = $idAttr->getInstance()->isGenerated();
 			if ($generatedValue && $this->entityModel->getInheritanceType() == InheritanceType::TABLE_PER_CLASS) {
-				throw OrmErrorException::create(
+				throw OrmError::create(
 						'Ids with generated values are not compatible with inheritance type TABLE_PER_CLASS in ' 
 								. $this->entityModel->getClass()->getName() . '.', $idAttrs);
 			}
@@ -394,7 +394,7 @@ class EntityModelInitializer {
 				return;
 			}
 
-			throw $this->setupProcess->createPropertyException('Invalid property type for id.', null, $idAttr);
+			throw $this->setupProcess->createPropertyException('Invalid property type for id.', null, [$idAttr]);
 		} catch (UnknownEntityPropertyException $e) {
 			throw $this->setupProcess->createPropertyException('No id property defined.', $e, []);
 		}

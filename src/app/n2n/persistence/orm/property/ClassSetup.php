@@ -27,7 +27,7 @@ use n2n\reflection\property\AccessProxy;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\OrmException;
-use n2n\persistence\orm\OrmErrorException;
+use n2n\persistence\orm\OrmError;
 use n2n\persistence\orm\attribute\Column;
 use n2n\reflection\attribute\AttributeSet;
 use n2n\persistence\orm\attribute\AttributeOverrides;
@@ -232,7 +232,7 @@ class ClassSetup {
 	 * @param EntityProperty $entityProperty
 	 * @param array $relatedComponents
 	 * @throws OrmException
-	 * @throws OrmErrorException
+	 * @throws OrmError
 	 */
 	public function provideEntityProperty(EntityProperty $entityProperty,
 			array $relatedComponents = array()) {

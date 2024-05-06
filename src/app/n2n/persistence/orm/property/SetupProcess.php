@@ -24,7 +24,7 @@ namespace n2n\persistence\orm\property;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\model\EntityPropertyAnalyzer;
 use n2n\util\ex\IllegalStateException;
-use n2n\persistence\orm\OrmErrorException;
+use n2n\persistence\orm\OrmError;
 use n2n\persistence\orm\model\NamingStrategy;
 use n2n\persistence\orm\model\OnFinalizeQueue;
 use n2n\persistence\orm\InheritanceType;
@@ -103,9 +103,9 @@ class SetupProcess {
 //	}
 	/**
 	 * @param string $message
-	 * @param \Exception $causingE
+	 * @param \Exception|null $causingE
 	 * @param array $causingComponents
-	 * @return \Exception
+	 * @return \Error
 	 */
 	public static function createPropertyException($message, \Exception $causingE = null,
 			array $causingComponents = array()) {

@@ -24,8 +24,7 @@ namespace n2n\persistence\orm\model;
 use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\OrmConfigurationException;
 use n2n\reflection\ReflectionContext;
-use n2n\persistence\orm\OrmErrorException;
-use n2n\web\dispatch\model\ModelInitializationException;
+use n2n\persistence\orm\OrmError;
 use n2n\persistence\orm\annotation\AnnoMappedSuperclass;
 use n2n\util\type\ArgUtils;
 use n2n\reflection\ReflectionUtils;
@@ -189,7 +188,7 @@ class EntityModelManager {
 		$annoMappedSuperClass = ReflectionContext::getAnnotationSet($class)
 				->getClassAnnotation(AnnoMappedSuperclass::class);
 		if ($annoMappedSuperClass !== null) {
-			throw OrmErrorException::create('Class can not be registered as Entity and be'
+			throw OrmError::create('Class can not be registered as Entity and be'
 					. ' annotated as MappedSuperClass at the same time:' . $class->getName(),
 					array($annoMappedSuperClass));
 		}
