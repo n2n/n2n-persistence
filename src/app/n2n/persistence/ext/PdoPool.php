@@ -175,7 +175,7 @@ class PdoPool {
 				$this->slowQueryTime, $this->n2nMonitor);
 	}
 
-	function createStandalonePdo(string $persistenceUnitName = null, bool $bindToTransactionManager = false): Pdo {
+	function createStandalonePdo(string $persistenceUnitName = null, bool $bindToTransactionManager = true): Pdo {
 		if ($persistenceUnitName === null) {
 			$persistenceUnitName = self::DEFAULT_DS_NAME;
 		}
