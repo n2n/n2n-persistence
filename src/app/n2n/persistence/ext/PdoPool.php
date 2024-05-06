@@ -41,6 +41,7 @@ use n2n\core\ext\N2nMonitor;
 use n2n\reflection\ReflectionUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\PdoFactory;
+use n2n\persistence\PdoTransactionManagerBindMode;
 
 class PdoPool {
 	const DEFAULT_DS_NAME = 'default';
@@ -175,7 +176,8 @@ class PdoPool {
 				$this->slowQueryTime, $this->n2nMonitor);
 	}
 
-	function createStandalonePdo(string $persistenceUnitName = null, bool $bindToTransactionManager = true): Pdo {
+	function createStandalonePdo(string $persistenceUnitName = null,
+			PdoTransactionManagerBindMode $bindMode = PdoTransactionManagerBindMode::FULL): Pdo {
 		if ($persistenceUnitName === null) {
 			$persistenceUnitName = self::DEFAULT_DS_NAME;
 		}
@@ -186,8 +188,7 @@ class PdoPool {
 
 		$persistenceUnitConfig = $this->persistenceUnitConfigs[$persistenceUnitName];
 		return PdoFactory::createFromPersistenceUnitConfig($persistenceUnitConfig,
-				($bindToTransactionManager ? $this->transactionManager : null),
-				$this->slowQueryTime, $this->n2nMonitor);
+				$this->transactionManager, $this->slowQueryTime, $this->n2nMonitor, $bindMode);
 	}
 	
 

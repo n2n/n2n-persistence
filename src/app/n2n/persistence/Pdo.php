@@ -22,13 +22,11 @@
 namespace n2n\persistence;
 
 use n2n\persistence\meta\MetaData;
-use n2n\reflection\ReflectionUtils;
 use n2n\core\container\TransactionManager;
 use n2n\core\container\Transaction;
 use n2n\core\container\err\CommitFailedException;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\meta\Dialect;
-use n2n\core\config\PersistenceUnitConfig;
 use n2n\core\ext\N2nMonitor;
 use n2n\util\type\TypeUtils;
 use n2n\spec\dbo\Dbo;
@@ -50,30 +48,50 @@ class Pdo implements Dbo {
 
 	public function __construct(private string $dataSourceName, Dialect $dialect,
 			private ?TransactionManager $transactionManager = null, ?float $slowQueryTime = null,
-			?N2nMonitor $n2nMonitor = null) {
+			?N2nMonitor $n2nMonitor = null, PdoTransactionManagerBindMode $pdoTransactionManagerBindMode = PdoTransactionManagerBindMode::FULL) {
 		$this->logger = new PdoLogger($this->getDataSourceName(), $slowQueryTime, $n2nMonitor);
 
 		$this->dialect = $dialect;
 		$this->metaData = new MetaData($this, $dialect);
 
 		$this->pdoTransactionalResource = new PdoTransactionalResource(
-				function(Transaction $transaction) {
+				function(Transaction $transaction) use ($pdoTransactionManagerBindMode) {
+					if (!$pdoTransactionManagerBindMode->isTransactionIncluded()) {
+						return;
+					}
+
 					$this->performBeginTransaction($transaction, $transaction->isReadOnly());
 				},
-				function(Transaction $transaction) {
+				function(Transaction $transaction) use ($pdoTransactionManagerBindMode) {
+					if (!$pdoTransactionManagerBindMode->isTransactionIncluded()) {
+						return true;
+					}
+
 					return $this->prepareCommit($transaction);
 				},
-				function(Transaction $transaction) {
+				function(Transaction $transaction) use ($pdoTransactionManagerBindMode) {
+					if (!$pdoTransactionManagerBindMode->isTransactionIncluded()) {
+						return;
+					}
+
 					try {
 						$this->performCommit($transaction);
 					} catch (PdoCommitException $e) {
 						throw new CommitFailedException('Pdo commit failed. Reason: ' . $e->getMessage(), 0, $e);
 					}
 				},
-				function(Transaction $transaction) {
+				function(Transaction $transaction) use ($pdoTransactionManagerBindMode){
+					if (!$pdoTransactionManagerBindMode->isTransactionIncluded()) {
+						return;
+					}
+
 					$this->performRollBack($transaction);
 				},
-				function() {
+				function() use ($pdoTransactionManagerBindMode) {
+					if (!$pdoTransactionManagerBindMode->isReleaseIncluded()) {
+						return;
+					}
+
 					$this->release();
 				});
 	}
