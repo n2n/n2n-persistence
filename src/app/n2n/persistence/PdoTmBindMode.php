@@ -2,9 +2,9 @@
 
 namespace n2n\persistence;
 
-enum PdoTransactionManagerBindMode {
-	case RELEASE_ONLY;
-	case FULL;
+enum PdoTmBindMode: string {
+	case RELEASE_ONLY = 'release-only';
+	case FULL = 'full';
 
 	function isTransactionIncluded(): bool {
 		return $this === self::FULL;

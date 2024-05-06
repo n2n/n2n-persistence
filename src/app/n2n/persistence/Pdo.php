@@ -48,7 +48,7 @@ class Pdo implements Dbo {
 
 	public function __construct(private string $dataSourceName, Dialect $dialect,
 			private ?TransactionManager $transactionManager = null, ?float $slowQueryTime = null,
-			?N2nMonitor $n2nMonitor = null, private PdoTransactionManagerBindMode $bindMode = PdoTransactionManagerBindMode::FULL) {
+			?N2nMonitor $n2nMonitor = null, private PdoTmBindMode $bindMode = PdoTmBindMode::FULL) {
 		$this->logger = new PdoLogger($this->getDataSourceName(), $slowQueryTime, $n2nMonitor);
 
 		$this->dialect = $dialect;

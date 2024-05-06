@@ -41,7 +41,7 @@ use n2n\core\ext\N2nMonitor;
 use n2n\reflection\ReflectionUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\PdoFactory;
-use n2n\persistence\PdoTransactionManagerBindMode;
+use n2n\persistence\PdoTmBindMode;
 
 class PdoPool {
 	const DEFAULT_DS_NAME = 'default';
@@ -125,21 +125,22 @@ class PdoPool {
 	 * @param ?string $persistenceUnitName
 	 * @return Pdo
 	 */
-	public function getPdo(string $persistenceUnitName = null): Pdo {
+	public function getPdo(string $persistenceUnitName = null, PdoTmBindMode $pdoTmBindMode = PdoTmBindMode::FULL): Pdo {
 		if ($persistenceUnitName === null) {
 			$persistenceUnitName = self::DEFAULT_DS_NAME;
 		}
-		
+
 		if (!isset($this->persistenceUnitConfigs[$persistenceUnitName])) {
 			throw new UnknownPersistenceUnitException('Unknown persistence unit: ' . $persistenceUnitName);
 		}
-		
-		if (!isset($this->dbhs[$persistenceUnitName])) {
-			$this->dbhs[$persistenceUnitName] = $this->createPdo(
-					$this->persistenceUnitConfigs[$persistenceUnitName]);
+
+
+		$key = $pdoTmBindMode->value . '_' . $persistenceUnitName;
+		if (!isset($this->dbhs[$key])) {
+			$this->dbhs[$key] = $this->createPdo($this->persistenceUnitConfigs[$persistenceUnitName], $pdoTmBindMode);
 		}
 		
-		return $this->dbhs[$persistenceUnitName];
+		return $this->dbhs[$key];
 	}
 	
 	/**
@@ -169,29 +170,13 @@ class PdoPool {
 
 	/**
 	 * @param PersistenceUnitConfig $persistenceUnitConfig
+	 * @param PdoTmBindMode $pdoTmBindMode
 	 * @return Pdo
 	 */
-	private function createPdo(PersistenceUnitConfig $persistenceUnitConfig): Pdo {
+	private function createPdo(PersistenceUnitConfig $persistenceUnitConfig, PdoTmBindMode $pdoTmBindMode): Pdo {
 		return PdoFactory::createFromPersistenceUnitConfig($persistenceUnitConfig, $this->transactionManager,
-				$this->slowQueryTime, $this->n2nMonitor);
+				$this->slowQueryTime, $this->n2nMonitor, $pdoTmBindMode);
 	}
-
-	function createStandalonePdo(string $persistenceUnitName = null,
-			PdoTransactionManagerBindMode $bindMode = PdoTransactionManagerBindMode::FULL): Pdo {
-		if ($persistenceUnitName === null) {
-			$persistenceUnitName = self::DEFAULT_DS_NAME;
-		}
-
-		if (!isset($this->persistenceUnitConfigs[$persistenceUnitName])) {
-			throw new UnknownPersistenceUnitException('Unknown persistence unit: ' . $persistenceUnitName);
-		}
-
-		$persistenceUnitConfig = $this->persistenceUnitConfigs[$persistenceUnitName];
-		return PdoFactory::createFromPersistenceUnitConfig($persistenceUnitConfig,
-				$this->transactionManager, $this->slowQueryTime, $this->n2nMonitor, $bindMode);
-	}
-	
-
 	
 //	public function registerListener(PdoPoolListener $dbhPoolListener) {
 //		$this->dbhPoolListeners[spl_object_hash($dbhPoolListener)] = $dbhPoolListener;

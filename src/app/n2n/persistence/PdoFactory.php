@@ -12,7 +12,7 @@ class PdoFactory {
 
 	static function createFromPersistenceUnitConfig(PersistenceUnitConfig $persistenceUnitConfig,
 			TransactionManager $transactionManager = null, float $slowQueryTime = null, N2nMonitor $n2nMonitor = null,
-			PdoTransactionManagerBindMode $pdoTransactionManagerBindMode = PdoTransactionManagerBindMode::FULL): Pdo {
+			PdoTmBindMode $pdoTransactionManagerBindMode = PdoTmBindMode::FULL): Pdo {
 		$dialectClass = ReflectionUtils::createReflectionClass($persistenceUnitConfig->getDialectClassName());
 		if (!$dialectClass->implementsInterface('n2n\\persistence\\meta\\Dialect')) {
 			throw new \InvalidArgumentException('Dialect class must implement n2n\\persistence\\meta\\Dialect: '
