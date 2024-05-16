@@ -33,5 +33,5 @@ interface ColumnComparableEntityProperty extends EntityProperty {
 	 * @return ColumnComparable
 	 * @throws UnsupportedOperationException if no ComparisonStrategy can be created
 	 */
-	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState);
+	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable;
 }

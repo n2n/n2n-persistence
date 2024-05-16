@@ -24,13 +24,14 @@ namespace n2n\persistence\orm\property;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\util\ex\UnsupportedOperationException;
+use n2n\persistence\orm\criteria\compare\CustomComparable;
 
 interface CustomComparableEntityProperty extends EntityProperty {
 	/**
 	 * @param MetaTreePoint $metaTreePoint
 	 * @param QueryState $queryState
-	 * @return \n2n\persistence\orm\criteria\compare\CustomComparable
+	 * @return CustomComparable
 	 * @throws UnsupportedOperationException if no ComparationStrategy can be created
 	 */
-	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState);
+	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): CustomComparable;
 }

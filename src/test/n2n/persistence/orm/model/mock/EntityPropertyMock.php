@@ -22,6 +22,8 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\reflection\property\PropertyAccessException;
 use n2n\util\ex\UnsupportedOperationException;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\persistence\orm\query\select\Selection;
 
 class EntityPropertyMock implements BasicEntityProperty {
 	private $entityModel;
@@ -137,15 +139,15 @@ class EntityPropertyMock implements BasicEntityProperty {
 		return (new \ReflectionClass($this))->getShortName() . ' [' . $this->accessProxy . ']';
 	}
 
-	public function valueToRep($value): string {
+	public function valueToRep(mixed $value): string {
 		throw new UnsupportedOperationException();
 	}
 
-	public function repToValue(string $rep) {
+	public function repToValue(string $rep): mixed {
 		throw new UnsupportedOperationException();
 	}
 
-	public function parseValue($raw, Pdo $pdo) {
+	public function parseValue(mixed $raw, Pdo $pdo): mixed {
 		throw new UnsupportedOperationException();
 	}
 
@@ -153,15 +155,15 @@ class EntityPropertyMock implements BasicEntityProperty {
 		throw new UnsupportedOperationException();
 	}
 
-	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState): Selection {
 		throw new UnsupportedOperationException();
 	}
 
-	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState): ColumnComparable {
 		throw new UnsupportedOperationException();
 	}
 
-	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
 		throw new UnsupportedOperationException();
 	}
 
@@ -173,7 +175,7 @@ class EntityPropertyMock implements BasicEntityProperty {
 		throw new UnsupportedOperationException();
 	}
 
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		throw new UnsupportedOperationException();
 	}
 
@@ -181,7 +183,7 @@ class EntityPropertyMock implements BasicEntityProperty {
 		throw new UnsupportedOperationException();
 	}
 
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		throw new UnsupportedOperationException();
 	}
 

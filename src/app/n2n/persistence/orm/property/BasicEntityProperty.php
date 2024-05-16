@@ -24,6 +24,8 @@ namespace n2n\persistence\orm\property;
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\Pdo;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\persistence\orm\query\select\Selection;
 
 interface BasicEntityProperty extends ColumnEntityProperty, ColumnComparableEntityProperty {
 	
@@ -32,14 +34,14 @@ interface BasicEntityProperty extends ColumnEntityProperty, ColumnComparableEnti
 	 * @throws \InvalidArgumentException
 	 * @return string
 	 */
-	public function valueToRep($value): string;
+	public function valueToRep(mixed $value): string;
 	
 	/**
 	 * @param string $rep
 	 * @return mixed
 	 * @throws \InvalidArgumentException
 	 */
-	public function repToValue(string $rep);
+	public function repToValue(string $rep): mixed;
 	
 	/**
 	 * @param mixed $raw
@@ -47,7 +49,7 @@ interface BasicEntityProperty extends ColumnEntityProperty, ColumnComparableEnti
 	 * @return mixed
 	 * @throws \InvalidArgumentException
 	 */
-	public function parseValue($raw, Pdo $pdo);
+	public function parseValue(mixed $raw, Pdo $pdo): mixed;
 	
 	/**
 	 * @param mixed $value
@@ -62,12 +64,7 @@ interface BasicEntityProperty extends ColumnEntityProperty, ColumnComparableEnti
 	 * @param QueryState $queryState
 	 * @return \n2n\persistence\orm\query\select\Selection
 	 */
-	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState);
+	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState): Selection;
 	
-	/**
-	 * @param QueryItem $queryItem
-	 * @param QueryState $queryState
-	 * @return \n2n\persistence\orm\criteria\compare\ColumnComparable
-	 */
-	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState);
+	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState): ColumnComparable;
 }

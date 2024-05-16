@@ -31,6 +31,7 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\util\ex\UnsupportedOperationException;
+use n2n\persistence\orm\query\select\Selection;
 
 interface EntityProperty {
 	/**
@@ -74,10 +75,10 @@ interface EntityProperty {
 	/**
 	 * @param MetaTreePoint $metaTreePoint
 	 * @param QueryState $queryState
-	 * @return \n2n\persistence\orm\query\select\Selection
+	 * @return Selection
 	 * @throws UnsupportedOperationException if EntityProperty cannot be selected
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState);
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection;
 	
 	/**
 	 * @param mixed $value
@@ -93,7 +94,7 @@ interface EntityProperty {
 	 * @param ValueHash $valueHash
 	 * @param ValueHash|null $oldValueHash
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash);
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void;
 	
 	/**
 	 * @param mixed $mappedValue
