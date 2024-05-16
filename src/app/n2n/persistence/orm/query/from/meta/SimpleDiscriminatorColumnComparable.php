@@ -29,6 +29,7 @@ use n2n\persistence\meta\data\QueryPartGroup;
 use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\criteria\compare\ColumnComparableAdapter;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 class SimpleDiscriminatorColumnComparable extends ColumnComparableAdapter {
 	private $queryState;
@@ -40,7 +41,7 @@ class SimpleDiscriminatorColumnComparable extends ColumnComparableAdapter {
 		$this->queryState = $queryState;
 	}
 	
-	public function buildCounterpartQueryItemFromValue($operator, $value) {
+	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
 		if ($operator != CriteriaComparator::OPERATOR_IN && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
 			ArgUtils::valType($value, 'ReflectionClass');
 			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue(

@@ -86,12 +86,14 @@ interface EntityProperty {
 	 * @return mixed
 	 */
 	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation);
-	
+
 	/**
-	 * @param mixed $mappedValue
-	 * @param PersistAction $persistingJob
+	 * @param PersistAction $persistAction
+	 * @param $value
+	 * @param ValueHash $valueHash
+	 * @param ValueHash|null $oldValueHash
 	 */
-	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $valueHash, ?ValueHash $oldValueHash);
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash);
 	
 	/**
 	 * @param mixed $mappedValue

@@ -30,7 +30,7 @@ class LazyValueBuilder implements ValueBuilder {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\ValueBuilder::buildValue()
 	 */
-	public function buildValue() {
+	public function buildValue(): mixed {
 		$c = $this->closure;
 		return $c();
 	}

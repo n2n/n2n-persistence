@@ -181,7 +181,7 @@ class EntityPropertyMock implements BasicEntityProperty {
 		throw new UnsupportedOperationException();
 	}
 
-	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 		throw new UnsupportedOperationException();
 	}
 

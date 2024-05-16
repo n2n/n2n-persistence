@@ -45,7 +45,7 @@ class SingleTableDiscriminatorColumnComparable extends ColumnComparableAdapter {
 		$this->queryState = $queryState;
 	}
 	
-	public function buildCounterpartQueryItemFromValue($operator, $value) {
+	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
 		if ($operator != CriteriaComparator::OPERATOR_IN && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
 			ArgUtils::valType($value, 'ReflectionClass');
 			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue(

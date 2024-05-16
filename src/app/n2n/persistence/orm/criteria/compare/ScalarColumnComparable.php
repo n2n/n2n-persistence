@@ -29,24 +29,15 @@ use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\persistence\meta\data\QueryPartGroup;
 
 class ScalarColumnComparable extends ColumnComparableAdapter {
-	private $queryState;
-	private $expectedType;
-	
-	/**
-	 * @param QueryItem $comparableQueryItem
-	 * @param QueryState $queryState
-	 * @param string|TypeConstraint $expectedType
-	 */
-	public function __construct(QueryItem $comparableQueryItem, QueryState $queryState, 
-			$expectedType = 'scalar') {
+
+	public function __construct(QueryItem $comparableQueryItem,  private QueryState $queryState,
+			private string $expectedType = 'scalar') {
 		parent::__construct(CriteriaComparator::getOperators(false), 
 				TypeConstraint::createSimple('scalar', true), $comparableQueryItem);
-		
-		$this->queryState = $queryState;
-		$this->expectedType = $expectedType;
+
 	}
 	
-	public function buildCounterpartQueryItemFromValue($operator, $value) {
+	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
 		if ($operator != CriteriaComparator::OPERATOR_IN && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
 			ArgUtils::valType($value, $this->expectedType, true);
 			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue($value));

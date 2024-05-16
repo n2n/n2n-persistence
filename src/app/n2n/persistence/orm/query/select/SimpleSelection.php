@@ -25,47 +25,30 @@ use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\PdoStatement;
 use n2n\util\type\ArgUtils;
 use n2n\util\type\TypeName;
+use n2n\util\type\TypeConstraint;
+use n2n\util\type\TypeConstraints;
 
 class SimpleSelection implements Selection {
-	private $queryItem;
-	private $type;
+	private $typeConstraint;
 	private $value;
 
-	public function __construct(QueryItem $queryItem, string $type = null) {
-		$this->queryItem = $queryItem;
-		ArgUtils::valEnum($type, [TypeName::BOOL, TypeName::INT, TypeName::FLOAT, TypeName::STRING], null, true);
-		$this->type = $type;
+	public function __construct(private QueryItem $queryItem, TypeConstraint|string $typeConstraint = null) {
+		$this->typeConstraint = TypeConstraints::type($typeConstraint);
 	}
 	
-	public function getSelectQueryItems() {
+	public function getSelectQueryItems(): array {
 		return array($this->queryItem);
 	}
 
-	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
+	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$stmt->shareBindColumn($columnAliases[0], $this->value);
 	}
 
-	public function createValueBuilder() {
-		$value = null; 
-		if ($this->value !== null) {
-			switch ($this->type) {
-				case TypeName::BOOL;
-					$value = (bool) $this->value;
-					break;
-				case TypeName::INT:
-					$value = (int) $this->value;
-					break;
-				case TypeName::FLOAT:
-					$value = (float) $this->value;
-					break;
-				case TypeName::STRING:
-					$value = (string) $this->value;
-					break;
-				default:
-					$value = $this->value;
-			}
+	public function createValueBuilder(): ValueBuilder {
+		if ($this->value === null) {
+			return new EagerValueBuilder(null);
 		}
-		
-		return new EagerValueBuilder($value);
+
+		return new EagerValueBuilder($this->typeConstraint->validate($this->value));
 	}
 }

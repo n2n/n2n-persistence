@@ -23,6 +23,7 @@ namespace n2n\persistence\orm\query\from\meta;
 
 use n2n\persistence\PdoStatement;
 use n2n\persistence\orm\query\select\EagerValueBuilder;
+use n2n\persistence\orm\query\select\ValueBuilder;
 
 class JoinedDiscriminatorSelection implements DiscriminatorSelection {
 	private $idQueryItems = array();
@@ -48,13 +49,13 @@ class JoinedDiscriminatorSelection implements DiscriminatorSelection {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::getSelectQueryItems()
 	*/
-	public function getSelectQueryItems() {
+	public function getSelectQueryItems(): array {
 		return $this->idQueryItems;
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::bindColumns()
 	*/
-	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
+	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		foreach ($columnAliases as $key => $columnAlias) {
 			$this->values[$key] = null;
 			$stmt->shareBindColumn($columnAlias, $this->values[$key]);
@@ -63,7 +64,7 @@ class JoinedDiscriminatorSelection implements DiscriminatorSelection {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
 	*/
-	public function createValueBuilder() {
+	public function createValueBuilder(): ValueBuilder {
 		if (null !== ($entityModel = $this->determineEntityModel())) {
 			return new EagerValueBuilder($entityModel->getClass());
 		}

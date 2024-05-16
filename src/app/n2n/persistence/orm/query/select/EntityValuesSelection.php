@@ -23,7 +23,7 @@ namespace n2n\persistence\orm\query\select;
 
 class EntityValuesSelection extends EntityObjSelection {
 
-	public function createValueBuilder() {
+	public function createValueBuilder(): ValueBuilder {
 		$valueBuilders = $this->assembleValueBuilders();
 			
 		return new LazyValueBuilder(function () use ($valueBuilders) {

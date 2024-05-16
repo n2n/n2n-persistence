@@ -25,5 +25,5 @@ interface ValueBuilder {
 	/**
 	 * @return mixed; 
 	 */
-	public function buildValue();
+	public function buildValue(): mixed;
 }

@@ -47,7 +47,7 @@ interface ColumnComparable {
 	 * @return QueryItem
 	 * @throws \n2n\persistence\orm\criteria\CriteriaConflictException
 	 */
-	public function buildCounterpartQueryItemFromValue($operator, $value);
+	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem;
 // 	/**
 // 	 * @param $operator
 // 	 * @param mixed $value

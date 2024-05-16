@@ -28,15 +28,15 @@ interface Selection {
 	/**
 	 * @return \n2n\spec\dbo\meta\data\QueryItem[]
 	 */
-	public function getSelectQueryItems();
+	public function getSelectQueryItems(): array;
 	/**
 	 * @param PdoStatement $stmt
 	 * @param array $columnAliases
 	 */
-	public function bindColumns(PdoStatement $stmt, array $columnAliases);
+	public function bindColumns(PdoStatement $stmt, array $columnAliases): void;
 	/**
 	 * @return ValueBuilder 
 	 * @throws CorruptedDataException
 	 */
-	public function createValueBuilder();
+	public function createValueBuilder(): ValueBuilder;
 }

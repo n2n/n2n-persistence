@@ -163,7 +163,7 @@ class CriteriaColumnComparable implements ColumnComparable {
 		return $this->queryItem;
 	}
 
-	public function buildCounterpartQueryItemFromValue($operator, $value) {
+	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
 		return $this->columnComparable->buildCounterpartQueryItemFromValue($operator, $value);
 	}
 	

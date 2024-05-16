@@ -25,6 +25,7 @@ use n2n\persistence\orm\query\select\EagerValueBuilder;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\PdoStatement;
+use n2n\persistence\orm\query\select\ValueBuilder;
 
 class SimpleDiscriminatorSelection implements DiscriminatorSelection {
 	private $idQueryItem;
@@ -46,19 +47,19 @@ class SimpleDiscriminatorSelection implements DiscriminatorSelection {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::getSelectQueryItems()
 	 */
-	public function getSelectQueryItems() {
+	public function getSelectQueryItems(): array {
 		return array($this->idQueryItem);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::bindColumns()
 	 */
-	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
+	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$stmt->shareBindColumn($columnAliases[0], $this->value);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
 	 */
-	public function createValueBuilder() {
+	public function createValueBuilder(): ValueBuilder {
 		if ($this->value === null) {
 			return new EagerValueBuilder(null);
 		}

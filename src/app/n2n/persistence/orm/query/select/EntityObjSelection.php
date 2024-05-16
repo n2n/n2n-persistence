@@ -53,13 +53,13 @@ class EntityObjSelection implements Selection {
 	/**
 	 * @return \n2n\spec\dbo\meta\data\QueryItem[]
 	 */
-	public function getSelectQueryItems() {
+	public function getSelectQueryItems(): array {
 		return $this->selectionGroup->getSelectQueryItems();
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::bindColumns()
 	 */
-	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
+	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$this->selectionGroup->bindColumns($stmt, $columnAliases);
 	}
 	
@@ -80,7 +80,7 @@ class EntityObjSelection implements Selection {
 		return $valueBuilders;
 	}
 	
-	public function createValueBuilder() {
+	public function createValueBuilder(): ValueBuilder {
 		$entityModel = null;
 		$valueBuilders = $this->assembleValueBuilders($entityModel);
 		
@@ -146,11 +146,11 @@ class SelectionGroup {
 		$this->selectionCaims[$key] = $caims;
 	}
 
-	public function getSelectQueryItems() {
+	public function getSelectQueryItems(): array {
 		return $this->queryItems;
 	}
 
-	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
+	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		foreach ($this->selections as $key => $selection) {
 			$selectionColumnAliases = array();
 			

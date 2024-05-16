@@ -26,6 +26,7 @@ use n2n\persistence\orm\CorruptedDataException;
 use n2n\persistence\PdoStatement;
 use n2n\persistence\orm\query\select\EagerValueBuilder;
 use n2n\util\type\TypeUtils;
+use n2n\persistence\orm\query\select\ValueBuilder;
 
 class SingleTableDiscriminatorSelection implements DiscriminatorSelection {
 	private $discriminatorColumn;
@@ -53,20 +54,20 @@ class SingleTableDiscriminatorSelection implements DiscriminatorSelection {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::getSelectQueryItems()
 	 */
-	public function getSelectQueryItems() {
+	public function getSelectQueryItems(): array {
 		return array($this->discriminatorColumn);
 	}
 
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::bindColumns()
 	 */
-	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
+	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$stmt->shareBindColumn($columnAliases[0], $this->value);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
 	 */
-	public function createValueBuilder() {
+	public function createValueBuilder(): ValueBuilder {
 		if (null !== ($entityModel = $this->determineEntityModel())) {
 			return new EagerValueBuilder($entityModel->getClass());
 		}

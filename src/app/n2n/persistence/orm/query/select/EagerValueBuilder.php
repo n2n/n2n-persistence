@@ -30,7 +30,7 @@ class EagerValueBuilder implements ValueBuilder {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\ValueBuilder::buildValue()
 	 */
-	public function buildValue() {
+	public function buildValue(): mixed {
 		return $this->value;
 	}
 }

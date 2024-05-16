@@ -24,12 +24,13 @@ namespace n2n\persistence\orm\property;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\util\ex\UnsupportedOperationException;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
 
 interface ColumnComparableEntityProperty extends EntityProperty {
 	/**
 	 * @param MetaTreePoint $metaTreePoint
 	 * @param QueryState $queryState
-	 * @return \n2n\persistence\orm\criteria\compare\ComparisonStrategy
+	 * @return ColumnComparable
 	 * @throws UnsupportedOperationException if no ComparisonStrategy can be created
 	 */
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState);

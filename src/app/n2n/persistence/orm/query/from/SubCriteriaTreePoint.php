@@ -34,6 +34,7 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\QueryItemSelect;
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\orm\query\QueryPoint;
+use n2n\persistence\orm\query\select\ValueBuilder;
 
 abstract class SubCriteriaTreePoint implements TreePoint {
 	protected $queryModel;
@@ -176,15 +177,15 @@ class DecoratedSubSelection implements Selection {
 		$this->queryItems = $queryColumns;
 	}
 	
-	public function getSelectQueryItems() {
+	public function getSelectQueryItems(): array {
 		return $this->queryItems;
 	}
 	
-	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
+	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$this->selection->bindColumns($stmt, $columnAliases);
 	}
 	
-	public function createValueBuilder() {
+	public function createValueBuilder(): ValueBuilder {
 		return $this->selection->createValueBuilder();
 	}
 }
@@ -221,7 +222,7 @@ class DecoratedColumnComparable implements ColumnComparable {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\criteria\compare\ColumnComparable::buildCounterpartQueryItemFromValue()
 	 */
-	public function buildCounterpartQueryItemFromValue($operator, $value) {
+	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
 		return $this->columnComparable->buildCounterpartQueryItemFromValue($operator, $value);	
 	}
 }

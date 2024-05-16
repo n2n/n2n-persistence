@@ -23,6 +23,7 @@ namespace n2n\persistence\orm\criteria\compare;
 
 use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\persistence\orm\query\QueryItemSelect;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 class SelectColumnComparable implements ColumnComparable {
 	private $columnComparable;
@@ -55,7 +56,7 @@ class SelectColumnComparable implements ColumnComparable {
 		return new QueryColumn($columnAlias, $this->tableAlias);
 	}
 
-	public function buildCounterpartQueryItemFromValue($operator, $value) {
+	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
 		return $this->columnComparable->buildCounterpartQueryItemFromValue($operator, $value);
 	}
 }

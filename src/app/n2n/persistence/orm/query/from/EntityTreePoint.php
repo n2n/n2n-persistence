@@ -90,7 +90,7 @@ abstract class EntityTreePoint extends ExtendableTreePoint {
 // 		return $this->idComparable->buildQueryItem($operator);
 // 	}
 	
-// 	public function buildCounterpartQueryItemFromValue($operator, $value) {
+// 	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
 // 		return $this->idComparable->buildCounterpartQueryItemFromValue($operator, 
 // 				$this->parseComparableValue($operator, $value));	
 // 	}
