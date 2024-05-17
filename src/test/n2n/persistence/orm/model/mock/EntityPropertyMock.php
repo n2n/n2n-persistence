@@ -151,7 +151,7 @@ class EntityPropertyMock implements BasicEntityProperty {
 		throw new UnsupportedOperationException();
 	}
 
-	public function buildRaw($value, Pdo $pdo) {
+	public function buildRaw(mixed $value, Pdo $pdo): mixed {
 		throw new UnsupportedOperationException();
 	}
 
@@ -179,7 +179,7 @@ class EntityPropertyMock implements BasicEntityProperty {
 		throw new UnsupportedOperationException();
 	}
 
-	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
+	public function mergeValue(mixed $value, bool $sameEntity, MergeOperation $mergeOperation): mixed {
 		throw new UnsupportedOperationException();
 	}
 
@@ -191,7 +191,7 @@ class EntityPropertyMock implements BasicEntityProperty {
 		throw new UnsupportedOperationException();
 	}
 
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		throw new UnsupportedOperationException();
 	}
 

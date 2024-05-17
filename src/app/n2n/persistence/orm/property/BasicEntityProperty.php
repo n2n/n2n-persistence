@@ -30,7 +30,7 @@ use n2n\persistence\orm\query\select\Selection;
 interface BasicEntityProperty extends ColumnEntityProperty, ColumnComparableEntityProperty {
 	
 	/**
-	 * @param mixed $value
+	 * @param mixed $value can never be null
 	 * @throws \InvalidArgumentException
 	 * @return string
 	 */
@@ -57,7 +57,7 @@ interface BasicEntityProperty extends ColumnEntityProperty, ColumnComparableEnti
 	 * @return mixed
 	 * @throws \InvalidArgumentException
 	 */
-	public function buildRaw($value, Pdo $pdo);
+	public function buildRaw(mixed $value, Pdo $pdo): mixed;
 	
 	/**
 	 * @param QueryItem $queryItem

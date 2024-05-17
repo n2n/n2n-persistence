@@ -144,6 +144,7 @@ class CriteriaColumnComparable implements ColumnComparable {
 	}
 	
 	public function getTypeConstraint($operator) {
+		// TODO: remove this if because this case is already handled in the ColumnComparable
 		if ($operator == CriteriaComparator::OPERATOR_CONTAINS || $operator == CriteriaComparator::OPERATOR_CONTAINS_NOT) {
 			return TypeConstraint::createArrayLike(null, false, $this->columnComparable->getTypeConstraint(CriteriaComparator::OPERATOR_EQUAL));
 		}

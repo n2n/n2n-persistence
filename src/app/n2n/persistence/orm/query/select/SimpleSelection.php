@@ -28,6 +28,9 @@ use n2n\util\type\TypeName;
 use n2n\util\type\TypeConstraint;
 use n2n\util\type\TypeConstraints;
 
+/**
+ * @deprecated use {@link EagerValueSelection}
+ */
 class SimpleSelection implements Selection {
 	private $typeConstraint;
 	private $value;

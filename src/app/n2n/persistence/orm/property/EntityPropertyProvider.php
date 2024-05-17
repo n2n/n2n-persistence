@@ -27,8 +27,8 @@ use n2n\reflection\property\PropertyAccessProxy;
 interface EntityPropertyProvider {
 	/**
 	 * @param AccessProxy $propertyAccessProxy
-	 * @param SetupProcess $setupProcess
+	 * @param SetupProcess $classSetup
 	 */
 	public function setupPropertyIfSuitable(PropertyAccessProxy $propertyAccessProxy,
-			ClassSetup $setupProcess);
+			ClassSetup $classSetup);
 }

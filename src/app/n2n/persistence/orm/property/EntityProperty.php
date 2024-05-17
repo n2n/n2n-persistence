@@ -86,7 +86,7 @@ interface EntityProperty {
 	 * @param MergeOperation $mergeOperation
 	 * @return mixed
 	 */
-	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation);
+	public function mergeValue(mixed $value, bool $sameEntity, MergeOperation $mergeOperation): mixed;
 
 	/**
 	 * @param PersistAction $persistAction
@@ -106,7 +106,7 @@ interface EntityProperty {
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	public function createValueHash($value, EntityManager $em): ValueHash;
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash;
 	
 	/**
 	 * @param mixed $mappedValue
