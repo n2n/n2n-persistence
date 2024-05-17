@@ -36,7 +36,11 @@ class SimpleSelection implements Selection {
 	private $value;
 
 	public function __construct(private QueryItem $queryItem, TypeConstraint|string $typeConstraint = null) {
-		$this->typeConstraint = TypeConstraints::type($typeConstraint);
+		if (is_string($typeConstraint)) {
+			$this->typeConstraint = TypeConstraints::namedType($typeConstraint, true, true);
+		} else {
+			$this->typeConstraint = TypeConstraints::type($typeConstraint);
+		}
 	}
 	
 	public function getSelectQueryItems(): array {
