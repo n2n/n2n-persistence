@@ -21,6 +21,6 @@
  */
 namespace n2n\persistence\orm;
 
-class CorruptedDataException extends OrmException {
+class CorruptedDataException extends \Exception {
 	
 }
