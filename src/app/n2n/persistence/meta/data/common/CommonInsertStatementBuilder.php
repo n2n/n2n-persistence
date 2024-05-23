@@ -26,16 +26,17 @@ use n2n\spec\dbo\meta\data\InsertStatementBuilder;
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\Pdo;
 use n2n\spec\dbo\meta\data\impl\QueryColumn;
+use n2n\util\type\ArgUtils;
 
 class CommonInsertStatementBuilder implements InsertStatementBuilder {
 
 	/**
-	 * @var \n2n\persistence\meta\data\common\QueryFragmentBuilderFactory
+	 * @var QueryFragmentBuilderFactory
 	 */
 	private $fragmentBuilderFactory;
 
 	/**
-	 * @var \n2n\persistence\Pdo
+	 * @var Pdo
 	 */
 	private $dbh;
 
@@ -43,6 +44,11 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 	private $columns;
 	private $whereSelector;
 	private $additionalValueGroups;
+
+	/**
+	 * @var QueryItem[]|null
+	 */
+	private ?array $upsertUniqueColumns;
 
 	public function __construct(Pdo $dbh, QueryFragmentBuilderFactory $fragmentBuilderFactory) {
 		$this->dbh = $dbh;
@@ -72,7 +78,7 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 	}
 
 	private function buildInsertIntoSql(): string {
-		return 'INSERT INTO ' . $this->dbh->quoteField($this->tableName);
+		return ($this->upsertUniqueColumns === null ? 'INSERT' : 'REPLACE') . $this->dbh->quoteField($this->tableName);
 	}
 
 	private function buildColumnSql(): string {
@@ -147,5 +153,11 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 			$sqlString .= ')';
 		}
 		return $sqlString;
+	}
+
+	function setUpsertUniqueColumns(?array $queryItems): static {
+		ArgUtils::valArray($queryItems, QueryItem::class, true);
+		$this->setUpsertUniqueColumns = $queryItems;
+		return $this;
 	}
 }
