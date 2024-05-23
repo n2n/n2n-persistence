@@ -78,7 +78,8 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 	}
 
 	private function buildInsertIntoSql(): string {
-		return ($this->upsertUniqueColumns === null ? 'INSERT' : 'REPLACE') . $this->dbh->quoteField($this->tableName);
+		return ($this->upsertUniqueColumns === null ? 'INSERT' : 'REPLACE') . ' INTO '
+				. $this->dbh->quoteField($this->tableName);
 	}
 
 	private function buildColumnSql(): string {
