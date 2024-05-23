@@ -48,7 +48,7 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 	/**
 	 * @var QueryItem[]|null
 	 */
-	private ?array $upsertUniqueColumns;
+	private ?array $upsertUniqueColumns = null;
 
 	public function __construct(Pdo $dbh, QueryFragmentBuilderFactory $fragmentBuilderFactory) {
 		$this->dbh = $dbh;
@@ -158,7 +158,7 @@ class CommonInsertStatementBuilder implements InsertStatementBuilder {
 
 	function setUpsertUniqueColumns(?array $queryItems): static {
 		ArgUtils::valArray($queryItems, QueryItem::class, true);
-		$this->setUpsertUniqueColumns = $queryItems;
+		$this->upsertUniqueColumns = $queryItems;
 		return $this;
 	}
 }
