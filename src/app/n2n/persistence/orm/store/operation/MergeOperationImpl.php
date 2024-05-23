@@ -32,6 +32,7 @@ use n2n\persistence\orm\store\PersistenceOperationException;
 
 class MergeOperationImpl implements MergeOperation {
 	private $actionQueue;
+	private array $mergedEntity = [];
 	
 	public function __construct(ActionQueue $actionQueue) {
 		$this->actionQueue = $actionQueue;
