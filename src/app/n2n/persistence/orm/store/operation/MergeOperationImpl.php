@@ -48,37 +48,41 @@ class MergeOperationImpl implements MergeOperation {
 	 */
 	public function mergeEntity($entity) {
 		ArgUtils::assertTrue(is_object($entity));
-		
+
 		$objHash = spl_object_hash($entity);
 		if (isset($this->mergedEntity[$objHash])) {
 			return $this->mergedEntity[$objHash];
 		}
-		
+
 		$em = $this->actionQueue->getEntityManager();
 		$persistenceContext = $em->getPersistenceContext();
-		
-		if ($entity instanceof EntityProxy 
+
+		if ($entity instanceof EntityProxy
 				&& !$persistenceContext->getEntityProxyManager()->isProxyInitialized($entity)) {
 			return $this->mergedEntity[$objHash] = $entity;
 		}
-		
+
 		$entityInfo = $em->getPersistenceContext()->getEntityInfo(
 				$entity, $em->getEntityModelManager());
-		
+
 		$this->mergedEntity[$objHash] = $mergedEntity = $this->createMergedEntity($entityInfo, $entity);
-		
+
 		$this->mergeProperties($entityInfo->getEntityModel(), $entity, $mergedEntity);
-		
+
+		if ($entity !== $mergedEntity) {
+			$this->actionQueue->getOrCreatePersistAction($mergedEntity);
+		}
+
 		return $mergedEntity;
-	}	
-	
+	}
+
 	private function createMergedEntity(EntityInfo $entityInfo, $entity) {
 		$entityModel = $entityInfo->getEntityModel();
-		
+
 		switch ($entityInfo->getState()) {
 			case EntityInfo::STATE_MANAGED:
 				return $entity;
-				
+
 			case EntityInfo::STATE_NEW:
 			case EntityInfo::STATE_DETACHED:
 				$newEntity = null;
@@ -87,41 +91,39 @@ class MergeOperationImpl implements MergeOperation {
 							$entityInfo->getEntityModel()->getClass(), $entityInfo->getId());
 					if ($newEntity !== null) return $newEntity;
 				}
-				
-				$newEntity = ReflectionUtils::createObject($entityModel->getClass(), false);
-				$this->actionQueue->getOrCreatePersistAction($newEntity, true);
-				return $newEntity;
-				
+
+				return ReflectionUtils::createObject($entityModel->getClass(), false);
+
 			case EntityInfo::STATE_REMOVED:
 			default:
 				throw new PersistenceOperationException('Can not merge removed entity: '
 						. $entityInfo->toEntityString());
 		}
 	}
-	
+
 	private function mergeProperties(EntityModel $entityModel, $entity, $mergedEntity) {
 		$generatedIdProperty = null;
-		
+
 		if ($entityModel->getIdDef()->isGenerated()) {
 			$generatedIdProperty = $entityModel->getIdDef()->getEntityProperty();
 		}
-		
+
 		foreach ($entityModel->getEntityProperties() as $property) {
 			if ($property === $generatedIdProperty) continue;
-			
+
 			$mergedValue = null;
 			try {
-				$mergedValue = $property->mergeValue($property->readValue($entity),  
+				$mergedValue = $property->mergeValue($property->readValue($entity),
 						$entity === $mergedEntity, $this);
 			} catch (PersistenceOperationException $e) {
-				throw new PersistenceOperationException('Failed to merge property: ' 
-						. $property->toPropertyString(), 0, $e);	
+				throw new PersistenceOperationException('Failed to merge property: '
+						. $property->toPropertyString(), 0, $e);
 			}
-			
+
 			try {
 				$property->writeValue($mergedEntity, $mergedValue);
 			} catch (ValueIncompatibleWithConstraintsException $e) {
-				throw new \InvalidArgumentException(get_class($property) 
+				throw new \InvalidArgumentException(get_class($property)
 						. '::mergeValue() returned invalid value.', 0, $e);
 			}
 		}
