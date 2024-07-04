@@ -23,6 +23,8 @@ namespace n2n\persistence;
 
 use n2n\core\container\TransactionalResource;
 use n2n\core\container\Transaction;
+use n2n\util\ex\IllegalStateException;
+use n2n\core\container\err\CommitPreparationFailedException;
 
 class PdoTransactionalResource implements TransactionalResource {
 	private $beginClosure;
@@ -49,7 +51,16 @@ class PdoTransactionalResource implements TransactionalResource {
 	 * @see \n2n\core\container\TransactionalResource::prepareCommit()
 	 */
 	public function prepareCommit(Transaction $transaction): void {
-		$this->prepareCommitClosure->invoke($transaction);
+		try {
+			$this->prepareCommitClosure->invoke($transaction);
+		} catch (PdoException $e) {
+			// == because code could be of type string
+			if ($e->getCode() != 40001) {
+				throw $e;
+			}
+
+			throw new CommitPreparationFailedException(previous: $e, deadlock: true);
+		}
 	}
 
 	public function requestCommit(Transaction $transaction): void {
