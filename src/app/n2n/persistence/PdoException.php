@@ -22,8 +22,9 @@
 namespace n2n\persistence;
 
 use n2n\spec\dbo\err\DboException;
+use n2n\core\container\TransactionExecutionException;
 
-class PdoException extends \PDOException implements DboException {
+class PdoException extends \PDOException implements DboException, TransactionExecutionException {
 	public function __construct(\PDOException $e) {
 		parent::__construct($e->getMessage(), previous: $e->getPrevious());
 
@@ -31,5 +32,10 @@ class PdoException extends \PDOException implements DboException {
 		// only allowes string
 		$this->code = $e->getCode();
 		$this->errorInfo = $e->errorInfo;
+	}
+
+	function isDeadlock(): bool {
+		// == because code could be of type string
+		return $this->code == 40001;
 	}
 }

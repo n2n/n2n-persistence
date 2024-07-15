@@ -55,7 +55,7 @@ class PdoTransactionalResource implements TransactionalResource {
 			$this->prepareCommitClosure->invoke($transaction);
 		} catch (PdoException $e) {
 			// == because code could be of type string
-			if ($e->getCode() != 40001) {
+			if (!$e->isDeadlock()) {
 				throw $e;
 			}
 

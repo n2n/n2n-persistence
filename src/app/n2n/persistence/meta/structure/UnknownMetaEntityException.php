@@ -24,5 +24,8 @@ namespace n2n\persistence\meta\structure;
 use n2n\spec\dbo\err\DboException;
 
 class UnknownMetaEntityException extends \RuntimeException implements DboException {
-	
+
+	function isDeadlock(): bool {
+		return false;
+	}
 }
