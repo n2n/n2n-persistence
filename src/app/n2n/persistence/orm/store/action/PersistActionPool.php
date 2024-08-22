@@ -214,13 +214,14 @@ class PersistActionPool {
 		$that = $this;
 		$persistAction->executeAtEnd(function () use ($that, $persistAction) {
 			$that->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::POST_PERSIST, 
-					$persistAction->getEntityObj(), $persistAction->getEntityModel(), $persistAction->getId()));
+					$persistAction->getEntityObj(), $persistAction->getEntityModel(), $persistAction->getId(),
+					$persistAction->getMeta()));
 		});
 
 		// Moved down so the entity has already the state managed when the external listener is called. This is to avoid
 		// problems if the called listener is flushing the EntityManager or persists the same entity again.
 		$this->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::PRE_PERSIST, $entity,
-				$entityModel, $persistAction->getId()));
+				$entityModel, $persistAction->getId(), $persistAction->getMeta()));
 
 	}
 	
@@ -356,22 +357,28 @@ class PersistActionPool {
 		
 		$supplyJob->prepare();
 	}
-	
+
+	/**
+	 * @param PersistAction[] $persistActions
+	 * @return bool
+	 */
 	private function announceUpdateLifecylcEvents(array $persistActions): bool {
 		$callbacksInvoked = false;
 		
 		foreach ($persistActions as $persistAction) {
 			if ($persistAction->isDisabled()) continue;
-			
+
 			if ($this->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::PRE_UPDATE,
-					$persistAction->getEntityObj(), $persistAction->getEntityModel(), $persistAction->getId()))) {
+					$persistAction->getEntityObj(), $persistAction->getEntityModel(), $persistAction->getId(),
+					$persistAction->getMeta()))) {
 				$callbacksInvoked = true;
 			}
 
 			$that = $this;
 			$persistAction->executeAtEnd(function () use ($that, $persistAction) {
 				$that->actionQueue->announceLifecycleEvent(new LifecycleEvent(LifecycleEvent::POST_UPDATE,
-						$persistAction->getEntityObj(), $persistAction->getEntityModel(), $persistAction->getId()));
+						$persistAction->getEntityObj(), $persistAction->getEntityModel(), $persistAction->getId(),
+						$persistAction->getMeta()));
 			});			
 		}	
 		

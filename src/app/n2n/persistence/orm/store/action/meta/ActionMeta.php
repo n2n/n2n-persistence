@@ -22,6 +22,7 @@
 namespace n2n\persistence\orm\store\action\meta;
 
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\property\EntityProperty;
 
 interface ActionMeta {
 	public function getEntityModel();
@@ -30,7 +31,7 @@ interface ActionMeta {
 	 * @param string $columnName
 	 * @param mixed $rawValue
 	 */
-	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, int $pdoDataType = null);
+	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, ?int $pdoDataType, EntityProperty $entityProperty);
 	/**
 	 * @param EntityModel $entityModel
 	 * @param string $columnName
@@ -65,6 +66,11 @@ interface ActionMeta {
 	 * @param bool $assign
 	 */
 	public function setIdRawValue($idRawValue, bool $assign = false);
+
+	function markChange(EntityProperty $entityProperty): void;
+
+	function getMarkedEntityProperties(): array;
+
 	/**
 	 * @return mixed 
 	 */

@@ -49,7 +49,7 @@ class LoadingQueue {
 		$this->valueHashJobs[$objHash] = array('entityObj' => $entity, 'values' => $values);		
 		
 		$this->postLoadEvents[$objHash] = new LifecycleEvent(LifecycleEvent::POST_LOAD, $entity, 
-				$this->persistenceContext->getEntityModelByEntityObj($entity), $id); 
+				$this->persistenceContext->getEntityModelByEntityObj($entity), $id, null);
 	}
 		
 	public function registerLoading($loadingContainer) {

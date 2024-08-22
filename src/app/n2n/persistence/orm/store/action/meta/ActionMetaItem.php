@@ -26,6 +26,7 @@ use n2n\spec\dbo\meta\data\PersistStatementBuilder;
 use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\persistence\PdoStatement;
+use n2n\persistence\orm\property\EntityProperty;
 
 class ActionMetaItem {
 	private $entityModel;
@@ -33,6 +34,7 @@ class ActionMetaItem {
 	private $idGenerated;
 	private $rawValues = array();
 	private $dataTypes = array();
+	private $entityProperties = array();
 	
 	public function __construct(EntityModel $entityModel, $idGenerated) {
 		$this->entityModel = $entityModel;
@@ -42,6 +44,14 @@ class ActionMetaItem {
 	
 	public function getEntityModel() {
 		return $this->entityModel;
+	}
+
+	function getEntityProperties(): array {
+		return $this->entityProperties;
+	}
+
+	function containsEntityProperty(EntityProperty $entityProperty): bool {
+		return in_array($entityProperty, $this->entityProperties, true);
 	}
 	
 	public function setIdGenerated($idGenerated) {
@@ -64,14 +74,18 @@ class ActionMetaItem {
 		return !(boolean) sizeof($this->rawValues);
 	}
 	
-	public function setRawValue($columnName, $rawValue, int $pdoDataType = null) {
+	public function setRawValue($columnName, $rawValue, ?int $pdoDataType, ?EntityProperty $entityProperty) {
 		$this->rawValues[$columnName] = $rawValue;
 		$this->dataTypes[$columnName] = $pdoDataType;
+		if ($entityProperty !== null) {
+			$this->entityProperties[$columnName] = $entityProperty;
+		}
 	}
 	
 	public function removeRawValue($columnName) {
 		unset($this->rawValues[$columnName]);
 		unset($this->dataTypes[$columnName]);
+		unset($this->entityProperties[$columnName]);
 	}	
 	
 	public function getRawValues() {

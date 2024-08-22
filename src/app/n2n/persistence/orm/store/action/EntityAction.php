@@ -32,6 +32,11 @@ interface EntityAction extends Action {
 	 * @return \n2n\persistence\orm\model\EntityModel 
 	 */
 	public function getEntityModel();
+
+	/**
+	 * @return object
+	 */
+	function getEntityObj();
 	/**
 	 * @return mixed
 	 */

@@ -24,8 +24,12 @@ namespace n2n\persistence\orm\store\action\meta;
 use n2n\util\ex\IllegalStateException;
 
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\property\EntityProperty;
 
 class JoinedTableActionMeta extends ActionMetaAdapter {
+	/**
+	 * @var ActionMetaItem[]
+	 */
 	private $items = null;
 	
 	public function __construct(EntityModel $entityModel) {
@@ -43,27 +47,23 @@ class JoinedTableActionMeta extends ActionMetaAdapter {
 		$this->items = array_reverse($items);
 	}
 	
-	protected function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, int $pdoDataType = null) {
+	protected function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, ?int $pdoDataType, EntityProperty $entityProperty) {
 		$className = $entityModel->getClass()->getName();
-		if (!isset($this->items[$className])) {
-			throw IllegalStateException::createDefault();
-		}
+		IllegalStateException::assertTrue(isset($this->items[$className]));
 		
 		if (!$isId) {
-			$this->items[$className]->setRawValue($columnName, $rawValue, $pdoDataType);
+			$this->items[$className]->setRawValue($columnName, $rawValue, $pdoDataType, $entityProperty);
 			return;
 		}
 		
 		foreach ($this->items as $item) {
-			$item->setRawValue($columnName, $rawValue, $pdoDataType);
+			$item->setRawValue($columnName, $rawValue, $pdoDataType, $entityProperty);
 		}
 	}
 	
 	protected function unassignRawValue(EntityModel $entityModel, $columnName, $isId) {
 		$className = $entityModel->getClass()->getName();
-		if (!isset($this->items[$className])) {
-			throw IllegalStateException::createDefault();
-		}
+		IllegalStateException::assertTrue(isset($this->items[$className]));
 		
 		if (!$isId) {
 			$this->items[$className]->removeRawValue($columnName);

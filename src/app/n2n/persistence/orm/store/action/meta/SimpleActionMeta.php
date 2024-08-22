@@ -22,6 +22,7 @@
 namespace n2n\persistence\orm\store\action\meta;
 
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\property\EntityProperty;
 
 class SimpleActionMeta extends ActionMetaAdapter {
 	private $item;
@@ -32,8 +33,9 @@ class SimpleActionMeta extends ActionMetaAdapter {
 		$this->item = new ActionMetaItem($entityModel, $this->isIdGenerated());
 	}
 	
-	public function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, int $pdoDataType = null) {
-		$this->item->setRawValue($columnName, $rawValue, $pdoDataType);
+	public function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, ?int $pdoDataType,
+			EntityProperty $entityProperty) {
+		$this->item->setRawValue($columnName, $rawValue, $pdoDataType, $entityProperty);
 	}
 	
 	public function unassignRawValue(EntityModel $entityModel, $columnName, $isId) {

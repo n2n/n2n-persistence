@@ -21,6 +21,15 @@
  */
 namespace n2n\persistence\orm;
 
+use n2n\persistence\orm\store\action\meta\ActionMeta;
+use n2n\util\type\ArgUtils;
+use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\criteria\item\CrIt;
+use n2n\persistence\orm\property\EntityProperty;
+use n2n\persistence\orm\model\UnknownEntityPropertyException;
+use n2n\persistence\orm\store\action\meta\ActionMetaUtil;
+use n2n\util\ex\IllegalStateException;
+
 class LifecycleEvent {
 	const PRE_PERSIST = '_prePersist';
 	const POST_PERSIST = '_postPersist';
@@ -32,14 +41,14 @@ class LifecycleEvent {
 	
 	protected $type;
 	protected $entity;
-	protected $entityModel;
 	protected $id;
 		
-	public function __construct($type, $entity, $entityModel, $id = null) {
+	public function __construct($type, $entity, protected readonly EntityModel $entityModel, mixed $id,
+			private ?ActionMeta $actionMeta = null) {
 		$this->type = $type;
 		$this->entity = $entity;
-		$this->entityModel = $entityModel;
 		$this->id = $id;
+		ArgUtils::assertTrue(($type === self::POST_LOAD) !== ($actionMeta !== null));
 	}
 	/**
 	 * @return string
@@ -69,5 +78,41 @@ class LifecycleEvent {
 	public static function getTypes() {
 		return array(self::PRE_PERSIST, self::POST_PERSIST, self::PRE_REMOVE, self::POST_REMOVE, 
 				self::PRE_UPDATE, self::POST_UPDATE, self::POST_LOAD);
+	}
+
+	private function determineEntityProperty(string $propertyExpression): EntityProperty {
+		IllegalStateException::assertTrue($this->actionMeta !== null, 'Event of type ' . $this->type
+				. ' can not have changes.');
+
+		$criteriaProperty = CrIt::p($propertyExpression);
+		$propertyNames = $criteriaProperty->getPropertyNames();
+
+		$entityPropertyCollection = $this->entityModel;
+		$entityProperty = null;
+		while (null !== ($propertyName = array_shift($propertyNames))) {
+			if ($entityPropertyCollection === null) {
+				throw new UnknownEntityPropertyException('Unknown entity property "' . $criteriaProperty
+						. '". EntityProperty ' . $entityProperty->toPropertyString() . ' has embedded children.');
+			}
+
+			$entityProperty = $entityPropertyCollection->getLevelEntityPropertyByName($propertyName);
+			if ($entityProperty->hasEmbeddedEntityPropertyCollection()) {
+				$entityPropertyCollection = $entityProperty->getEmbeddedEntityPropertyCollection();
+			}
+		}
+
+		return $entityProperty;
+	}
+
+	function containsChangesFor(string $propertyExpression): bool {
+		$entityProperty = $this->determineEntityProperty($propertyExpression);
+
+		return (new ActionMetaUtil($this->actionMeta))->containsChangesFor($entityProperty);
+	}
+
+	function containsChangesForAnyBut(string $propertyExpression): bool {
+		$entityProperty = $this->determineEntityProperty($propertyExpression);
+
+		return (new ActionMetaUtil($this->actionMeta))->containsChangesForAnyBut($entityProperty);
 	}
 }

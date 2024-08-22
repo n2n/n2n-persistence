@@ -45,6 +45,9 @@ class ActionQueueImpl implements ActionQueue {
 	private $flushing = false;
 	private $bufferedEvents = array();
 	private \WeakMap $entityListenersMap;
+	/**
+	 * @var LifecycleListener[]
+	 */
 	private $lifecylceListeners = array();
 
 	const MAGIC_ENTITY_OBJ_PARAM = 'entityObj';
@@ -268,6 +271,7 @@ class ActionQueueImpl implements ActionQueue {
 
 		$methodInvoker->setParamValue(self::MAGIC_ENTITY_OBJ_PARAM, $entityObj);
 		$methodInvoker->setClassParamObject(EntityManager::class, $this->em);
+		$methodInvoker->setClassParamObject(LifecycleEvent::class, $event);
 
 		foreach ($methods as $method) {
 			$method->setAccessible(true);

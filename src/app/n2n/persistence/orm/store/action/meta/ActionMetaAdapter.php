@@ -23,6 +23,8 @@ namespace n2n\persistence\orm\store\action\meta;
 
 use n2n\persistence\orm\EntityDataException;
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\property\EntityProperty;
+use n2n\util\type\ArgUtils;
 
 abstract class ActionMetaAdapter implements ActionMeta {
 	private $entityModel;
@@ -31,6 +33,10 @@ abstract class ActionMetaAdapter implements ActionMeta {
 	private $idGenerated;
 	private $sequenceName;
 	private $idRawValue;
+	/**
+	 * @var EntityProperty[]
+	 */
+	private array $changedEntityProperties = [];
 
 	public function __construct(EntityModel $entityModel) {
 		$this->entityModel = $entityModel;
@@ -76,7 +82,7 @@ abstract class ActionMetaAdapter implements ActionMeta {
 	public function setIdRawValue($idRawValue, bool $assign = false) {
 		$this->idRawValue = $idRawValue;
 		if ($assign) {
-			$this->assignRawValue($this->idProperty->getEntityModel(), $this->idColumnName, $idRawValue, true);
+			$this->assignRawValue($this->entityModel, $this->idColumnName, $idRawValue, true, null, $this->idProperty);
 		}
 	}
 
@@ -96,9 +102,10 @@ abstract class ActionMetaAdapter implements ActionMeta {
 // 		return $this->hasId();
 // 	}
 
-	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, int $pdoDataType = null) {
+	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, ?int $pdoDataType,
+			EntityProperty $entityProperty): void {
 		if ($columnName != $this->idColumnName) {
-			$this->assignRawValue($entityModel, $columnName, $rawValue, false, $pdoDataType);
+			$this->assignRawValue($entityModel, $columnName, $rawValue, false, $pdoDataType, $entityProperty);
 			return;
 		}
 		
@@ -106,11 +113,12 @@ abstract class ActionMetaAdapter implements ActionMeta {
 			throw new EntityDataException('Entity id changed for ' . $this->entityModel->getClass()->getName()
 					. ' (id: ' . $this->idRawValue . ' new id: ' . $rawValue . ')');
 		}
-		
+
+		ArgUtils::assertTrue($this->idProperty !== $entityProperty);
 		$this->setIdRawValue($rawValue, true);
 	}
 	
-	public function removeRawValue(EntityModel $entityModel, string $columnName) {
+	public function removeRawValue(EntityModel $entityModel, string $columnName): void {
 		if ($columnName == $this->idColumnName) {
 			$this->removeId();
 			return;
@@ -127,7 +135,22 @@ abstract class ActionMetaAdapter implements ActionMeta {
 		return true;
 	}
 
-	protected abstract function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, int $pdoDataType = null);
+	protected abstract function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, ?int $pdoDataType, EntityProperty $entityProperty);
 
 	protected abstract function unassignRawValue(EntityModel $entityModel, $columnName, $isId);
+
+	function markChange(EntityProperty $entityProperty): void {
+		ArgUtils::assertTrue($this->entityModel->containsEntityProperty($entityProperty));
+
+		$this->changedEntityProperties[$entityProperty->toPropertyString()] = $entityProperty;
+	}
+
+	function unmarkChange(EntityProperty $entityProperty): void {
+		unset($this->changedEntityProperties[$entityProperty->toPropertyString()]);
+	}
+
+	function getMarkedEntityProperties(): array {
+		return $this->changedEntityProperties;
+	}
+
 }
