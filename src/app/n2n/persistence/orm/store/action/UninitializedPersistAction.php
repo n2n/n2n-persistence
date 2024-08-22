@@ -156,4 +156,8 @@ class UninitializedPersistAction implements PersistAction {
 	public function setSupplied(bool $supplied) {
 		throw new UnsupportedOperationException();
 	}
+
+	function getEntityObj() {
+		throw new UnsupportedOperationException();
+	}
 }
