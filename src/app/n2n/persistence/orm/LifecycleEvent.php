@@ -97,6 +97,8 @@ class LifecycleEvent {
 			$entityProperty = $entityPropertyCollection->getLevelEntityPropertyByName($propertyName);
 			if ($entityProperty->hasEmbeddedEntityPropertyCollection()) {
 				$entityPropertyCollection = $entityProperty->getEmbeddedEntityPropertyCollection();
+			} else {
+				$entityPropertyCollection = null;
 			}
 		}
 
