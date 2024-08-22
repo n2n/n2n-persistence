@@ -275,7 +275,9 @@ class EntityModel implements EntityPropertyCollection {
 	public function containsEntityProperty(EntityProperty $entityProperty): bool {
 		$this->ensureInit();
 
-		if  (in_array($entityProperty, $this->properties, true)) return true;
+		if ($this === $entityProperty->getEntityModel()) {
+			return true;
+		}
 
 		return $this->superEntityModel !== null
 				&& $this->superEntityModel->containsEntityProperty($entityProperty);
