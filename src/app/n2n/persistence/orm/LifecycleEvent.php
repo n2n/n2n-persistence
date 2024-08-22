@@ -48,7 +48,6 @@ class LifecycleEvent {
 		$this->type = $type;
 		$this->entity = $entity;
 		$this->id = $id;
-		ArgUtils::assertTrue(($type === self::POST_LOAD) !== ($actionMeta !== null));
 	}
 	/**
 	 * @return string
