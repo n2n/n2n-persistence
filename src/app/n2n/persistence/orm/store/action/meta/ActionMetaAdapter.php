@@ -103,7 +103,7 @@ abstract class ActionMetaAdapter implements ActionMeta {
 // 	}
 
 	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, ?int $pdoDataType,
-			EntityProperty $entityProperty): void {
+			?EntityProperty $entityProperty): void {
 		if ($columnName != $this->idColumnName) {
 			$this->assignRawValue($entityModel, $columnName, $rawValue, false, $pdoDataType, $entityProperty);
 			return;
@@ -135,7 +135,7 @@ abstract class ActionMetaAdapter implements ActionMeta {
 		return true;
 	}
 
-	protected abstract function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, ?int $pdoDataType, EntityProperty $entityProperty);
+	protected abstract function assignRawValue(EntityModel $entityModel, $columnName, $rawValue, $isId, ?int $pdoDataType, ?EntityProperty $entityProperty);
 
 	protected abstract function unassignRawValue(EntityModel $entityModel, $columnName, $isId);
 

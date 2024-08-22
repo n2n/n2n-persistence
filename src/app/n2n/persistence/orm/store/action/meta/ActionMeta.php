@@ -31,7 +31,7 @@ interface ActionMeta {
 	 * @param string $columnName
 	 * @param mixed $rawValue
 	 */
-	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, ?int $pdoDataType, EntityProperty $entityProperty);
+	public function setRawValue(EntityModel $entityModel, string $columnName, $rawValue, ?int $pdoDataType, ?EntityProperty $entityProperty);
 	/**
 	 * @param EntityModel $entityModel
 	 * @param string $columnName

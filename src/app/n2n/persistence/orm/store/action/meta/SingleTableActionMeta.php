@@ -29,7 +29,7 @@ class SingleTableActionMeta extends SimpleActionMeta {
 
 		if ($new) {
 			$this->setRawValue($entityModel, $entityModel->getDiscriminatorColumnName(),
-					$entityModel->getDiscriminatorValue());
+					$entityModel->getDiscriminatorValue(), null, null);
 		}
 	}
 }
