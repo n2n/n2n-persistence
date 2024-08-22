@@ -114,7 +114,7 @@ abstract class ActionMetaAdapter implements ActionMeta {
 					. ' (id: ' . $this->idRawValue . ' new id: ' . $rawValue . ')');
 		}
 
-		ArgUtils::assertTrue($this->idProperty !== $entityProperty);
+		ArgUtils::assertTrue($this->idProperty === $entityProperty);
 		$this->setIdRawValue($rawValue, true);
 	}
 	
