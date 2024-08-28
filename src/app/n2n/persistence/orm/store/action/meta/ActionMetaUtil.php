@@ -61,14 +61,14 @@ class ActionMetaUtil {
 	function containsChangesForAnyBut(EntityProperty $entityProperty): bool {
 		foreach ($this->actionMeta->getMarkedEntityProperties() as $markedEntityProperty) {
 			if (!$this->isEntityPropertyPartOf($entityProperty, $markedEntityProperty)) {
-				return false;
+				return true;
 			}
 		}
 
 		foreach ($this->actionMeta->getItems() as $item) {
 			foreach ($item->getEntityProperties() as $changedEntityProperty) {
 				if (!$this->isEntityPropertyPartOf($entityProperty, $changedEntityProperty)) {
-					return false;
+					return true;
 				}
 			}
 		}
