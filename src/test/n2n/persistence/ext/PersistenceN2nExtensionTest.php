@@ -33,6 +33,7 @@ use n2n\persistence\orm\LazyEntityManager;
 use n2n\core\N2nApplication;
 use n2n\core\cache\AppCache;
 use n2n\util\io\fs\FsPath;
+use n2n\core\cache\impl\N2nCaches;
 
 class PersistenceN2nExtensionTest extends TestCase {
 
@@ -52,8 +53,7 @@ class PersistenceN2nExtensionTest extends TestCase {
 
 		$this->n2nApplication = new N2nApplication($this->createMock(VarStore::class),
 				$this->createMock(ModuleManager::class),
-				new EphemeralAppCache(),
-				$this->appConfig, null);
+				N2nCaches::ephemeral(), $this->appConfig, null);
 
 		$this->persistenceN2nExtension = new PersistenceN2nExtension($this->n2nApplication);
 	}

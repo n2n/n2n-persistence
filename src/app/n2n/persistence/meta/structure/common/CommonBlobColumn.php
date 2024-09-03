@@ -24,11 +24,9 @@ namespace n2n\persistence\meta\structure\common;
 use n2n\spec\dbo\meta\structure\Column;
 
 use n2n\spec\dbo\meta\structure\BinaryColumn;
-use n2n\spec\dbo\meta\structure\BlobColumn;
 
-class CommonBlobColumn extends ColumnAdapter implements BlobColumn {
+class CommonBlobColumn extends ColumnAdapter implements BinaryColumn {
 	private $size;
-
 	public function __construct($name, $size) {
 		parent::__construct($name);
 		$this->size = $size;
