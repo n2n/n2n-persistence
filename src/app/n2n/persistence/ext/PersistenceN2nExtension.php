@@ -62,7 +62,7 @@ class PersistenceN2nExtension implements ConfigN2nExtension {
 			return;
 		}
 
-		$pdoPoolUsage->pdoPool->clear();
+		$pdoPoolUsage->pdoPool->clear(false);
 		$this->pdoPoolsMaps->offsetUnset($pdoPoolUsage->pdoPool->getTransactionManager());
 	}
 

@@ -96,11 +96,15 @@ class PdoPool {
 //				$appConfig->error()->getMonitorSlowQueryTime(), $n2nContext->getMonitor());
 //	}
 
-	function clear(): void {
+	function clear(bool $closePdos = false): void {
 		$pdos = $this->dbhs;
 
 		$this->dbhs = [];
 //		$this->dbhPoolListeners = []
+
+		if (!$closePdos) {
+			return;
+		}
 
 		foreach ($pdos as $pdo) {
 			$pdo->close();
