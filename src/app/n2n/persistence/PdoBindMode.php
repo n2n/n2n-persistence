@@ -2,7 +2,7 @@
 
 namespace n2n\persistence;
 
-enum PdoTmBindMode: string {
+enum PdoBindMode: string {
 	case RELEASE_ONLY = 'release-only';
 	case FULL = 'full';
 
@@ -12,5 +12,9 @@ enum PdoTmBindMode: string {
 
 	function isReleaseIncluded(): bool {
 		return true;
+	}
+
+	function isCloseIncluded(): bool {
+		return $this === self::FULL;
 	}
 }

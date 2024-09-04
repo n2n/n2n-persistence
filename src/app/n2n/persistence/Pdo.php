@@ -48,7 +48,7 @@ class Pdo implements Dbo {
 
 	public function __construct(private string $dataSourceName, Dialect $dialect,
 			private ?TransactionManager $transactionManager = null, ?float $slowQueryTime = null,
-			?N2nMonitor $n2nMonitor = null, private PdoTmBindMode $bindMode = PdoTmBindMode::FULL) {
+			?N2nMonitor $n2nMonitor = null, private PdoBindMode $bindMode = PdoBindMode::FULL) {
 		$this->logger = new PdoLogger($this->getDataSourceName(), $slowQueryTime, $n2nMonitor);
 
 		$this->dialect = $dialect;
@@ -91,6 +91,7 @@ class Pdo implements Dbo {
 	function __destruct() {
 		$this->disconnect();
 	}
+
 
 //	function fork(): Pdo {
 //		$pdo = new Pdo($this->persistenceUnitConfig, $this->transactionManager, $this->slowQueryTime, $this->n2nMonitor);
@@ -181,6 +182,11 @@ class Pdo implements Dbo {
 	public function getLogger(): PdoLogger {
 		return $this->logger;
 	}
+
+	function getBindMode(): PdoBindMode {
+		return $this->bindMode;
+	}
+
 	/**
 	 *
 	 * @param mixed $pdo

@@ -41,11 +41,14 @@ use n2n\core\ext\N2nMonitor;
 use n2n\reflection\ReflectionUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\PdoFactory;
-use n2n\persistence\PdoTmBindMode;
+use n2n\persistence\PdoBindMode;
 
 class PdoPool {
 	const DEFAULT_DS_NAME = 'default';
 
+	/**
+	 * @var Pdo[] $dbhs
+	 */
 	protected array $dbhs = array();
 
 //	private $dbhPoolListeners = array();
@@ -96,7 +99,7 @@ class PdoPool {
 //				$appConfig->error()->getMonitorSlowQueryTime(), $n2nContext->getMonitor());
 //	}
 
-	function clear(bool $closePdos = false): void {
+	function clear(bool $closePdos = true): void {
 		$pdos = $this->dbhs;
 
 		$this->dbhs = [];
@@ -107,7 +110,9 @@ class PdoPool {
 		}
 
 		foreach ($pdos as $pdo) {
-			$pdo->close();
+			if ($pdo->getBindMode()->isCloseIncluded()) {
+				$pdo->close();
+			}
 		}
 	}
 
@@ -129,7 +134,7 @@ class PdoPool {
 	 * @param ?string $persistenceUnitName
 	 * @return Pdo
 	 */
-	public function getPdo(string $persistenceUnitName = null, PdoTmBindMode $pdoTmBindMode = PdoTmBindMode::FULL): Pdo {
+	public function getPdo(string $persistenceUnitName = null, PdoBindMode $pdoTmBindMode = PdoBindMode::FULL): Pdo {
 		if ($persistenceUnitName === null) {
 			$persistenceUnitName = self::DEFAULT_DS_NAME;
 		}
@@ -174,10 +179,10 @@ class PdoPool {
 
 	/**
 	 * @param PersistenceUnitConfig $persistenceUnitConfig
-	 * @param PdoTmBindMode $pdoTmBindMode
+	 * @param PdoBindMode $pdoTmBindMode
 	 * @return Pdo
 	 */
-	private function createPdo(PersistenceUnitConfig $persistenceUnitConfig, PdoTmBindMode $pdoTmBindMode): Pdo {
+	private function createPdo(PersistenceUnitConfig $persistenceUnitConfig, PdoBindMode $pdoTmBindMode): Pdo {
 		return PdoFactory::createFromPersistenceUnitConfig($persistenceUnitConfig, $this->transactionManager,
 				$this->slowQueryTime, $this->n2nMonitor, $pdoTmBindMode);
 	}
