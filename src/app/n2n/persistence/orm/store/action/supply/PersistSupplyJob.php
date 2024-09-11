@@ -33,7 +33,7 @@ class PersistSupplyJob extends SupplyJobAdapter {
 	private $valueHashCol = null;
 	private $prepared = false;
 
-	public function __construct(PersistAction $persistAction, ValueHashCol $oldValueHashCol = null) {
+	public function __construct(private PersistAction $persistAction, ValueHashCol $oldValueHashCol = null) {
 		parent::__construct($persistAction, $oldValueHashCol);
 	}
 
@@ -76,18 +76,18 @@ class PersistSupplyJob extends SupplyJobAdapter {
 		return $this->valueHashCol->getValueHash($propertyString);
 	}
 
-	public function prepare() {
+	public function prepare(): void {
 // 		parent::prepare();
 		
 		if ($this->isDisabled()) return;
 
 		$new = $this->isInsert();
-		
+
+//		$this->persistAction->getMeta()->unmarkAllChanges();
 		foreach ($this->entityAction->getEntityModel()->getEntityProperties() as $entityProperty) {
 			if (!($entityProperty instanceof CascadableEntityProperty)) continue;
 
 			$propertyString = $entityProperty->toPropertyString();
-			
 			
 			$oldValueHash = null;
 			if (!$new) {
@@ -96,6 +96,7 @@ class PersistSupplyJob extends SupplyJobAdapter {
 			}
 		
 			$entityProperty->prepareSupplyJob($this, $this->values[$propertyString], $oldValueHash);
+			$this->persistAction->getMeta()->markChange($entityProperty);
 		}
 	}
 

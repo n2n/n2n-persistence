@@ -139,6 +139,10 @@ abstract class ActionMetaAdapter implements ActionMeta {
 
 	protected abstract function unassignRawValue(EntityModel $entityModel, $columnName, $isId);
 
+	function unmarkAllChanges(): void {
+		$this->changedEntityProperties = [];
+	}
+
 	function markChange(EntityProperty $entityProperty): void {
 		ArgUtils::assertTrue($this->entityModel->containsEntityProperty($entityProperty));
 
