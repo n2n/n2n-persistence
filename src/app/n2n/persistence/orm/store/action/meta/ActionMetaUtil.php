@@ -38,6 +38,7 @@ class ActionMetaUtil {
 				return true;
 			}
 
+			// probably no longer necessary to check items because SupplyJob already marks all changed EntityProperties
 			foreach ($items as $item) {
 				if (in_array($entityProperty, $item->getEntityProperties())) {
 					return true;
@@ -65,6 +66,7 @@ class ActionMetaUtil {
 			}
 		}
 
+		// probably no longer necessary to check items because SupplyJob already marks all changed EntityProperties
 		foreach ($this->actionMeta->getItems() as $item) {
 			foreach ($item->getEntityProperties() as $changedEntityProperty) {
 				if (!$this->isEntityPropertyPartOf($entityProperty, $changedEntityProperty)) {
