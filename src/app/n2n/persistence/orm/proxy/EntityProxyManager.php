@@ -120,6 +120,10 @@ class EntityProxyManager {
 		return null === $this->retrieveAccessListener($proxy, false);
 	}
 
+	function extractProxyId(EntityProxy $proxy): mixed {
+		return $this->retrieveAccessListener($proxy, false)?->getId();
+	}
+
 	public function disposeProxyAccessListenerOf($entity) {
 		$this->retrieveAccessListener($entity, true)?->dispose();
 	}

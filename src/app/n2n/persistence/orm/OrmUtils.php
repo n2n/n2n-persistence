@@ -82,6 +82,14 @@ class OrmUtils {
 		}
 	}
 
+	static function extractId(?object $proxy): mixed {
+		if ($proxy instanceof EntityProxy) {
+			return EntityProxyManager::getInstance()->extractProxyId($proxy);
+		}
+
+		return null;
+	}
+
 	/**
 	 * @param EntityManager $em
 	 * @param object $obj
