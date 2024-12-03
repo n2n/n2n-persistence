@@ -84,7 +84,7 @@ class CourseDate extends ObjectAdapter {
 		return $this->dateTo;
 	}
 
-	public function setDateTo(\DateTime $dateTo = null) {
+	public function setDateTo(?\DateTime $dateTo = null) {
 		$this->dateTo = $dateTo;
 
 	}
@@ -100,7 +100,7 @@ class CourseDate extends ObjectAdapter {
 		return $this->logo;
 	}
 
-	public function setLogo(File $logo = null) {
+	public function setLogo(?File $logo = null) {
 		$this->logo = $logo;
 	}
 
@@ -140,7 +140,7 @@ class CourseDate extends ObjectAdapter {
 		return $this->pdf;
 	}
 
-	public function setPdf(File $pdf = null) {
+	public function setPdf(?File $pdf = null) {
 		$this->pdf = $pdf;
 	}
 	

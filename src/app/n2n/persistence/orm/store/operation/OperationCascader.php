@@ -57,7 +57,7 @@ class OperationCascader {
 	 * @throws PersistenceOperationException
 	 */
 	public function cascadeProperties(EntityModel|EntityPropertyCollection $entityModel, $entityObj,
-			EntityProperty &$entityProperty = null) {
+			?EntityProperty &$entityProperty = null) {
 		try {
 			$this->traverse($entityModel, $entityObj, $entityProperty);
 		} catch (PersistenceOperationException $e) {
@@ -68,7 +68,7 @@ class OperationCascader {
 	}
 
 	private function traverse(EntityPropertyCollection $entityPropertyCollection, $entityObj,
-			EntityProperty &$entityProperty = null) {
+			?EntityProperty &$entityProperty = null) {
 		foreach ($entityPropertyCollection->getEntityProperties() as $entityProperty) {
 			if ($entityProperty instanceof CascadableEntityProperty) {
 				$this->cascade($entityProperty, $entityObj);

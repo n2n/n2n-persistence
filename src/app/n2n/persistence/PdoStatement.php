@@ -98,7 +98,7 @@ class PdoStatement implements DboStatement {
 	 * (non-PHPdoc)
 	 * @see PDOStatement::execute()
 	 */
-	public function execute(array $params = null): bool {
+	public function execute(?array $params = null): bool {
 		if (is_array($params)) $this->boundValues = $params;
 		
 		try {

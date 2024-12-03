@@ -29,7 +29,7 @@ class OrmError extends FancyError {
 	
 	
 	public static function create($message, array $causingComponents, 
-			\Exception $previous = null, $documentId = null) {
+			?\Exception $previous = null, $documentId = null) {
 		$tps = array();
 		foreach ($causingComponents as $causingComponent) {
 			if ($causingComponent === null) continue;

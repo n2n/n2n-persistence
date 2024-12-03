@@ -177,8 +177,8 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 	 * @param int $num
 	 * @return BaseCriteria
 	 */
-	public function createSimpleCriteria(string|ReflectionClass $class, array $matches = null, array $order = null,
-			int $limit = null, int $num = null): Criteria {
+	public function createSimpleCriteria(string|ReflectionClass $class, ?array $matches = null, ?array $order = null,
+			?int $limit = null, ?int $num = null): Criteria {
 		$this->ensureEntityManagerOpen();
 			
 		$criteria = $this->createCriteria();

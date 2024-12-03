@@ -23,7 +23,7 @@ class PdoLoggerTest extends TestCase {
 
 	private function createPdo(bool $persistent,
 			string $readOnlyTransactionIsolationLevel = PersistenceUnitConfig::TIL_REPEATABLE_READ,
-			TransactionManager $transactionManager = null): Pdo {
+			?TransactionManager $transactionManager = null): Pdo {
 		return PdoFactory::createFromPersistenceUnitConfig(
 				$this->createPersistenceUnitConfig($persistent, $readOnlyTransactionIsolationLevel),
 				$transactionManager);

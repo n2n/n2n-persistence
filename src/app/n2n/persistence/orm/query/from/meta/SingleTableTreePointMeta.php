@@ -63,7 +63,7 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 		return array();
 	}
 	
-	public function setMetaGenerator(MetaGenerator $metaGenerator = null) {
+	public function setMetaGenerator(?MetaGenerator $metaGenerator = null) {
 		parent::setMetaGenerator($metaGenerator);
 		$this->discriminatorColumnName = $this->generateColumnName(
 				$this->entityModel, $this->entityModel->getDiscriminatorColumnName());
@@ -113,7 +113,7 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 		}
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, QueryComparator $onComparator = null) {
+	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, ?QueryComparator $onComparator = null) {
 		$this->applySelection($selectStatementBuilder);
 		$onQueryComparator = $selectStatementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)),
 				$this->tableAlias, $onComparator);

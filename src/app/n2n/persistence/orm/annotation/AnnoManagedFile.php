@@ -43,7 +43,7 @@ class AnnoManagedFile implements PropertyAnnotation, LegacyAnnotation {
 	 * @param FileLocator $fileLocator
 	 * @throws \InvalidArgumentException
 	 */
-	public function __construct(string $fileManagerlookupId = FileManager::TYPE_PUBLIC, FileLocator $fileLocator = null, bool $cascadeDelete = true) {
+	public function __construct(string $fileManagerlookupId = FileManager::TYPE_PUBLIC, ?FileLocator $fileLocator = null, bool $cascadeDelete = true) {
 		$this->fileManagerlookupId = $fileManagerlookupId;
 		$this->fileLocator = $fileLocator;
 		$this->cascadeDelete = $cascadeDelete;

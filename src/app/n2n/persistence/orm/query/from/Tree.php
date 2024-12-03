@@ -54,7 +54,7 @@ class Tree implements QueryPointResolver {
 		}
 	}
 	
-	public function setInheritedQueryPointResolver(Tree $inheritedQueryPointResolver = null) {
+	public function setInheritedQueryPointResolver(?Tree $inheritedQueryPointResolver = null) {
 		$this->inheritedQueryPointResolver = $inheritedQueryPointResolver;
 	}
 	
@@ -95,7 +95,7 @@ class Tree implements QueryPointResolver {
 	 * @param string $alias
 	 * @return \n2n\persistence\orm\query\from\MetaTreePoint
 	 */
-	public function createBaseTreePoint(EntityModel $entityModel, string $alias = null) {
+	public function createBaseTreePoint(EntityModel $entityModel, ?string $alias = null) {
 		$treePoint = new BaseEntityTreePoint($this->queryState, 
 				$entityModel->createTreePointMeta($this->queryState));
 		

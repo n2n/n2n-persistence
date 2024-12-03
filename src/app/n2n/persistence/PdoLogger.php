@@ -45,31 +45,31 @@ class PdoLogger {
 		$this->capturing = $capturing;
 	}
 
-	public function addQuery(string $sqlStr, float $time = null): void {
+	public function addQuery(string $sqlStr, ?float $time = null): void {
 		$this->addEntry(['sql' => $sqlStr, 'type' => 'query', 'time' => $time]);
 	}
 
-	public function addExecution(string $sqlStr, float $time = null): void {
+	public function addExecution(string $sqlStr, ?float $time = null): void {
 		$this->addEntry(['sql' => $sqlStr, 'type' => 'execute', 'time' => $time]);
 	}
 
-	public function addPreparation(string $sqlStr, float $time = null): void {
+	public function addPreparation(string $sqlStr, ?float $time = null): void {
 		$this->addEntry(['sql' => $sqlStr, 'type' => 'prepare', 'time' => $time]);
 	}
 
-	public function addPreparedExecution(string $sqlStr, array $values = null, float $time = null): void {
+	public function addPreparedExecution(string $sqlStr, ?array $values = null, ?float $time = null): void {
 		$this->addEntry(['sql' => $sqlStr, 'values' => $values, 'type' => 'prepared-execute', 'time' => $time]);
 	}
 
-	public function addTransactionBegin(float $time = null): void {
+	public function addTransactionBegin(?float $time = null): void {
 		$this->addEntry(['type' => 'begin transaction', 'time' => $time]);
 	}
 
-	public function addTransactionRollBack(float $time = null): void {
+	public function addTransactionRollBack(?float $time = null): void {
 		$this->addEntry(['type' => 'rollback', 'time' => $time]);
 	}
 
-	public function addTransactionCommit(float $time = null): void {
+	public function addTransactionCommit(?float $time = null): void {
 		$this->addEntry(['type' => 'commit', 'time' => $time]);
 	}
 

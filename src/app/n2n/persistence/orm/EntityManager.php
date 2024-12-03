@@ -61,8 +61,8 @@ interface EntityManager {
 	 * @param int|null $num
 	 * @return Criteria<T>
 	 */
-	public function createSimpleCriteria(string|ReflectionClass $class, array $matches = null,
-			array $order = null, int $limit = null, int $num = null): Criteria;
+	public function createSimpleCriteria(string|ReflectionClass $class, ?array $matches = null,
+			?array $order = null, ?int $limit = null, ?int $num = null): Criteria;
 
 	/**
 	 * @param string $nql

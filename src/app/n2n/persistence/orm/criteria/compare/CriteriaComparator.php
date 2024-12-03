@@ -64,7 +64,7 @@ class CriteriaComparator {
 	 * @param bool $expectConstForArg1
 	 * @param bool $expectConstForArg2
 	 */
-	public function __construct(Criteria $criteria = null, CriteriaComparator $parentComparator = null, 
+	public function __construct(?Criteria $criteria = null, ?CriteriaComparator $parentComparator = null,
 			$expectConstForArg1 = false, $expectConstForArg2 = true) {
 		$this->criteria = $criteria;
 		$this->parentComparator = $parentComparator;

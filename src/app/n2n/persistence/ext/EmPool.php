@@ -31,7 +31,7 @@ class EmPool {
 		return $this->magicContext;
 	}
 
-	public function getEntityManagerFactory(string $persistenceUnitName = null): EntityManagerFactory {
+	public function getEntityManagerFactory(?string $persistenceUnitName = null): EntityManagerFactory {
 		if ($persistenceUnitName === null) {
 			$persistenceUnitName = PdoPool::DEFAULT_DS_NAME;
 		}

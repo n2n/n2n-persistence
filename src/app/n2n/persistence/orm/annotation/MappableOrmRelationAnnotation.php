@@ -24,8 +24,8 @@ namespace n2n\persistence\orm\annotation;
 abstract class MappableOrmRelationAnnotation extends OrmRelationAnnotation {
 	private $mappedBy = null;
 	
-	public function __construct(\ReflectionClass $targetEntityClass, string $mappedBy = null, 
-			int $cascadeType = null, string $fetchType = null) {
+	public function __construct(\ReflectionClass $targetEntityClass, ?string $mappedBy = null,
+			?int $cascadeType = null, ?string $fetchType = null) {
 		parent::__construct($targetEntityClass, $cascadeType, $fetchType);
 		
 		if ($mappedBy !== null) {

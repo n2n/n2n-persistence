@@ -105,7 +105,7 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 		}
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, QueryComparator $onComparator = null) {
+	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, ?QueryComparator $onComparator = null) {
 		if (!$this->entityModel->hasSubEntityModels()) {
 			return $selectStatementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)),
 					$this->tableAlias, $onComparator);

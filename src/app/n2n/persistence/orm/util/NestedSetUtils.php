@@ -53,7 +53,7 @@ class NestedSetUtils {
 	private $leftEcp;
 	private $rightEcp;
 	
-	public function __construct(EntityManager $em, \ReflectionClass $class, NestedSetStrategy $nestedSetStrategy = null) {
+	public function __construct(EntityManager $em, \ReflectionClass $class, ?NestedSetStrategy $nestedSetStrategy = null) {
 		$this->em = $em;
 		$this->class = $class;
 		$this->entityModel = $em->getEntityModelManager()->getEntityModelByClass($this->class);
@@ -63,7 +63,7 @@ class NestedSetUtils {
 	/**
 	 * @param NestedSetStrategy $nestedSetStrategy
 	 */
-	public function setStrategy(NestedSetStrategy $nestedSetStrategy = null) {
+	public function setStrategy(?NestedSetStrategy $nestedSetStrategy = null) {
 		if ($nestedSetStrategy === null) {
 			$this->leftCriteriaProperty = CrIt::p(self::DEFAULT_LEFT_PROPERTY_NAME);
 			$this->rightCriteriaProperty = CrIt::p(self::DEFAULT_RIGHT_PROPERTY_NAME);
@@ -140,7 +140,7 @@ class NestedSetUtils {
 	/**
 	 * @return \n2n\persistence\orm\util\NestedSetItem[] 
 	 */
-	public function fetch($baseEntity = null, $descendantsOnly = false, Criteria $criteria = null): array {
+	public function fetch($baseEntity = null, $descendantsOnly = false, ?Criteria $criteria = null): array {
 		if ($criteria === null) {
 			$criteria = $this->em->createCriteria()->from($this->class, self::NODE_ALIAS);
 		}
@@ -192,7 +192,7 @@ class NestedSetUtils {
 		return $items;
 	}
 	
-	public function fetchParents($entityObj, bool $includeSelf = false, string $direction = 'DESC', Criteria $criteria = null) {
+	public function fetchParents($entityObj, bool $includeSelf = false, string $direction = 'DESC', ?Criteria $criteria = null) {
 		if ($criteria === null) {
 			$criteria = $this->em->createCriteria()->from($this->class, self::NODE_ALIAS);
 		}
@@ -219,7 +219,7 @@ class NestedSetUtils {
 		return $result;
 	}
 	
-	public function fetchLevel($entityObj, Criteria $criteria = null) {
+	public function fetchLevel($entityObj, ?Criteria $criteria = null) {
 		if ($criteria === null) {
 			$criteria = $this->em->createCriteria()->from($this->class, self::NODE_ALIAS);
 		}
@@ -764,7 +764,7 @@ class NestedSetUtils {
 // 	 * @param unknown_type $childrenOnly
 // 	 * @return NN6PdoStatement
 // 	 */
-// 	public function buildSelect(NN6DataCollection $baseEntry = null, array $selectFieldNames = null, $childrenOnly = false) {
+// 	public function buildSelect(?NN6DataCollection $baseEntry = null, ?array $selectFieldNames = null, $childrenOnly = false) {
 // 		$sqlEscTableName = $this->dbh->quoteField($this->tableName);
 // 		$sqlEscRootFkField = $this->dbh->quoteField($this->rootFkField);
 // 		$sqlEscLftField = $this->dbh->quoteField($this->lftField);
@@ -900,7 +900,7 @@ class NestedSetUtils {
 // 	 * @param unknown_type $childrenOnly
 // 	 * @return array
 // 	 */
-// 	public function getOptions(NN6EntityClass $entityClass, $optionLabelField, NN6Entity $baseEntry = null, $optionKeyField = null, $childrenOnly = false) {
+// 	public function getOptions(NN6EntityClass $entityClass, $optionLabelField, ?NN6Entity $baseEntry = null, $optionKeyField = null, $childrenOnly = false) {
 // 		$optionLabelField = (string) $optionLabelField;
 // 		if (is_null($optionKeyField)) {
 // 			$optionKeyField = $entityClass->getIdFieldName();
@@ -924,7 +924,7 @@ class NestedSetUtils {
 // 	 * @param unknown_type $childrenOnly
 // 	 * @return array
 // 	 */
-// 	public function getOptionsFromMeta(NN6MetaTable $metaTable, $optionLabelField, NN6DataCollection $baseEntry = null, $optionKeyField = null, $childrenOnly = false) {
+// 	public function getOptionsFromMeta(NN6MetaTable $metaTable, $optionLabelField, ?NN6DataCollection $baseEntry = null, $optionKeyField = null, $childrenOnly = false) {
 // 		$optionLabelField = (string) $optionLabelField;
 // 		if (is_null($optionKeyField)) {
 // 			$optionKeyField = $metaTable->getPrimaryKeyField()->getName();
@@ -959,7 +959,7 @@ class NestedSetUtils {
 // 	 * @param unknown_type $childrenOnly
 // 	 * @return array
 // 	 */
-// 	public function getEntities(NN6EntityClass $entityClass, NN6Entity $baseEntity = null, $childrenOnly = false) {
+// 	public function getEntities(NN6EntityClass $entityClass, ?NN6Entity $baseEntity = null, $childrenOnly = false) {
 // 		$stmtBuilder = $this->createBuilder($entityClass->getTableName(), $entityClass->getIdFieldName());
 // 		$stmt = $stmtBuilder->buildSelect($baseEntity, null, $childrenOnly);
 // 		return $this->dbh->getEntityManager()->findByStmt($entityClass, $stmt);
@@ -971,7 +971,7 @@ class NestedSetUtils {
 // 	 * @param unknown_type $childrenOnly
 // 	 * @return array
 // 	 */
-// 	public function getTableEntries(NN6MetaTable $metaTable, NN6TableEntry $baseEntry = null, $childrenOnly = false) {
+// 	public function getTableEntries(NN6MetaTable $metaTable, ?NN6TableEntry $baseEntry = null, $childrenOnly = false) {
 // 		$stmtBuilder = $this->createBuilder($metaTable->getName(), $metaTable->getPrimaryKeyField()->getName());
 // 		$stmt = $stmtBuilder->buildSelect($baseEntry, null , $childrenOnly);
 // 		return $metaTable->findTableEntries($stmt);

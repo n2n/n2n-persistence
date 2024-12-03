@@ -76,7 +76,7 @@ class QueryState {
 	 * @param string $tableName
 	 * @return string
 	 */
-	public function createTableAlias(string $tableName = null) {
+	public function createTableAlias(?string $tableName = null) {
 		if ($tableName !== null) {
 			$tableName = mb_strtolower(StringUtils::buildAcronym($tableName));
 		}

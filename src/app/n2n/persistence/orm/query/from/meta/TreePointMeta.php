@@ -34,13 +34,13 @@ interface TreePointMeta {
 
 	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder);
 
-	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, QueryComparator $onComparator = null);
+	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, ?QueryComparator $onComparator = null);
 
 	public function getEntityModel(): EntityModel;
 
 	public function setIdColumnName(string $idColumnname);
 
-	public function setMetaGenerator(MetaGenerator $metaGenerator = null);
+	public function setMetaGenerator(?MetaGenerator $metaGenerator = null);
 	
 	public function getMetaColumnAliases();
 	/**

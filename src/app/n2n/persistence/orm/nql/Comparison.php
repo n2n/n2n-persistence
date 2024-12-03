@@ -308,7 +308,7 @@ class Comparison {
 		$this->processedTokens = array();
 	}
 
-	private function createNqlParseException($message, $donePart = null, \Exception $previous = null) {
+	private function createNqlParseException($message, $donePart = null, ?\Exception $previous = null) {
 		return $this->parsingState->createNqlParseException($message, $donePart, $previous);
 	}
 	

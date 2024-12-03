@@ -28,7 +28,7 @@ use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\persistence\orm\proxy\EntityProxyManager;
 
 class OrmUtils {	
-// 	public static function extractId($entity, EntityModel $entityModel = null) {
+// 	public static function extractId($entity, ?EntityModel $entityModel = null) {
 // 		if (is_null($entityModel)) {
 // 			$entityModel = EntityModelManager::getInstance()->getEntityModelByObject($entity);
 // 		}
@@ -42,13 +42,13 @@ class OrmUtils {
 // 	 * @param array $matches
 // 	 * @return \n2n\persistence\orm\criteria\Criteria
 // 	 */
-// 	public static function createCountCriteria(EntityManager $em, \ReflectionClass $class, array $matches = null) {
+// 	public static function createCountCriteria(EntityManager $em, \ReflectionClass $class, ?array $matches = null) {
 // 		$criteria = $em->createSimpleCriteria($class, $matches);
 // 		$criteria->select(CrIt::f(CriteriaFunction::COUNT, CrIt::c(1)));
 // 		return $criteria;
 // 	}
 		
-// 	public static function copy($entity, EntityModel $entityModel = null, $resetId = false) {
+// 	public static function copy($entity, ?EntityModel $entityModel = null, $resetId = false) {
 // 		if (null === $entityModel) {
 // 			$entityModel = EntityModelManager::getInstance()->getEntityModelByObject($entity);
 // 		}
@@ -133,7 +133,7 @@ class OrmUtils {
 // 		return false;
 // 	}
 	
-// 	public static function areObjectsEqual(Entity $obj = null, Entity $obj2 = null, EntityModel $entityModel = null) {
+// 	public static function areObjectsEqual(?Entity $obj = null, ?Entity $obj2 = null, ?EntityModel $entityModel = null) {
 // 		if (!isset($obj) || !isset($obj2)) return false;
 		
 // 		if ($entityModel === null) {

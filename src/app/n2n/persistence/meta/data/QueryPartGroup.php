@@ -28,7 +28,7 @@ use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
 class QueryPartGroup implements QueryItem {
 	protected $queryParts = array();
 	
-	public function __construct(QueryPart $queryPart = null) {
+	public function __construct(?QueryPart $queryPart = null) {
 		if ($queryPart !== null) {
 			$this->addQueryPart($queryPart);
 		}

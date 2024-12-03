@@ -107,7 +107,7 @@ class SetupProcess {
 	 * @param array $causingComponents
 	 * @return \Error
 	 */
-	public static function createPropertyException($message, \Exception $causingE = null,
+	public static function createPropertyException($message, ?\Exception $causingE = null,
 			array $causingComponents = array()) {
 		if (0 == count($causingComponents)) {
 			return new PropertyInitializationException($message, null, $causingE);
@@ -121,7 +121,7 @@ class SetupProcess {
 	}
 
 	private static function createError($message, array $causingComponents,
-			\Exception $previous = null, $documentId = null) {
+			?\Exception $previous = null, $documentId = null) {
 		$tps = array();
 		foreach ($causingComponents as $causingComponent) {
 			if ($causingComponent === null) continue;

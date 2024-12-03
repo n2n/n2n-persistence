@@ -81,7 +81,7 @@ class CommonSelectStatementBuilder implements SelectStatementBuilder {
 		return $this;
 	}
 
-	public function addJoin($joinType, QueryResult $queryResult, $alias = null, ComparisonBuilder $onComparator = null): ComparisonBuilder {
+	public function addJoin($joinType, QueryResult $queryResult, $alias = null, ?ComparisonBuilder $onComparator = null): ComparisonBuilder {
 		ArgUtils::valEnum($joinType, JoinType::getValues());
 		if ($onComparator === null) {
 			$onComparator = new QueryComparator();

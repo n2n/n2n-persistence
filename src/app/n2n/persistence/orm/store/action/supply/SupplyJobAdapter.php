@@ -33,7 +33,7 @@ abstract class SupplyJobAdapter implements SupplyJob {
 	protected $values;
 	protected $init = false;
 	
-	public function __construct(EntityAction $entityAction, ValueHashCol $oldValueHashCol = null){
+	public function __construct(EntityAction $entityAction, ?ValueHashCol $oldValueHashCol = null){
 		$this->entityAction = $entityAction;
 		$this->oldValueHashCol = $oldValueHashCol;
 		

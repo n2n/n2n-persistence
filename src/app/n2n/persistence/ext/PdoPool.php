@@ -66,7 +66,7 @@ class PdoPool {
 //	 * @param TransactionManager|null $transactionManager if provided already initialized pdos will not be forked.
 //	 * @return PdoPool
 //	 */
-//	function fork(MagicContext $magicContext, TransactionManager $transactionManager = null): PdoPool {
+//	function fork(MagicContext $magicContext, ?TransactionManager $transactionManager = null): PdoPool {
 //		$pdoPool = new PdoPool($this->persistenceUnitConfigs, $this->entityModelManager, $magicContext,
 //				$transactionManager ?? $this->transactionManager,
 //				$this->slowQueryTime, $this->n2nMonitor);
@@ -134,7 +134,7 @@ class PdoPool {
 	 * @param ?string $persistenceUnitName
 	 * @return Pdo
 	 */
-	public function getPdo(string $persistenceUnitName = null, PdoBindMode $pdoTmBindMode = PdoBindMode::FULL): Pdo {
+	public function getPdo(?string $persistenceUnitName = null, PdoBindMode $pdoTmBindMode = PdoBindMode::FULL): Pdo {
 		if ($persistenceUnitName === null) {
 			$persistenceUnitName = self::DEFAULT_DS_NAME;
 		}

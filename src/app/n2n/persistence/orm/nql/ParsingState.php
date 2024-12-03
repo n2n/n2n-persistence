@@ -81,7 +81,7 @@ class ParsingState {
 		array_pop($this->tokenizerStack);
 	}
 	
-	public function createNqlParseException($message, $donePart = null, \Exception $previous = null) {
+	public function createNqlParseException($message, $donePart = null, ?\Exception $previous = null) {
 		$positionString = $donePart . implode('', array_reverse($this->tokenizerStack));
 		if (!empty($positionString)) {
 			$positionString = '. Position: \'' . $positionString . '\'';

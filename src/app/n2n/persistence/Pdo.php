@@ -271,7 +271,7 @@ class Pdo implements Dbo {
 		}
 	}
 
-	private function performBeginTransaction(Transaction $transaction = null, bool $readOnly = false): void {
+	private function performBeginTransaction(?Transaction $transaction = null, bool $readOnly = false): void {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_BEGIN, $transaction);
 
 		IllegalStateException::assertTrue(!$this->pdo()->inTransaction(),
@@ -288,12 +288,12 @@ class Pdo implements Dbo {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_BEGAN, $transaction);
 	}
 
-	private function prepareCommit(Transaction $transaction = null): bool {
+	private function prepareCommit(?Transaction $transaction = null): bool {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_COMMIT, $transaction);
 		return true;
 	}
 
-	private function performCommit(Transaction $transaction = null): void {
+	private function performCommit(?Transaction $transaction = null): void {
 		$mtime = microtime(true);
 
 		$preErr = error_get_last();
@@ -311,7 +311,7 @@ class Pdo implements Dbo {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_COMMITTED, $transaction);
 	}
 
-	private function performRollBack(Transaction $transaction = null): void {
+	private function performRollBack(?Transaction $transaction = null): void {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_ROLL_BACK, $transaction);
 		$mtime = microtime(true);
 		$this->pdo()->rollBack();
@@ -331,7 +331,7 @@ class Pdo implements Dbo {
 		return $this->dialect->quoteField($field);
 	}
 
-	function lastInsertId(string $name = null) {
+	function lastInsertId(?string $name = null) {
 		return $this->pdo()->lastInsertId($name);
 	}
 // 	/**
@@ -348,7 +348,7 @@ class Pdo implements Dbo {
 		return $this->metaData;
 	}
 
-	private function triggerTransactionEvent($type, Transaction $transaction = null) {
+	private function triggerTransactionEvent($type, ?Transaction $transaction = null) {
 		$e = new TransactionEvent($type, $transaction);
 		foreach ($this->listeners as $listener) {
 			$listener->onTransactionEvent($e);
@@ -399,7 +399,7 @@ class TransactionEvent {
 	private $type;
 	private $transaction;
 
-	public function __construct($type, Transaction $transaction = null) {
+	public function __construct($type, ?Transaction $transaction = null) {
 		$this->type = $type;
 		$this->transaction = $transaction;
 	}

@@ -49,7 +49,7 @@ class Event extends ObjectAdapter {
 		return $this->dateTo;
 	}
 	
-	public function setDateTo(\DateTime $dateTo = null) {
+	public function setDateTo(?\DateTime $dateTo = null) {
 		$this->dateTo = $dateTo;
 	}
 	

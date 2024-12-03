@@ -27,27 +27,27 @@ interface NamingStrategy {
 	 * @param string $tableName
 	 * @return string
 	 */
-	public function buildTableName(\ReflectionClass $class, string $tableName = null): string;
+	public function buildTableName(\ReflectionClass $class, ?string $tableName = null): string;
 	/**
 	 * @param \ReflectionClass $class1
 	 * @param \ReflectionClass $class2
 	 * @param string $tableName
 	 * @return string
 	 */
-	public function buildJunctionTableName(string $ownerTableName, string $propertyName, string $tableName = null): string;
+	public function buildJunctionTableName(string $ownerTableName, string $propertyName, ?string $tableName = null): string;
 	/**
 	 * @param string $propertyName
 	 * @param string $columnName
 	 * @return string
 	 */
-	public function buildColumnName(string $propertyName, string $columnName = null): string;
+	public function buildColumnName(string $propertyName, ?string $columnName = null): string;
 	/**
 	 * @param \ReflectionClass $targetClass
 	 * @param string $targetIdPropertyName
 	 * @return string
 	 */
 	public function buildJunctionJoinColumnName(\ReflectionClass $targetClass, string $targetIdPropertyName, 
-			string $joinColumnName = null): string;
+			?string $joinColumnName = null): string;
 	/**
 	 * @param string $propertyName
 	 * @param string $targetIdPropertyName
@@ -55,5 +55,5 @@ interface NamingStrategy {
 	 * @return string
 	 */
 	public function buildJoinColumnName(string $propertyName, string $targetIdPropertyName, 
-			string $joinColumnName = null): string;
+			?string $joinColumnName = null): string;
 }

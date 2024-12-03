@@ -29,7 +29,7 @@ class NqlParseException extends OrmException implements QueryStumble {
 	private $queryString;
 	private $boundValues;
 	
-	public function __construct($message, $code, $previous, $queryString, array $boundValues = null) {
+	public function __construct($message, $code, $previous, $queryString, ?array $boundValues = null) {
 		parent::__construct($message, $code, $previous);
 		$this->queryString = $queryString;
 		$this->boundValues = $boundValues;

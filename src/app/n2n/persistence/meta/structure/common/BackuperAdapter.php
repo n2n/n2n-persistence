@@ -58,7 +58,7 @@ abstract class BackuperAdapter implements Backuper {
 	 */
 	private $outputStream;
 
-	public function __construct(Pdo $dbh, Database $database, array $metaEntities = null) {
+	public function __construct(Pdo $dbh, Database $database, ?array $metaEntities = null) {
 		$this->dbh = $dbh;
 		$this->dialect = $dbh->getMetaData()->getDialect();
 		$this->database = $database;
@@ -68,7 +68,7 @@ abstract class BackuperAdapter implements Backuper {
 		$this->replaceTableEnabled = true;
 	}
 
-	public function setMetaEntities(array $metaEntities = null) {
+	public function setMetaEntities(?array $metaEntities = null) {
 		$this->metaEntities = $metaEntities;
 	}
 

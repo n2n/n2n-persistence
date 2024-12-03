@@ -104,7 +104,7 @@
 // 	 * @param int $num
 // 	 * @return \n2n\persistence\orm\criteria\Criteria
 // 	 */
-// 	public function createSimpleCriteria(\ReflectionClass $class, array $matches = null, array $order = null, $limit = null, $num = null) {
+// 	public function createSimpleCriteria(\ReflectionClass $class, ?array $matches = null, ?array $order = null, $limit = null, $num = null) {
 // 		$criteria = $this->createCriteria($class, self::SIMPLE_CRITERIA_ENTITY_ALIAS);
 	
 // 		$whereSelector = $criteria->where();

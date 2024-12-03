@@ -52,7 +52,7 @@ class ActionQueueImpl implements ActionQueue {
 
 	const MAGIC_ENTITY_OBJ_PARAM = 'entityObj';
 
-	public function __construct(EntityManager $em, MagicContext $magicContext = null) {
+	public function __construct(EntityManager $em, ?MagicContext $magicContext = null) {
 		$this->em = $em;
 		$this->magicContext = $magicContext;
 		$this->persistActionPool = new PersistActionPool($this);

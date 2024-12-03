@@ -31,8 +31,8 @@ class ComparisonStrategy {
 	private $columnComparable;
 	private $customComparable;
 	
-	public function __construct(ColumnComparable $columnComparable = null, 
-			CustomComparable $customComparable = null) {
+	public function __construct(?ColumnComparable $columnComparable = null,
+			?CustomComparable $customComparable = null) {
 		if ($columnComparable === null && $customComparable === null) {
 			throw new \InvalidArgumentException('No comparable defined for ComparisonStrategy.');
 		}

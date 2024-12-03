@@ -63,7 +63,7 @@ class EntityObjSelection implements Selection {
 		$this->selectionGroup->bindColumns($stmt, $columnAliases);
 	}
 	
-	protected function assembleValueBuilders(EntityModel &$entityModel = null) {
+	protected function assembleValueBuilders(?EntityModel &$entityModel = null) {
 		$discrSelection = $this->selectionGroup->getSelectionByKey(null);
 		$entityModel = $discrSelection->determineEntityModel();
 		

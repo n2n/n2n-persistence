@@ -43,7 +43,7 @@ class ClassSetup {
 	private $parentPropertyName;
 
 	public function __construct(SetupProcess $setupProcess, \ReflectionClass $class,
-			NamingStrategy $namingStrategy, ClassSetup $parentClassSetup = null, $parentPropertyName = null) {
+			NamingStrategy $namingStrategy, ?ClassSetup $parentClassSetup = null, $parentPropertyName = null) {
 		$this->setupProcess = $setupProcess;
 		$this->class = $class;
 		$this->attributeSet = ReflectionContext::getAttributeSet($this->class);
@@ -70,7 +70,7 @@ class ClassSetup {
 		return $this->class;
 	}
 
-// 	public function setParentClassSetup(ClassSetup $parentClassSetup = null) {
+// 	public function setParentClassSetup(?ClassSetup $parentClassSetup = null) {
 // 		$this->parentClassSetup = $parentClassSetup;
 // 	}
 	/**
@@ -134,7 +134,7 @@ class ClassSetup {
 	 * @param array $causingComponents
 	 * @return \Exception
 	 */
-	public function createException($message, \Exception $causingE = null,
+	public function createException($message, ?\Exception $causingE = null,
 			array $causingComponents = array()) {
 		return SetupProcess::createPropertyException($message, $causingE, $causingComponents);
 	}
@@ -182,7 +182,7 @@ class ClassSetup {
 	 * @param array $relatedComponents
 	 * @return string
 	 */
-	public function requestColumn(string $propertyName, string $columnName = null, array $relatedComponents = array()) {
+	public function requestColumn(string $propertyName, ?string $columnName = null, array $relatedComponents = array()) {
 		$determineColumnName = $this->determineColumnName($propertyName, $columnName === null, $relatedComponents);
 		if ($columnName === null) {
 			$columnName = $determineColumnName;
@@ -195,7 +195,7 @@ class ClassSetup {
 		return $columnName;
 	}
 
-	public function requestJoinColumn(string $propertyName, string $targetIdPropertyName, string $joinColumnName = null, array $relatedComponents = array()) {
+	public function requestJoinColumn(string $propertyName, string $targetIdPropertyName, ?string $joinColumnName = null, array $relatedComponents = array()) {
 		$this->determineColumnName($propertyName, false, $relatedComponents);
 
 		$columnName = $this->namingStrategy->buildJoinColumnName($propertyName, $targetIdPropertyName, $joinColumnName);

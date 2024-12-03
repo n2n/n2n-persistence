@@ -118,7 +118,7 @@ class EntityModelFactory {
 	 * @param EntityModel $superEntityModel
 	 * @return EntityModel
 	 */
-	public function create(ReflectionClass $entityClass, EntityModel $superEntityModel = null) {
+	public function create(ReflectionClass $entityClass, ?EntityModel $superEntityModel = null) {
 		$attributeSet = ReflectionContext::getAttributeSet($entityClass);
 
 		if (null !== $attributeSet->getClassAttribute(MappedSuperclass::class)) {

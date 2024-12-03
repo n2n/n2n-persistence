@@ -117,7 +117,7 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 		}
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, QueryComparator $onComparator = null) {
+	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, ?QueryComparator $onComparator = null) {
 // 		$this->applySelection($selectBuilder);
 		
 		if (count($this->tableAliases) == 1) {

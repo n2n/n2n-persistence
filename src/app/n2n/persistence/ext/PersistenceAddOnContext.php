@@ -27,7 +27,7 @@ class PersistenceAddOnContext implements AddOnContext {
 		return $this->simpleMagicContext->has($id);
 	}
 
-	function lookupMagicObject(string $id, bool $required = true, string $contextNamespace = null): mixed {
+	function lookupMagicObject(string $id, bool $required = true, ?string $contextNamespace = null): mixed {
 		$this->ensureNotFinalized();
 
 		return $this->simpleMagicContext->lookup($id, false, $contextNamespace);

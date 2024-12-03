@@ -54,7 +54,7 @@ class EntityModel implements EntityPropertyCollection {
 	private $subEntityModels = array();
 	private $actionDependencies = array();
 	
-	public function __construct(\ReflectionClass $class, EntityModel $superEntityModel = null) {
+	public function __construct(\ReflectionClass $class, ?EntityModel $superEntityModel = null) {
 		$this->class = $class;
 		$this->superEntityModel = $superEntityModel;
 		

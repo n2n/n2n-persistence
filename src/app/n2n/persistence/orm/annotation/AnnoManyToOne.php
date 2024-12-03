@@ -28,8 +28,8 @@ use n2n\reflection\attribute\legacy\LegacyAnnotation;
  * @deprecated use { @link ManyToOne }
  */
 class AnnoManyToOne extends OrmRelationAnnotation implements LegacyAnnotation {
-	public function __construct(\ReflectionClass $targetEntityClass, int $cascadeType = null, 
-			string $fetchType = null) {
+	public function __construct(\ReflectionClass $targetEntityClass, ?int $cascadeType = null,
+			?string $fetchType = null) {
 		if (3 < count(func_get_args())) {
 			throw new \InvalidArgumentException('Maximum parameter number for AnnoManyToOne is 3.');
 		}

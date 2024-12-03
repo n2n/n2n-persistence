@@ -39,7 +39,7 @@ class AnnoAssociationOverrides implements ClassAnnotation, PropertyAnnotation, L
 	private $annoJoinColumns;
 	private $annoJoinTables;
 	
-	public function __construct(array $annoJoinColumns = null, array $annoJoinTables = null) {
+	public function __construct(?array $annoJoinColumns = null, ?array $annoJoinTables = null) {
 		$this->annoJoinColumns = (array) $annoJoinColumns;
 		ArgUtils::valArray($this->annoJoinColumns, 'n2n\persistence\orm\annotation\AnnoJoinColumn');
 

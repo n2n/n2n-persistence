@@ -28,7 +28,7 @@ class DialectMock implements Dialect {
 		throw new UnsupportedOperationException();
 	}
 
-	function createPDO(PdoLogger $pdoLogger = null): \PDO {
+	function createPDO(?PdoLogger $pdoLogger = null): \PDO {
 		return new \PDO($this->persistenceUnitConfig->getDsnUri(), $this->persistenceUnitConfig->getUser(),
 				$this->persistenceUnitConfig->getPassword(),
 				[\PDO::ATTR_PERSISTENT => $this->persistenceUnitConfig->isPersistent()]);
@@ -88,7 +88,7 @@ class DialectMock implements Dialect {
 
 	public array $beginTransactionCalls = [];
 
-	function beginTransaction(\PDO $pdo, bool $readOnly, PdoLogger $pdoLogger = null): void {
+	function beginTransaction(\PDO $pdo, bool $readOnly, ?PdoLogger $pdoLogger = null): void {
 		$this->beginTransactionCalls[] = ['method' => 'beginTransaction', 'readOnly' => $readOnly];
 
 		PDOOperations::beginTransaction($pdoLogger, $pdo);

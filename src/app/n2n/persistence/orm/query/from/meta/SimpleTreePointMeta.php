@@ -81,7 +81,7 @@ class SimpleTreePointMeta extends TreePointMetaAdapter {
 		$selectStatementBuilder->addFrom(new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias);
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, QueryComparator $onComparator = null) {
+	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, ?QueryComparator $onComparator = null) {
 		$this->applySelection($selectStatementBuilder);
 
 		return $selectStatementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias, $onComparator);

@@ -25,19 +25,19 @@ use n2n\util\StringUtils;
 	  
 class HyphenatedNamingStrategy implements NamingStrategy {
 	
-	public function buildTableName(\ReflectionClass $class, string $tableName = null): string {
+	public function buildTableName(\ReflectionClass $class, ?string $tableName = null): string {
 		if ($tableName !== null) return $tableName;
 		
 		return StringUtils::hyphenated($class->getShortName());
 	}
 	
-	public function buildJunctionTableName(string $ownerTableName, string $propertyName, string $tableName = null): string {
+	public function buildJunctionTableName(string $ownerTableName, string $propertyName, ?string $tableName = null): string {
 		if ($tableName !== null) return $tableName;
 		
 		return StringUtils::hyphenated($ownerTableName . ucfirst($propertyName));
 	}
 	
-	public function buildColumnName(string $propertyName, string $columnName = null): string {
+	public function buildColumnName(string $propertyName, ?string $columnName = null): string {
 		if ($columnName !== null) return $columnName;
 		
 		return StringUtils::hyphenated($propertyName);
@@ -46,7 +46,7 @@ class HyphenatedNamingStrategy implements NamingStrategy {
 	 * @see \n2n\persistence\orm\model\NamingStrategy::buildJunctionJoinColumnName()
 	 */
 	public function buildJunctionJoinColumnName(\ReflectionClass $targetClass, string $targetIdPropertyName, 
-			string $joinColumnName = null): string {
+			?string $joinColumnName = null): string {
 		if ($joinColumnName !== null) return $joinColumnName;
 		
 		return StringUtils::hyphenated($targetClass->getShortName() . ucfirst($targetIdPropertyName));
@@ -54,7 +54,7 @@ class HyphenatedNamingStrategy implements NamingStrategy {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\model\NamingStrategy::buildJoinColumnName()
 	 */
-	public function buildJoinColumnName(string $propertyName, string $targetIdPropertyName, string $joinColumnName = null): string {
+	public function buildJoinColumnName(string $propertyName, string $targetIdPropertyName, ?string $joinColumnName = null): string {
 		if ($joinColumnName !== null) return $joinColumnName;
 
 		return StringUtils::hyphenated($propertyName . ucfirst($targetIdPropertyName));

@@ -55,7 +55,7 @@ interface Dialect {
 	 * @return \PDO
 	 * @throws \PDOException
 	 */
-	function createPDO(PdoLogger $pdoLogger = null): \PDO;
+	function createPDO(?PdoLogger $pdoLogger = null): \PDO;
 
 	/**
 	 * Starts a new transaction and applies necessary Transaction Isolation Level or/and Access Mode for this transaction.
@@ -65,7 +65,7 @@ interface Dialect {
 	 * @param bool $readOnly
 	 * @return void
 	 */
-	function beginTransaction(\PDO $pdo, bool $readOnly, PdoLogger $pdoLogger = null): void;
+	function beginTransaction(\PDO $pdo, bool $readOnly, ?PdoLogger $pdoLogger = null): void;
 
 	/**
 	 * @param Pdo $dbh

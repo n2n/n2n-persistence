@@ -11,7 +11,7 @@ use n2n\core\ext\N2nMonitor;
 class PdoFactory {
 
 	static function createFromPersistenceUnitConfig(PersistenceUnitConfig $persistenceUnitConfig,
-			TransactionManager $transactionManager = null, float $slowQueryTime = null, N2nMonitor $n2nMonitor = null,
+			?TransactionManager $transactionManager = null, ?float $slowQueryTime = null, ?N2nMonitor $n2nMonitor = null,
 			PdoBindMode $pdoTransactionManagerBindMode = PdoBindMode::FULL): Pdo {
 		$dialectClass = ReflectionUtils::createReflectionClass($persistenceUnitConfig->getDialectClassName());
 		if (!$dialectClass->implementsInterface('n2n\\persistence\\meta\\Dialect')) {

@@ -33,7 +33,7 @@ class PersistSupplyJob extends SupplyJobAdapter {
 	private $valueHashCol = null;
 	private $prepared = false;
 
-	public function __construct(private PersistAction $persistAction, ValueHashCol $oldValueHashCol = null) {
+	public function __construct(private PersistAction $persistAction, ?ValueHashCol $oldValueHashCol = null) {
 		parent::__construct($persistAction, $oldValueHashCol);
 	}
 

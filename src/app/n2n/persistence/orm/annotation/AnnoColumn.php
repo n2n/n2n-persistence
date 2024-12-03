@@ -36,8 +36,8 @@ class AnnoColumn implements PropertyAnnotation, LegacyAnnotation {
 	
 	private $name;
 
-	public function __construct(string $name = null, bool $nullable = true, int $length = null, 
-			int $percision = null, int $scale = null) {
+	public function __construct(?string $name = null, bool $nullable = true, ?int $length = null,
+			?int $percision = null, ?int $scale = null) {
 		$this->name = $name;
 	}
 	

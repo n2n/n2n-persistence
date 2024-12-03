@@ -23,19 +23,19 @@ namespace n2n\persistence\orm\model;
 
 class LowercasedNamingStrategy implements NamingStrategy {
 	
-	public function buildTableName(\ReflectionClass $class, string $tableName = null): string {
+	public function buildTableName(\ReflectionClass $class, ?string $tableName = null): string {
 		if ($tableName !== null) return $tableName;
 	
 		return mb_strtolower($class->getShortName());
 	}
 	
-	public function buildJunctionTableName(string $ownerTableName, string $propertyName, string $tableName = null): string {
+	public function buildJunctionTableName(string $ownerTableName, string $propertyName, ?string $tableName = null): string {
 		if ($tableName !== null) return $tableName;
 	
 		return $ownerTableName . mb_strtolower($propertyName);
 	}
 	
-	public function buildColumnName(string $propertyName, string $columnName = null): string {
+	public function buildColumnName(string $propertyName, ?string $columnName = null): string {
 		if ($columnName !== null) return $columnName;
 	
 		return mb_strtolower($propertyName);
@@ -44,13 +44,13 @@ class LowercasedNamingStrategy implements NamingStrategy {
 	 * @see \n2n\persistence\orm\model\NamingStrategy::buildJunctionJoinColumnName()
 	 */
 	public function buildJunctionJoinColumnName(\ReflectionClass $targetClass, string $targetIdPropertyName,
-			string $joinColumnName = null): string {
+			?string $joinColumnName = null): string {
 		if ($joinColumnName !== null) return $joinColumnName;
 	
 		return mb_strtolower($targetClass->getShortName() . $targetIdPropertyName);
 	}
 	
-	public function buildJoinColumnName(string $propertyName, string $targetIdPropertyName, string $joinColumnName = null): string {
+	public function buildJoinColumnName(string $propertyName, string $targetIdPropertyName, ?string $joinColumnName = null): string {
 		if ($joinColumnName !== null) return $joinColumnName;
 		
 		return mb_strtolower($propertyName . $targetIdPropertyName);

@@ -28,8 +28,8 @@ use n2n\reflection\attribute\legacy\LegacyAnnotation;
  * @deprecated use { @link ManyToMany }
  */
 class AnnoManyToMany extends MappableOrmRelationAnnotation implements LegacyAnnotation {
-	public function __construct(\ReflectionClass $targetEntityClass, string $mappedBy = null,
-			int $cascadeType = null, string $fetchType = null) {
+	public function __construct(\ReflectionClass $targetEntityClass, ?string $mappedBy = null,
+			?int $cascadeType = null, ?string $fetchType = null) {
 		
 		parent::__construct($targetEntityClass, $mappedBy, $cascadeType, $fetchType);
 	}

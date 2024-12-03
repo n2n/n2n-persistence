@@ -138,7 +138,7 @@ class PersistActionPool {
 		$this->actionQueue->add($persistAction);
 	}
 	
-	private function createPersistAction($entity, EntityInfo $entityInfo, LifecycleEvent &$prePersistEvent = null) {
+	private function createPersistAction($entity, EntityInfo $entityInfo, ?LifecycleEvent &$prePersistEvent = null) {
 		$entityModel = $entityInfo->getEntityModel();
 		
 		switch ($entityInfo->getState()) {
@@ -194,7 +194,7 @@ class PersistActionPool {
 		return $this->persistActions;
 	}
 	
-	private function manage(PersistActionAdapter $persistAction, LifecycleEvent &$prePersistEvent = null): void {
+	private function manage(PersistActionAdapter $persistAction, ?LifecycleEvent &$prePersistEvent = null): void {
 		$entityModel = $persistAction->getEntityModel();
 		$entity = $persistAction->getEntityObj();
 		

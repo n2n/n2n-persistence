@@ -36,7 +36,7 @@ interface OrmDialectConfig {
 	 * @param \DateTime $dateTime
 	 * @return string
 	 */
-	public function buildDateTimeRawValue(\DateTime $dateTime = null);
+	public function buildDateTimeRawValue(?\DateTime $dateTime = null);
 	/**
 	 * @return string
 	 */

@@ -221,7 +221,7 @@ class Criteria {
 	 * @throws CriteriaConflictException
 	 */
 	private function preparePropertyJoin($propertyExpression, string $alias, $joinType = JoinType::INNER, bool $fetch = false, 
-			CriteriaComparator $onCriteriaComparator = null) {
+			?CriteriaComparator $onCriteriaComparator = null) {
 		$criteriaProperty = CrIt::p($propertyExpression);
 		$this->validateAlias($alias);
 		if ($joinType === null) {
@@ -321,7 +321,7 @@ class Criteria {
 	 * @param int $num
 	 * @return Criteria
 	 */
-	public function limit(int $limit = null, int $num = null): static {
+	public function limit(?int $limit = null, ?int $num = null): static {
 		$this->limit = $limit;
 		$this->num = $num;
 		return $this;
@@ -357,7 +357,7 @@ class Criteria {
 		return array(self::ORDER_DIRECTION_ASC, self::ORDER_DIRECTION_DESC);
 	}
 	
-	protected function createQueryModel(QueryState $queryState, QueryPointResolver $inheritedQueryPointResolver = null) {
+	protected function createQueryModel(QueryState $queryState, ?QueryPointResolver $inheritedQueryPointResolver = null) {
 		$tree = new Tree($queryState);
 		$tree->setInheritedQueryPointResolver($inheritedQueryPointResolver);
 		

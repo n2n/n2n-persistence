@@ -37,7 +37,7 @@ abstract class TreePointMetaAdapter implements TreePointMeta {
 		$this->idColumnName = $entityModel->getIdDef()->getEntityProperty()->getColumnName();
 	}
 
-	public function setMetaGenerator(MetaGenerator $metaGenerator = null) {
+	public function setMetaGenerator(?MetaGenerator $metaGenerator = null) {
 		$this->metaGenerator = $metaGenerator;
 	}
 

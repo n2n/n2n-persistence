@@ -294,7 +294,7 @@ class QueryComparatorBuilder {
 	}
 	
 	private function createIncompatibleCriteriaItemsException(CriteriaItem $item1, $operator,
-			CriteriaItem $item2, \Exception $previous = null) {
+			CriteriaItem $item2, ?\Exception $previous = null) {
 		return new CriteriaConflictException('Invalid comparison: ' . $item1->__toString() . ' ' 
 				. $operator . ' ' . $item2->__toString(), 0, $previous);
 	}

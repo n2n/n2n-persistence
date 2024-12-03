@@ -53,7 +53,7 @@ class QueryComparator implements ComparisonBuilder {
 	private $firstComparison = null;
 	private $lastComparison = null;
 	
-	public function __construct(QueryComparator $parentSelector = null) {
+	public function __construct(?QueryComparator $parentSelector = null) {
 		$this->parentSelector = $parentSelector;
 	}
 	
@@ -106,7 +106,7 @@ class QueryComparator implements ComparisonBuilder {
 		return $this;
 	}
 	
-	public function group(ComparisonBuilder $queryComparator = null, bool $useAnd = true): ComparisonBuilder {
+	public function group(?ComparisonBuilder $queryComparator = null, bool $useAnd = true): ComparisonBuilder {
 		if ($useAnd) {
 			return $this->andGroup($queryComparator);
 		} else {
@@ -114,13 +114,13 @@ class QueryComparator implements ComparisonBuilder {
 		}
 	}
 	
-	public function andGroup(ComparisonBuilder $queryComparator = null): ComparisonBuilder {
+	public function andGroup(?ComparisonBuilder $queryComparator = null): ComparisonBuilder {
 		if (is_null($queryComparator)) $queryComparator = new QueryComparator();
 		$this->addComparison(true, new ComparisonGroup($queryComparator));
 		return $queryComparator;
 	}
 	
-	public function orGroup(ComparisonBuilder $queryComparator = null): ComparisonBuilder {
+	public function orGroup(?ComparisonBuilder $queryComparator = null): ComparisonBuilder {
 		if (is_null($queryComparator)) $queryComparator = new QueryComparator();
 		$this->addComparison(false, new ComparisonGroup($queryComparator));
 		return $queryComparator;

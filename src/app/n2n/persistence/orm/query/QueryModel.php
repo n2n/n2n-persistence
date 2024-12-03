@@ -95,7 +95,7 @@ class QueryModel {
 	/**
 	 * @param QueryComparator $queryComparator
 	 */
-	public function setWhereQueryComparator(QueryComparator $queryComparator = null) {
+	public function setWhereQueryComparator(?QueryComparator $queryComparator = null) {
 		$this->whereQueryComparator = $queryComparator;	
 	}
 	/**
@@ -110,7 +110,7 @@ class QueryModel {
 		$this->groupQueryItems[] = $queryItem;
 	}
 
-	public function setHavingQueryComparator(QueryComparator $queryComparator = null) {
+	public function setHavingQueryComparator(?QueryComparator $queryComparator = null) {
 		$this->havingQueryComparator = $queryComparator;
 	}
 	
