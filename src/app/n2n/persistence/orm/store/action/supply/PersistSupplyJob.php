@@ -24,7 +24,6 @@ namespace n2n\persistence\orm\store\action\supply;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\PersistenceOperationException;
-use n2n\persistence\orm\property\CascadableEntityProperty;
 use n2n\persistence\orm\store\ValueHashCol;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\ValueHashColFactory;
@@ -83,16 +82,24 @@ class PersistSupplyJob extends SupplyJobAdapter {
 
 		$new = $this->isInsert();
 
+		$entityModel = $this->entityAction->getEntityModel();
+		$idDef = $entityModel->getIdDef();
+		$idPropertyString = $idDef->getEntityProperty()->toPropertyString();
+
 //		$this->persistAction->getMeta()->unmarkAllChanges();
 		foreach ($this->entityAction->getEntityModel()->getEntityProperties() as $entityProperty) {
-			if (!($entityProperty instanceof CascadableEntityProperty)) continue;
-
 			$propertyString = $entityProperty->toPropertyString();
+			if ($idPropertyString === $propertyString && ($idDef->isGenerated() || !$this->entityAction->isNew())) {
+				continue;
+			}
 			
 			$oldValueHash = null;
 			if (!$new) {
 				$oldValueHash = $this->getOldValueHash($propertyString);
-				if ($oldValueHash->matches($this->getValueHash($propertyString))) continue;
+				if ($oldValueHash->matches($this->getValueHash($propertyString))) {
+					$this->persistAction->getMeta()->unmarkChange($entityProperty);
+					continue;
+				}
 			}
 		
 			$entityProperty->prepareSupplyJob($this, $this->values[$propertyString], $oldValueHash);
@@ -100,7 +107,7 @@ class PersistSupplyJob extends SupplyJobAdapter {
 		}
 	}
 
-	private function validateId() {
+	private function validateId(): void {
 		if (null !== $this->entityAction->getId()) return;
 
 		$idDef = $this->entityAction->getEntityModel()->getIdDef();

@@ -69,6 +69,8 @@ interface ActionMeta {
 
 	function markChange(EntityProperty $entityProperty): void;
 
+	function unmarkChange(EntityProperty $entityProperty): void;
+
 	function getMarkedEntityProperties(): array;
 
 	/**

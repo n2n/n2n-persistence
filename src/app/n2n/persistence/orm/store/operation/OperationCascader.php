@@ -22,7 +22,6 @@
 namespace n2n\persistence\orm\store\operation;
 
 use n2n\persistence\orm\model\EntityModel;
-use n2n\persistence\orm\property\CascadableEntityProperty;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\CascadeType;
 use n2n\util\type\ArgUtils;
@@ -70,9 +69,7 @@ class OperationCascader {
 	private function traverse(EntityPropertyCollection $entityPropertyCollection, $entityObj,
 			?EntityProperty &$entityProperty = null) {
 		foreach ($entityPropertyCollection->getEntityProperties() as $entityProperty) {
-			if ($entityProperty instanceof CascadableEntityProperty) {
-				$this->cascade($entityProperty, $entityObj);
-			}
+			$this->cascade($entityProperty, $entityObj);
 
 			if ($entityProperty->hasEmbeddedEntityPropertyCollection()
 					&& null !== ($subEntityObj = $entityProperty->getEmbeddedCascadeEntityObj($entityObj))) {
@@ -81,7 +78,7 @@ class OperationCascader {
 		}
 	}
 
-	private function cascade(CascadableEntityProperty $entityProperty, $entityObj) {
+	private function cascade(EntityProperty $entityProperty, $entityObj) {
 		try {
 			$entityProperty->cascade($entityProperty->readValue($entityObj),
 					$this->cascadeType, $this->cascadeOperation);

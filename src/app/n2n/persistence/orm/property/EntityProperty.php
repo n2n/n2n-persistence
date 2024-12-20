@@ -32,6 +32,8 @@ use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\orm\store\action\supply\SupplyJob;
+use n2n\persistence\orm\store\operation\CascadeOperation;
 
 interface EntityProperty {
 	/**
@@ -87,6 +89,10 @@ interface EntityProperty {
 	 * @return mixed
 	 */
 	public function mergeValue(mixed $value, bool $sameEntity, MergeOperation $mergeOperation): mixed;
+
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void;
+
+	public function cascade(mixed $value, int $cascadeType, CascadeOperation $cascadeOperation): void;
 
 	/**
 	 * @param PersistAction $persistAction

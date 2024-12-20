@@ -24,6 +24,8 @@ use n2n\reflection\property\PropertyAccessException;
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\orm\store\action\supply\SupplyJob;
+use n2n\persistence\orm\store\operation\CascadeOperation;
 
 class EntityPropertyMock implements BasicEntityProperty {
 	private $entityModel;
@@ -201,5 +203,11 @@ class EntityPropertyMock implements BasicEntityProperty {
 
 	function ensureInit(): void {
 		throw new UnsupportedOperationException();
+	}
+
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
+	}
+
+	public function cascade(mixed $value, int $cascadeType, CascadeOperation $cascadeOperation): void {
 	}
 }
