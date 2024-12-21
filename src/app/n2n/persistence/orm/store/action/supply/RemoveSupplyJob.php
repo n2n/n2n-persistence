@@ -28,7 +28,7 @@ use n2n\persistence\orm\store\action\meta\ActionMeta;
 
 class RemoveSupplyJob extends SupplyJobAdapter {
 
-	public function __construct(RemoveAction $removeAction, ValueHashCol $oldValueHashCol) {
+	public function __construct(private RemoveAction $removeAction, ValueHashCol $oldValueHashCol) {
 		parent::__construct($removeAction, $oldValueHashCol);
 	}
 
@@ -62,7 +62,7 @@ class RemoveSupplyJob extends SupplyJobAdapter {
 		foreach ($this->entityAction->getEntityModel()->getEntityProperties() as $entityProperty) {
 			$propertyString = $entityProperty->toPropertyString();
 			$entityProperty->prepareSupplyJob($this, $this->getValue($propertyString), 
-					$this->getOldValueHash($propertyString));
+					null, $this->getOldValueHash($propertyString));
 		}
 	}
 
@@ -86,12 +86,12 @@ class RemoveSupplyJob extends SupplyJobAdapter {
 		
 		foreach ($entityModel->getEntityProperties() as $entityProperty) {
 			$propertyString = $entityProperty->toPropertyString();
-			$entityProperty->supplyRemoveAction($this->entityAction, $this->getValue($propertyString), 
+			$entityProperty->supplyRemoveAction($this->removeAction, $this->getValue($propertyString),
 					$this->getOldValueHash($propertyString));
 		}
 		
 		foreach ($entityModel->getActionDependencies() as $actionDependency) {
-			$actionDependency->removeActionSupplied($this->entityAction);
+			$actionDependency->removeActionSupplied($this->removeAction);
 		}
 	}
 }

@@ -27,10 +27,11 @@ use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\store\ValueHashCol;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\ValueHashColFactory;
+use n2n\persistence\orm\store\action\meta\ActionMeta;
 
 class PersistSupplyJob extends SupplyJobAdapter {
-	private $valueHashCol = null;
-	private $prepared = false;
+	private ?ValueHashCol $valueHashCol = null;
+	private bool $prepared = false;
 
 	public function __construct(private PersistAction $persistAction, ?ValueHashCol $oldValueHashCol = null) {
 		parent::__construct($persistAction, $oldValueHashCol);
@@ -39,7 +40,11 @@ class PersistSupplyJob extends SupplyJobAdapter {
 	public function getPersistAction() {
 		return $this->entityAction;
 	}
-	
+
+	function getActionMeta(): ?ActionMeta {
+		return $this->persistAction->getMeta();
+	}
+
 	public function isInsert() {
 		return $this->entityAction->isNew();
 	}
@@ -55,7 +60,7 @@ class PersistSupplyJob extends SupplyJobAdapter {
 	/**
 	 * @param ValueHashCol|null $valueHashCol
 	 */
-	public function setValueHashCol(?ValueHashCol $valueHashCol) {
+	public function setValueHashCol(?ValueHashCol $valueHashCol): void {
 		$this->valueHashCol = $valueHashCol;
 	}
 
@@ -92,17 +97,18 @@ class PersistSupplyJob extends SupplyJobAdapter {
 			if ($idPropertyString === $propertyString && ($idDef->isGenerated() || !$this->entityAction->isNew())) {
 				continue;
 			}
-			
+
+			$valueHash = $this->getValueHash($propertyString);
 			$oldValueHash = null;
 			if (!$new) {
 				$oldValueHash = $this->getOldValueHash($propertyString);
-				if ($oldValueHash->matches($this->getValueHash($propertyString))) {
+				if ($oldValueHash->matches($valueHash)) {
 					$this->persistAction->getMeta()->unmarkChange($entityProperty);
 					continue;
 				}
 			}
 		
-			$entityProperty->prepareSupplyJob($this, $this->values[$propertyString], $oldValueHash);
+			$entityProperty->prepareSupplyJob($this, $this->values[$propertyString], $valueHash, $oldValueHash);
 			$this->persistAction->getMeta()->markChange($entityProperty);
 		}
 	}
@@ -130,18 +136,18 @@ class PersistSupplyJob extends SupplyJobAdapter {
 		$idPropertyString = $idDef->getEntityProperty()->toPropertyString();
 		foreach ($entityModel->getEntityProperties() as $property) {
 			$propertyString = $property->toPropertyString();
-			if ($idPropertyString === $propertyString && ($idDef->isGenerated() || !$this->entityAction->isNew())) {
+			if ($idPropertyString === $propertyString && ($idDef->isGenerated() || !$this->persistAction->isNew())) {
 				continue;
 			}
 
 			$oldValueHash = null;
 			$valueHash = $this->getValueHash($propertyString);
-			if (!$this->entityAction->isNew()) {
+			if (!$this->persistAction->isNew()) {
 				$oldValueHash = $this->getOldValueHash($propertyString);
 				if ($oldValueHash->matches($valueHash)) continue;
 			}
 
-			$property->supplyPersistAction($this->entityAction, $this->getValue($propertyString), $valueHash, $oldValueHash);
+			$property->supplyPersistAction($this->persistAction, $this->getValue($propertyString), $valueHash, $oldValueHash);
 		}
 
 //		foreach ($entityModel->getActionDependencies() as $actionDependency) {
