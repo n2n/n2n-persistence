@@ -61,7 +61,8 @@ class ActionMetaUtil {
 
 	function containsChangesForAnyBut(EntityProperty $entityProperty): bool {
 		foreach ($this->actionMeta->getMarkedEntityProperties() as $markedEntityProperty) {
-			if (!$this->isEntityPropertyPartOf($entityProperty, $markedEntityProperty)) {
+			if (!$this->isEntityPropertyPartOf($entityProperty, $markedEntityProperty)
+					&& !$this->isEntityPropertyPartOf($markedEntityProperty, $entityProperty)) {
 				return true;
 			}
 		}
@@ -69,7 +70,8 @@ class ActionMetaUtil {
 		// probably no longer necessary to check items because SupplyJob already marks all changed EntityProperties
 		foreach ($this->actionMeta->getItems() as $item) {
 			foreach ($item->getEntityProperties() as $changedEntityProperty) {
-				if (!$this->isEntityPropertyPartOf($entityProperty, $changedEntityProperty)) {
+				if (!$this->isEntityPropertyPartOf($entityProperty, $changedEntityProperty)
+						&& !$this->isEntityPropertyPartOf($changedEntityProperty, $entityProperty)) {
 					return true;
 				}
 			}
