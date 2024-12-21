@@ -21,11 +21,16 @@
  */
 namespace n2n\persistence\orm\store\action\supply;
 
+use n2n\persistence\orm\store\action\meta\ActionMeta;
+
 interface SupplyJob {
 	/**
 	 * @return \n2n\persistence\orm\store\action\ActionQueue
 	 */
 	public function getActionQueue();
+
+	public function getActionMeta(): ?ActionMeta;
+
 	/**
 	 * @return boolean 
 	 */

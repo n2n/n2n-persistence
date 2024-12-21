@@ -205,7 +205,7 @@ class EntityPropertyMock implements BasicEntityProperty {
 		throw new UnsupportedOperationException();
 	}
 
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
+	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 	}
 
 	public function cascade(mixed $value, int $cascadeType, CascadeOperation $cascadeOperation): void {

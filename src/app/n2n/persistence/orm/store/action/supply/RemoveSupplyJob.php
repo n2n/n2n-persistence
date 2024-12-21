@@ -23,8 +23,8 @@ namespace n2n\persistence\orm\store\action\supply;
 
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\util\ex\IllegalStateException;
-use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\store\ValueHashCol;
+use n2n\persistence\orm\store\action\meta\ActionMeta;
 
 class RemoveSupplyJob extends SupplyJobAdapter {
 
@@ -32,19 +32,20 @@ class RemoveSupplyJob extends SupplyJobAdapter {
 		parent::__construct($removeAction, $oldValueHashCol);
 	}
 
-	public function getPersistAction() {
-		return $this->entityAction;
+
+	public function getActionMeta(): ?ActionMeta {
+		return null;
 	}
 	
-	public function isInsert() {
+	public function isInsert(): bool {
 		return false;
 	}
 	
-	public function isUpdate() {
+	public function isUpdate(): bool {
 		return false;
 	}
 	
-	public function isRemove() {
+	public function isRemove(): bool {
 		return true;
 	}
 

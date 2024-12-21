@@ -90,7 +90,7 @@ interface EntityProperty {
 	 */
 	public function mergeValue(mixed $value, bool $sameEntity, MergeOperation $mergeOperation): mixed;
 
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void;
+	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void;
 
 	public function cascade(mixed $value, int $cascadeType, CascadeOperation $cascadeOperation): void;
 
