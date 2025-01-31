@@ -65,9 +65,9 @@ abstract class ActionAdapter implements Action {
 		$this->dependents = $dependents;
 	}
 	
-	protected function executeDependents() {
+	protected function executeDependents(Pdo $pdo) {
 		foreach ($this->dependents as $actionJob) {
-			$actionJob->execute();
+			$actionJob->execute($pdo);
 		}
 	}
 
@@ -98,7 +98,7 @@ abstract class ActionAdapter implements Action {
 		$this->executed = true;
 		
 		$this->executingDependends = true;
-		$this->executeDependents();
+		$this->executeDependents($pdo);
 		$this->executingDependends = false;
 		
 		$this->triggerAtStartClosures();

@@ -23,6 +23,7 @@ namespace n2n\persistence\orm\store\action;
 
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\Pdo;
 
 class UninitializedPersistAction implements PersistAction {
 	private $entityModel;
@@ -82,7 +83,7 @@ class UninitializedPersistAction implements PersistAction {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\store\action\Action::execute()
 	 */
-	public function execute() {
+	public function execute(Pdo $pdo): void {
 		throw new UnsupportedOperationException();
 	}
 

@@ -182,6 +182,8 @@ class ActionQueueImpl implements ActionQueue {
 
 		$this->triggerAtStartClosures();
 
+		$this->flushing = true;
+
 		do {
 			do {
 				$this->persistActionPool->prepareSupplyJobs();
@@ -200,7 +202,6 @@ class ActionQueueImpl implements ActionQueue {
 		IllegalStateException::assertTrue(
 				$this->persistActionPool->isFrozend() && $this->removeActionPool->isFrozend(),
 				'Is not supplied nor frozen.');
-		$this->flushing = true;
 
 		uasort($this->actionJobs, fn (Action $aj1, Action $aj2) => $aj1->getPriority() - $aj2->getPriority());
 
