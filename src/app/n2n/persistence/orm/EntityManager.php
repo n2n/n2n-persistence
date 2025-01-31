@@ -131,10 +131,10 @@ interface EntityManager {
 
 	/**
 	 * Check if the instance is a managed entity instance belonging to the current persistence context. 
-	 * @param object $entity
+	 * @param object $entityObj
 	 * @return boolean indicating if entity is in persistence context 
 	 */
-	public function contains(object $entity): bool;
+	public function contains(object $entityObj): bool;
 
 	/**
 	 * Clear the persistence context, causing all managed entities to become detached. Changes made to entities that

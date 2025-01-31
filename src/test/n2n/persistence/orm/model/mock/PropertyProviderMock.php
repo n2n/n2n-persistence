@@ -9,7 +9,7 @@ use n2n\reflection\attribute\PropertyAttribute;
 use n2n\reflection\property\PropertyAccessProxy;
 
 class PropertyProviderMock implements EntityPropertyProvider {
-	public function setupPropertyIfSuitable(PropertyAccessProxy $propertyAccessProxy, ClassSetup $classSetup) {
+	public function setupPropertyIfSuitable(PropertyAccessProxy $propertyAccessProxy, ClassSetup $classSetup): void {
 		$classSetup->provideEntityProperty(new EntityPropertyMock($propertyAccessProxy),
 				array(PropertyAttribute::fromAttribute(
 				$propertyAccessProxy->getProperty()->getAttributes(Id::class)[0],

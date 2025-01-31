@@ -65,8 +65,8 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 			private bool $clearOnResourcesRelease = false) {
 		$this->emPool = $emPool;
 		$this->entityModelManager = $emPool->getEntityModelManager();
-		$this->persistenceContext = new PersistenceContext($emPool->getEntityProxyManager());
-		$this->actionQueue = new ActionQueueImpl($this, $emPool->getMagicContext());
+		$this->persistenceContext = new PersistenceContext($this->entityModelManager);
+		$this->actionQueue = new ActionQueueImpl($this->persistenceContext, $this, $emPool->getMagicContext());
 		$this->loadingQueue = new LoadingQueue($this->persistenceContext, $this->actionQueue);
 		$this->nqlParser = new NqlParser($this, $this->entityModelManager);
 	}
@@ -322,8 +322,9 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 		foreach ($this->persistenceContext->getManagedEntityObjs() as $entity) {
 			$persistOperation->cascade($entity);
 		}
-		
-		$this->actionQueue->flush();
+
+		$this->actionQueue->supply();
+		$this->actionQueue->flush($this->getPdo());
 	}
 	
 	public function close(): void {
@@ -345,10 +346,10 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\EntityManager::contains()
 	 */
-	public function contains($object): bool {
+	public function contains($entityObj): bool {
 		$this->ensureEntityManagerOpen();
 		
-		return $this->getPersistenceContext()->containsManagedEntityObj($object);
+		return $this->getPersistenceContext()->containsManagedEntityObj($entityObj);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\EntityManager::clear()

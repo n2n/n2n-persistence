@@ -32,9 +32,10 @@ use n2n\persistence\orm\LifecycleEvent;
 use n2n\persistence\orm\store\ValueHashColFactory;
 use n2n\persistence\orm\store\action\supply\PersistSupplyJob;
 use n2n\persistence\orm\store\operation\PersistOperation;
+use n2n\persistence\orm\proxy\EntityProxyManager;
 
 class PersistActionPool {
-	private $actionQueue;
+	private ActionQueue $actionQueue;
 	private $persistActions = array();
 	private $unsuppliedPersistActions = array();
 	private $persistSupplyJobs = array();
@@ -57,12 +58,11 @@ class PersistActionPool {
 			return $this->persistActions[$objHash];
 		}
 
-		$em = $this->actionQueue->getEntityManager();
-		$persistenceContext = $em->getPersistenceContext();
+		$persistenceContext = $this->actionQueue->getPersistenceContext();
 
 		if ($entity instanceof EntityProxy
-				&& !$persistenceContext->getEntityProxyManager()->isProxyInitialized($entity)) {
-			$entityInfo = $persistenceContext->getEntityInfo($entity, $em->getEntityModelManager());
+				&& !EntityProxyManager::getInstance()->isProxyInitialized($entity)) {
+			$entityInfo = $persistenceContext->getEntityInfo($entity);
 			return new UninitializedPersistAction($entityInfo->getEntityModel(), $entityInfo->getId());
 		}
 
@@ -120,11 +120,9 @@ class PersistActionPool {
 
 		IllegalStateException::assertTrue(!$this->frozen);
 
-		$em = $this->actionQueue->getEntityManager();
-		$persistenceContext = $em->getPersistenceContext();
+		$persistenceContext = $this->actionQueue->getPersistenceContext();
 
-		$entityInfo = $persistenceContext->getEntityInfo($entity,
-				$em->getEntityModelManager());
+		$entityInfo = $persistenceContext->getEntityInfo($entity);
 		$entityModel = $entityInfo->getEntityModel();
 
 		$prePersistEvent = null;
@@ -198,7 +196,7 @@ class PersistActionPool {
 		$entityModel = $persistAction->getEntityModel();
 		$entity = $persistAction->getEntityObj();
 
-		$persistenceContext = $this->actionQueue->getEntityManager()->getPersistenceContext();
+		$persistenceContext = $this->actionQueue->getPersistenceContext();
 		$persistenceContext->manageEntityObj($entity, $entityModel);
 
 		if ($persistAction->hasId()) {
@@ -319,11 +317,11 @@ class PersistActionPool {
 	private function checkDiff(PersistActionAdapter $persistAction) {
 		$entityModel = $persistAction->getEntityModel();
 		$entity = $persistAction->getEntityObj();
-		$hasher = new ValueHashColFactory($entityModel, $persistAction->getActionQueue()->getEntityManager());
+		$hasher = new ValueHashColFactory($entityModel, $persistAction->getActionQueue()->getMagicContext());
 
 		$values = array();
 		$valueHashCol = $hasher->create($entity, $values);
-		$oldValueHashCol = $this->actionQueue->getEntityManager()->getPersistenceContext()
+		$oldValueHashCol = $this->actionQueue->getPersistenceContext()
 				->getValueHashColByEntityObj($entity);
 
 		if ($valueHashCol->matches($oldValueHashCol)) {
@@ -346,7 +344,7 @@ class PersistActionPool {
 		$entityModel = $persistAction->getEntityModel();
 		$entity = $persistAction->getEntityObj();
 
-		$hasher = new ValueHashColFactory($entityModel, $this->actionQueue->getEntityManager());
+		$hasher = new ValueHashColFactory($entityModel, $this->actionQueue->getMagicContext());
 		$values = array();
 		$valueHashCol = $hasher->create($entity, $values);
 

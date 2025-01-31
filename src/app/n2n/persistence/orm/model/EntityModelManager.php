@@ -32,7 +32,7 @@ use n2n\reflection\ReflectionUtils;
 /**
  * Allowes you to access the {@see EntityModel} of each entity.
  */
-class EntityModelManager {
+class EntityModelManager implements EntityModelCollection {
 	private $entityClasses = null;
 	private $entityModels = array();
 	private bool $eagerInited = false;
@@ -161,9 +161,9 @@ class EntityModelManager {
 		});
 	}
 		
-	public function getEntityModelByEntityObj($entity) {		
-		$class = new \ReflectionClass($entity);
-		if ($entity instanceof EntityProxy) {
+	public function getEntityModelByEntityObj(object $entityObj): EntityModel {
+		$class = new \ReflectionClass($entityObj);
+		if ($entityObj instanceof EntityProxy) {
 			$class = $class->getParentClass();
 		}
 		return $this->getEntityModelByClass($class);

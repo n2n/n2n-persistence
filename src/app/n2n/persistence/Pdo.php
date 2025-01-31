@@ -344,7 +344,7 @@ class Pdo implements Dbo {
 	/**
 	 * @return \n2n\persistence\meta\MetaData
 	 */
-	public function getMetaData() {
+	public function getMetaData(): MetaData {
 		return $this->metaData;
 	}
 

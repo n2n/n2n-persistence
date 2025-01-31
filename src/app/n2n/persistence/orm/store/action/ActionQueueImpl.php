@@ -31,12 +31,17 @@ use n2n\persistence\orm\LifecycleUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\reflection\magic\MagicUtils;
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\store\PersistenceContext;
+use n2n\persistence\Pdo;
 
 class ActionQueueImpl implements ActionQueue {
 	protected $em;
 	protected $magicContext;
 	protected $actionQueueListeners = array();
-	protected $actionJobs = array();
+	/**
+	 * @var Action[]
+	 */
+	protected array $actionJobs = array();
 	protected $atStartClosures = array();
 	protected $atEndClosures = array();
 	protected $atPrepareCycleEndClosures = array();
@@ -52,7 +57,8 @@ class ActionQueueImpl implements ActionQueue {
 
 	const MAGIC_ENTITY_OBJ_PARAM = 'entityObj';
 
-	public function __construct(EntityManager $em, ?MagicContext $magicContext = null) {
+	public function __construct(private PersistenceContext $persistenceContext,
+			EntityManager $em, ?MagicContext $magicContext) {
 		$this->em = $em;
 		$this->magicContext = $magicContext;
 		$this->persistActionPool = new PersistActionPool($this);
@@ -62,6 +68,14 @@ class ActionQueueImpl implements ActionQueue {
 
 	public function getEntityManager() {
 		return $this->em;
+	}
+
+	function getMagicContext(): MagicContext {
+		return $this->magicContext;
+	}
+
+	function getPersistenceContext(): PersistenceContext {
+		return $this->persistenceContext;
 	}
 
 	public function removeAction($entity) {
@@ -125,15 +139,15 @@ class ActionQueueImpl implements ActionQueue {
 // 		};
 // 	}
 
-	public function executeAtStart(\Closure $closure) {
-		$this->atStartClosures[] = $closure;
-	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\store\Action::executeAtEnd()
-	 */
-	public function executeAtEnd(\Closure $closure) {
-		$this->atEndClosures[] = $closure;
-	}
+//	public function executeAtStart(\Closure $closure) {
+//		$this->atStartClosures[] = $closure;
+//	}
+//	/* (non-PHPdoc)
+//	 * @see \n2n\persistence\orm\store\Action::executeAtEnd()
+//	 */
+//	public function executeAtEnd(\Closure $closure) {
+//		$this->atEndClosures[] = $closure;
+//	}
 
 	public function executeAtPrepareCycleEnd(\Closure $closure) {
 		$this->atPrepareCycleEndClosures[] = $closure;
@@ -161,11 +175,10 @@ class ActionQueueImpl implements ActionQueue {
 		return true;
 	}
 
-	public function flush(): void {
+	function supply(): void {
 		IllegalStateException::assertTrue(
 				!$this->persistActionPool->isFrozend() && !$this->removeActionPool->isFrozend(),
-					'ActionQueue is already flushing and in a too advanced state to be further modified.');
-		$this->flushing = true;
+				'ActionQueue is already supplied and in a too advanced state to be further modified.');
 
 		$this->triggerAtStartClosures();
 
@@ -174,18 +187,25 @@ class ActionQueueImpl implements ActionQueue {
 				$this->persistActionPool->prepareSupplyJobs();
 			} while ($this->removeActionPool->prepareSupplyJobs() || $this->triggerAtPrepareCycleEndClosures());
 		} while ($this->triggerPreFinilizeAttempt()
-				&& ($this->persistActionPool->prepareSupplyJobs() || $this->removeActionPool->prepareSupplyJobs()));
+		&& ($this->persistActionPool->prepareSupplyJobs() || $this->removeActionPool->prepareSupplyJobs()));
 
 		$this->persistActionPool->freeze();
 		$this->removeActionPool->freeze();
 
 		$this->persistActionPool->supply();
 		$this->removeActionPool->supply();
+	}
+
+	public function flush(Pdo $pdo): void {
+		IllegalStateException::assertTrue(
+				$this->persistActionPool->isFrozend() && $this->removeActionPool->isFrozend(),
+				'Is not supplied nor frozen.');
+		$this->flushing = true;
 
 		uasort($this->actionJobs, fn (Action $aj1, Action $aj2) => $aj1->getPriority() - $aj2->getPriority());
 
 		while (null != ($job = array_shift($this->actionJobs))) {
-			$job->execute();
+			$job->execute($pdo);
 		}
 
 		$this->persistActionPool->clear();
@@ -201,7 +221,7 @@ class ActionQueueImpl implements ActionQueue {
 	}
 
 	public function commit() {
-		$this->em->getPersistenceContext()->detachNotManagedEntityObjs();
+		$this->persistenceContext->detachNotManagedEntityObjs();
 	}
 
 	public function clear(): void {

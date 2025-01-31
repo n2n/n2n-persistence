@@ -23,12 +23,17 @@ namespace n2n\persistence\orm\store\action;
 
 use n2n\persistence\orm\LifecycleEvent;
 use n2n\persistence\orm\LifecycleListener;
+use n2n\persistence\orm\store\PersistenceContext;
+use n2n\util\magic\MagicContext;
+use n2n\persistence\Pdo;
 
 interface ActionQueue {
+
+	function getMagicContext(): MagicContext;
 	/**
-	 * @return \n2n\persistence\orm\EntityManager 
+	 * @return PersistenceContext
 	 */
-	public function getEntityManager();
+	public function getPersistenceContext(): PersistenceContext;
 	/**
 	 * @param Action $action
 	 */
@@ -82,7 +87,7 @@ interface ActionQueue {
 	/**
 	 * 
 	 */
-	public function flush();
+	public function flush(Pdo $pdo);
 	
 	/**
 	 * 
@@ -94,15 +99,15 @@ interface ActionQueue {
 	 */
 	public function clear();
 	
-	/**
-	 * @param \Closure $closure
-	 */
-	public function executeAtStart(\Closure $closure);
-	
-	/**
-	 * @param \Closure $closure
-	 */
-	public function executeAtEnd(\Closure $closure);
+//	/**
+//	 * @param \Closure $closure
+//	 */
+//	public function executeAtStart(\Closure $closure);
+//
+//	/**
+//	 * @param \Closure $closure
+//	 */
+//	public function executeAtEnd(\Closure $closure);
 	
 	/**
 	 * @param \Closure $closure

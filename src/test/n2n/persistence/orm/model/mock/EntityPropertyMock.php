@@ -26,6 +26,7 @@ use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\store\operation\CascadeOperation;
+use n2n\util\magic\MagicContext;
 
 class EntityPropertyMock implements BasicEntityProperty {
 	private $entityModel;
@@ -193,7 +194,7 @@ class EntityPropertyMock implements BasicEntityProperty {
 		throw new UnsupportedOperationException();
 	}
 
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		throw new UnsupportedOperationException();
 	}
 

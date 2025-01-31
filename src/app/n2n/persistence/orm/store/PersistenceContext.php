@@ -37,6 +37,8 @@ use n2n\reflection\ObjectCreationFailedException;
 use n2n\persistence\orm\EntityCreationFailedException;
 use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\property\BasicEntityProperty;
+use n2n\persistence\orm\model\EntityModelCollection;
+use n2n\util\magic\MagicContext;
 
 class PersistenceContext {
 	private $entityProxyManager;
@@ -49,8 +51,8 @@ class PersistenceContext {
 	private $entityIdentifiers = array();
 	private $entityModels = array();
 	
-	public function __construct(EntityProxyManager $entityProxyManager) {
-		$this->entityProxyManager = $entityProxyManager;
+	public function __construct(private EntityModelCollection $entityModelCollection) {
+		$this->entityProxyManager = EntityProxyManager::getInstance();
 	}
 	/**
 	 * @return EntityProxyManager
@@ -83,7 +85,7 @@ class PersistenceContext {
 		return null;
 	}
 	
-	public function getEntityById(EntityModel $entityModel, $id) {
+	public function getEntityById(EntityModel $entityModel, mixed $id): ?object {
 		return $this->getEntityByIdRep($entityModel, 
 				$entityModel->getIdDef()->getEntityProperty()->valueToRep($id));
 	}
@@ -123,7 +125,7 @@ class PersistenceContext {
 	 * @param $entity
 	 * @return \n2n\persistence\orm\store\EntityInfo
 	 */
-	public function getEntityInfo($entityObj, EntityModelManager $entityModelManager) {
+	public function getEntityInfo($entityObj): EntityInfo {
 		ArgUtils::assertTrue(is_object($entityObj));
 		
 		$objectHash = spl_object_hash($entityObj);
@@ -142,7 +144,7 @@ class PersistenceContext {
 			return new EntityInfo(EntityInfo::STATE_REMOVED, $this->entityModels[$objectHash], $id);
 		}
 		
-		$entityModel = $entityModelManager->getEntityModelByEntityObj($entityObj);
+		$entityModel = $this->entityModelCollection->getEntityModelByEntityObj($entityObj);
 		$idDef = $entityModel->getIdDef();
 		$id = $idDef->getEntityProperty()->readValue($entityObj);
 	
@@ -214,9 +216,9 @@ class PersistenceContext {
 	 * @param EntityManager $em
 	 * @throws EntityProxyInitializationException
 	 * @throws LazyInitialisationException
-	 * @return EntityProxy
+	 * @return object|null
 	 */
-	public function getOrCreateEntityProxy(EntityModel $entityModel, $id, EntityManager $em) {
+	public function getOrCreateEntityProxy(EntityModel $entityModel, $id, EntityManager $em): ?object {
 		if ($id === null) return null;
 	
 		if (null !== ($entity = $this->getEntityById($entityModel, $id))) {
@@ -446,7 +448,7 @@ class PersistenceContext {
 	 * @throws IllegalStateException
 	 * @return ValueHashCol
 	 */
-	public function getValueHashColByEntityObj($entityObj) {
+	public function getValueHashColByEntityObj(object $entityObj): ValueHashCol {
 		$objectHash = spl_object_hash($entityObj);
 		
 		if (isset($this->entityValueHashCols[$objectHash])) {
@@ -461,15 +463,13 @@ class ValueHashColFactory {
 	private $entityPropertyCollection;
 	private $valueHashes = array();
 	private $values = array();
-	private $em;	
 	
 	/**
 	 * @param EntityPropertyCollection $entityPropertyCollection
-	 * @param EntityManager $em
+	 * @param MagicContext $magicContext
 	 */
-	public function __construct(EntityPropertyCollection $entityPropertyCollection, EntityManager $em) {
+	public function __construct(EntityPropertyCollection $entityPropertyCollection, private MagicContext $magicContext) {
 		$this->entityPropertyCollection = $entityPropertyCollection;
-		$this->em = $em;
 	}
 	
 	/**
@@ -519,20 +519,20 @@ class ValueHashColFactory {
 			
 			if (array_key_exists($propertyString, $this->values)) {
 				$valueHashCol->putValueHash($propertyString, $entityProperty->createValueHash(
-						$values[$propertyString] = $this->values[$propertyString], $this->em));
+						$values[$propertyString] = $this->values[$propertyString], $this->magicContext));
 				continue;
 			}
 
 			$valueHashCol->putValueHash($propertyString, $entityProperty->createValueHash(
-					$values[$propertyString] = $entityProperty->readValue($object), $this->em));
+					$values[$propertyString] = $entityProperty->readValue($object), $this->magicContext));
 		}
 		
 		return $valueHashCol;
 	}
 	
 	static function updateId(BasicEntityProperty $idEntityProperty, $idValue, ValueHashCol $valueHashCol, 
-			EntityManager $em) {
+			MagicContext $magicContext): void {
 		$valueHashCol->putValueHash($idEntityProperty->toPropertyString(), 
-				$idEntityProperty->createValueHash($idValue, $em));
+				$idEntityProperty->createValueHash($idValue, $magicContext));
 	}
 }

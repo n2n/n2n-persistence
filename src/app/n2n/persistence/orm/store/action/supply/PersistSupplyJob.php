@@ -156,15 +156,15 @@ class PersistSupplyJob extends SupplyJobAdapter {
 		
 		$that = $this;
 		$this->entityAction->executeAtEnd(function () use ($that) {
-			$em = $that->getActionQueue()->getEntityManager();
+			$magicContext = $that->getActionQueue()->getMagicContext();
 			$entityModel = $this->entityAction->getEntityModel();
 			
 			if ($this->entityAction->isNew() && $entityModel->getIdDef()->isGenerated()) {
 				$idEntityProperty = $this->entityAction->getEntityModel()->getIdDef()->getEntityProperty();
-				ValueHashColFactory::updateId($idEntityProperty, $this->entityAction->getId(), $that->valueHashCol, $em);
+				ValueHashColFactory::updateId($idEntityProperty, $this->entityAction->getId(), $that->valueHashCol, $magicContext);
 			}
-			
-			$em->getPersistenceContext()
+
+			$that->getActionQueue()->getPersistenceContext()
 					->updateValueHashes($that->entityAction->getEntityObj(), $that->valueHashCol);
 			
 		});

@@ -27,6 +27,7 @@ use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\persistence\orm\store\action\meta\ActionMeta;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\ValueHashCol;
+use n2n\persistence\Pdo;
 
 class RemoveActionImpl extends EntityActionAdapter implements RemoveAction {
 	private $meta;
@@ -53,9 +54,7 @@ class RemoveActionImpl extends EntityActionAdapter implements RemoveAction {
 		return $this->oldValueHashCol;
 	}
 	
-	protected function exec() {
-		$pdo = $this->actionQueue->getEntityManager()->getPdo();
-		
+	protected function exec(Pdo $pdo): void {
 		foreach ($this->meta->getItems() as $item) {
 			$deleteBuilder = $pdo->getMetaData()->createDeleteStatementBuilder();
 			$deleteBuilder->setTable($item->getTableName());

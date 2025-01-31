@@ -24,6 +24,7 @@ namespace n2n\persistence\orm\store\action;
 use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\persistence\meta\data\QueryComparator;
+use n2n\persistence\Pdo;
 
 class UpdatePersistAction extends PersistActionAdapter {
 
@@ -31,9 +32,8 @@ class UpdatePersistAction extends PersistActionAdapter {
 		return false;
 	}
 	
-	protected function exec() {
-		$dbh = $this->actionQueue->getEntityManager()->getPdo();
-		$metaData = $dbh->getMetaData();
+	protected function exec(Pdo $pdo): void {
+		$metaData = $pdo->getMetaData();
 				
 		$idColumnName = $this->meta->getIdColumnName();
 		
@@ -54,7 +54,7 @@ class UpdatePersistAction extends PersistActionAdapter {
 			$updateBuilder->getWhereComparator()->match(new QueryColumn($idColumnName),
 					QueryComparator::OPERATOR_EQUAL, new QueryPlaceMarker($idColumnName));
 				
-			$stmt = $dbh->prepare($updateBuilder->toSqlString());
+			$stmt = $pdo->prepare($updateBuilder->toSqlString());
 			$item->bindRawValues($stmt);
 			$stmt->autoBindValue($idColumnName, $this->meta->getIdRawValue());
 			

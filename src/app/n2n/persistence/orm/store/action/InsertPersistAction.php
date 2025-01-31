@@ -30,8 +30,7 @@ class InsertPersistAction extends PersistActionAdapter {
 		return true;
 	}
 	
-	protected function exec() {
-		$pdo = $this->actionQueue->getEntityManager()->getPdo();
+	protected function exec(Pdo $pdo): void {
 		$metaData = $pdo->getMetaData();
 		$dialect = $metaData->getDialect();
 	

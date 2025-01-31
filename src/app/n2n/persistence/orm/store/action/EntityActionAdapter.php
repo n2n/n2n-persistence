@@ -25,6 +25,7 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\util\type\ArgUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\property\EntityProperty;
+use n2n\persistence\Pdo;
 
 abstract class EntityActionAdapter extends ActionAdapter implements EntityAction {
 	protected $actionQueue;
@@ -92,10 +93,10 @@ abstract class EntityActionAdapter extends ActionAdapter implements EntityAction
 		return $this->disabled;
 	}
 	
-	public function execute() {
+	public function execute(Pdo $pdo): void {
 		if ($this->disabled) return;
 		
-		parent::execute();
+		parent::execute($pdo);
 	}
 
 	public function setAttr(EntityProperty $entityProperty, $name, $value) {

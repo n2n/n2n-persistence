@@ -55,7 +55,7 @@ class EntityModelFactory {
 
 	private ?array $entityPropertyProviders = null;
 	private NamingStrategy $defaultNamingStrategy;
-	private OnFinalizeQueue $onFinalizeQueue;
+	private ?OnFinalizeQueue $onFinalizeQueue = null;
 	private array $entityModelInitializers = [];
 
 
@@ -115,10 +115,10 @@ class EntityModelFactory {
 
 	/**
 	 * @param ReflectionClass $entityClass
-	 * @param EntityModel $superEntityModel
+	 * @param EntityModel|null $superEntityModel
 	 * @return EntityModel
 	 */
-	public function create(ReflectionClass $entityClass, ?EntityModel $superEntityModel = null) {
+	public function create(ReflectionClass $entityClass, ?EntityModel $superEntityModel = null): EntityModel {
 		$attributeSet = ReflectionContext::getAttributeSet($entityClass);
 
 		if (null !== $attributeSet->getClassAttribute(MappedSuperclass::class)) {
@@ -157,7 +157,7 @@ class EntityModelInitializer {
 
 	function __construct(private EntityModel $entityModel, private NamingStrategy $defaultNamingStrategy,
 			private AttributeSet $attributeSet, private array $entityPropertyProviders,
-			private OnFinalizeQueue $onFinalizeQueue, private ?EntityModelInitializer $superEntityModelInitializer = null) {
+			private ?OnFinalizeQueue $onFinalizeQueue, private ?EntityModelInitializer $superEntityModelInitializer = null) {
 
 	}
 
@@ -190,7 +190,7 @@ class EntityModelInitializer {
 			return;
 		}
 
-		$this->onFinalizeQueue->push($this->entityModel);
+		$this->onFinalizeQueue?->push($this->entityModel);
 
 		$this->pre();
 
@@ -207,7 +207,7 @@ class EntityModelInitializer {
 					. $this->entityModel->getClass()->getName(), 0, $e);
 		}
 
-		$this->onFinalizeQueue->pop($this->entityModel);
+		$this->onFinalizeQueue?->pop($this->entityModel);
 	}
 	
 	/**

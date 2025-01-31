@@ -21,6 +21,8 @@
  */
 namespace n2n\persistence\orm\store\action;
 
+use n2n\persistence\Pdo;
+
 interface Action {
 	const PRIORITY_DEFAULT = 2;
 	const PRIORITY_REMOVE = 1;
@@ -32,7 +34,7 @@ interface Action {
 	/**
 	 * Can be called multiple times.
 	 */
-	public function execute();
+	public function execute(Pdo $pdo): void;
 	/**
 	 * @param \Closure $closure
 	 */

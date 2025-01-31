@@ -30,5 +30,5 @@ interface EntityPropertyProvider {
 	 * @param SetupProcess $classSetup
 	 */
 	public function setupPropertyIfSuitable(PropertyAccessProxy $propertyAccessProxy,
-			ClassSetup $classSetup);
+			ClassSetup $classSetup): void;
 }

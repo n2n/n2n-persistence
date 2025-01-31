@@ -35,9 +35,11 @@ class PersistOperation implements CascadeOperation {
 	
 	public function cascade($entity) {
 		if (!$this->cascader->markAsCascaded($entity)) return;
-		
+
 		$persistAction = $this->actionQueue->getOrCreatePersistAction($entity);
-		if (!$persistAction->isInitialized()) return;
+		if (!$persistAction->isInitialized()) {
+			return;
+		}
 		
 		$this->cascader->cascadeProperties($persistAction->getEntityModel(), $entity);
 	}

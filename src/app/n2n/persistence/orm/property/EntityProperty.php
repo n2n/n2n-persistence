@@ -34,6 +34,7 @@ use n2n\util\ex\UnsupportedOperationException;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\store\operation\CascadeOperation;
+use n2n\util\magic\MagicContext;
 
 interface EntityProperty {
 	/**
@@ -112,7 +113,7 @@ interface EntityProperty {
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash;
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash;
 	
 	/**
 	 * @param mixed $mappedValue

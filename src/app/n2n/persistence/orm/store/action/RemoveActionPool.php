@@ -101,14 +101,13 @@ class RemoveActionPool {
 	}
 	
 	private function createRemoveAction($entity) {
-		$em = $this->actionQueue->getEntityManager();
+		$persistenceContext = $this->actionQueue->getPersistenceContext();
 		if ($entity instanceof EntityProxy) {
-			$em->getPersistenceContext()->getEntityProxyManager()
+			$persistenceContext->getEntityProxyManager()
 					->initializeProxy($entity);
 		}
 
-		$entityInfo = $em->getPersistenceContext()->getEntityInfo($entity, 
-				$em->getEntityModelManager());
+		$entityInfo = $persistenceContext->getEntityInfo($entity);
 		
 		switch ($entityInfo->getState()) {
 			case EntityInfo::STATE_MANAGED:
@@ -128,7 +127,6 @@ class RemoveActionPool {
 					. $entityInfo->toEntityString());
 		}
 
-		$persistenceContext = $em->getPersistenceContext();
 		$oldValueHashCol = $persistenceContext->getValueHashColByEntityObj($entity);
 		IllegalStateException::assertTrue($oldValueHashCol !== null);
 

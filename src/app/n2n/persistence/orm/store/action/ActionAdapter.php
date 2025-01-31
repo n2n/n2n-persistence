@@ -22,6 +22,7 @@
 namespace n2n\persistence\orm\store\action;
 
 use n2n\persistence\orm\OrmException;
+use n2n\persistence\Pdo;
 
 abstract class ActionAdapter implements Action {
 	protected $executed = false;
@@ -60,8 +61,8 @@ abstract class ActionAdapter implements Action {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\store\Action::setDependents()
 	 */
-	public function setDependents(array $actionJobs) {
-		$this->dependents = $actionJobs;
+	public function setDependents(array $dependents): void {
+		$this->dependents = $dependents;
 	}
 	
 	protected function executeDependents() {
@@ -88,7 +89,7 @@ abstract class ActionAdapter implements Action {
 	
 	private $executingDependends = false;
 	
-	public function execute() {
+	public function execute(Pdo $pdo): void {
 		if ($this->executingDependends) {
 			throw new OrmException('Multiple relations conflicts. This exception will be improved soon. :-)');
 		}
@@ -102,12 +103,12 @@ abstract class ActionAdapter implements Action {
 		
 		$this->triggerAtStartClosures();
 		
-		$this->exec();	
+		$this->exec($pdo);
 		
 		$this->triggerAtEndClosures();
 	}
 	
 // 	protected abstract function prepareExec();
 	
-	protected abstract function exec();
+	protected abstract function exec(Pdo $pdo): void;
 }
