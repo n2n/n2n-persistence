@@ -66,15 +66,16 @@ class LoadingQueue {
 		unset($this->loadingContainerStack[$objHash]);
 		
 		if (!empty($this->loadingContainerStack)) return;
-		
-		$em = $this->actionQueue->getEntityManager();
+
+		$persistenceContext = $this->actionQueue->getPersistenceContext();
+		$magicContext = $this->actionQueue->getMagicContext();
 		
 		foreach ($this->valueHashJobs as $entityObjHash => $valueHashJob) {
 			unset($this->valueHashJobs[$entityObjHash]);
 			
 			$entityObj = $valueHashJob['entityObj'];
 			
-			$hashFactory = new ValueHashColFactory($em->getPersistenceContext()->getEntityModelByEntityObj($entityObj), $em);
+			$hashFactory = new ValueHashColFactory($persistenceContext->getEntityModelByEntityObj($entityObj), $magicContext);
 			$hashFactory->setValues($valueHashJob['values']);
 			
 			$this->persistenceContext->updateValueHashes($entityObj, $hashFactory->create($entityObj));
