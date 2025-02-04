@@ -22,6 +22,8 @@
 namespace n2n\persistence\orm\store\operation;
 
 interface CascadeOperation {
-
-	public function cascade(object $entityObj, bool $force = true): void;
+	/**
+	 * @param object $entity
+	 */
+	public function cascade($entity);
 }

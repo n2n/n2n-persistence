@@ -33,11 +33,11 @@ class RemoveOperation implements CascadeOperation {
 		$this->cascader = new OperationCascader(CascadeType::REMOVE, $this);
 	}
 	
-	public function cascade(object $entityObj, bool $force = true): void {
-		if (!$this->cascader->markAsCascaded($entityObj)) return;
+	public function cascade($entity) {
+		if (!$this->cascader->markAsCascaded($entity)) return;
 		
-		if (null !== ($removeAction = $this->actionQueue->getOrCreateRemoveAction($entityObj))) {
-			$this->cascader->cascadeProperties($removeAction->getEntityModel(), $entityObj);
+		if (null !== ($removeAction = $this->actionQueue->getOrCreateRemoveAction($entity))) {
+			$this->cascader->cascadeProperties($removeAction->getEntityModel(), $entity);
 		}
 	}
 }

@@ -33,16 +33,16 @@ class DetachOperation implements CascadeOperation {
 		$this->cascader = new OperationCascader(CascadeType::DETACH, $this);
 	}
 	
-	public function cascade(object $entityObj, bool $force = true): void {
-		if (!$this->cascader->markAsCascaded($entityObj)) return;
+	public function cascade($entity) {
+		if (!$this->cascader->markAsCascaded($entity)) return;
 		
 		$em = $this->actionQueue->getEntityManager();
 		$persistenceContext = $em->getPersistenceContext();
 		
-		$this->actionQueue->removeAction($entityObj);
-		$persistenceContext->detachEntityObj($entityObj);
+		$this->actionQueue->removeAction($entity);
+		$persistenceContext->detachEntityObj($entity);
 		
-		$entityInfo = $persistenceContext->getEntityInfo($entityObj, $em->getEntityModelManager());
-		$this->cascader->cascadeProperties($entityInfo->getEntityModel(), $entityObj);
+		$entityInfo = $persistenceContext->getEntityInfo($entity, $em->getEntityModelManager());
+		$this->cascader->cascadeProperties($entityInfo->getEntityModel(), $entity);
 	}
 }
