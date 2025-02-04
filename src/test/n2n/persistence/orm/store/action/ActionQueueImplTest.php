@@ -145,7 +145,7 @@ class ActionQueueImplTest extends TestCase {
 				$this->persistenceContext->getEntityInfo($entityObj1)->getState());
 
 		$this->expectException(PersistenceOperationException::class);
-		$this->actionQueue->getOrCreatePersistAction($entityObj1, true);
+		$this->actionQueue->getOrCreatePersistAction($entityObj1);
 
 	}
 }
