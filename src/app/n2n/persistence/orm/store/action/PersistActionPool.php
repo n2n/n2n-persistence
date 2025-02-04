@@ -107,13 +107,14 @@ class PersistActionPool {
 			$persistenceContext->manageEntityObj($entity, $persistAction->getEntityModel());
 		}
 	}
+
 	/**
 	 *
 	 * @param $entity
-	 * @param bool $initialize
+	 * @param bool $ignoreRemovedState
 	 * @return PersistAction
 	 */
-	public function getOrCreateAction($entity) {
+	public function getOrCreateAction($entity, bool $ignoreRemovedState): PersistAction {
 		if (null !== ($persistAction = $this->findAction($entity))) {
 			return $persistAction;
 		}
@@ -123,10 +124,8 @@ class PersistActionPool {
 		$persistenceContext = $this->actionQueue->getPersistenceContext();
 
 		$entityInfo = $persistenceContext->getEntityInfo($entity);
-		$entityModel = $entityInfo->getEntityModel();
 
-		$prePersistEvent = null;
-		return $this->createPersistAction($entity, $entityInfo);
+		return $this->createPersistAction($entity, $entityInfo, $ignoreRemovedState);
 	}
 
 	private function registerPersistAction($entity, PersistAction $persistAction): void {
@@ -136,7 +135,7 @@ class PersistActionPool {
 		$this->actionQueue->add($persistAction);
 	}
 
-	private function createPersistAction($entity, EntityInfo $entityInfo, ?LifecycleEvent &$prePersistEvent = null) {
+	private function createPersistAction($entity, EntityInfo $entityInfo, bool $ignoreRemovedState): PersistAction {
 		$entityModel = $entityInfo->getEntityModel();
 
 		switch ($entityInfo->getState()) {
@@ -163,14 +162,16 @@ class PersistActionPool {
 							. $entityInfo->toEntityString());
 				}
 
-				throw new PersistenceOperationException('Can not persist removed entity: '
-						. $entityInfo->toEntityString());
+				if (!$ignoreRemovedState) {
+					throw new PersistenceOperationException('Can not persist removed entity: '
+							. $entityInfo->toEntityString());
+				}
 
-//				$persistAction = new UpdatePersistAction($this->actionQueue, $entityModel, $entityInfo->getId(),
-//						$entity, $this->createActionMeta($entityModel, $entityInfo));
-//				$this->registerPersistAction($entity, $persistAction);
-//				$this->manage($persistAction);
-//				return $persistAction;
+				$persistAction = new UpdatePersistAction($this->actionQueue, $entityModel, $entityInfo->getId(),
+						$entity, $this->createActionMeta($entityModel, $entityInfo));
+				$this->registerPersistAction($entity, $persistAction);
+				$this->manage($persistAction);
+				return $persistAction;
 
 			case EntityInfo::STATE_DETACHED:
 				throw new PersistenceOperationException('Can not persist detached entity: '

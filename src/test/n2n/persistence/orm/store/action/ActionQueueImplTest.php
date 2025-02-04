@@ -81,15 +81,15 @@ class ActionQueueImplTest extends TestCase {
 		$this->persistenceContext->identifyManagedEntityObj($entityObj3, $entityObj3->getId());
 		$this->persistenceContext->updateValueHashes($entityObj3, $hasher->create($entityObj3));
 
-		$this->actionQueue->getOrCreatePersistAction($entityObj1);
-		$this->actionQueue->getOrCreatePersistAction($entityObj2);
+//		$this->actionQueue->getOrCreatePersistAction($entityObj1);
+//		$this->actionQueue->getOrCreatePersistAction($entityObj2);
 
-		$this->assertTrue($this->actionQueue->containsPersistAction($entityObj1));
 
 		$entityObj1->setName('holeradio-1-1');
 
 		$this->listener->onPreUpdate = function () use ($entityObj1, $entityObj2, $entityObj3) {
-			$this->actionQueue->getOrCreatePersistAction($entityObj3);
+
+			$this->assertTrue($this->actionQueue->containsPersistAction($entityObj1));
 			$this->listener->onPreUpdate = null;
 
 			$this->assertCount(1, $this->listener->events);

@@ -25,5 +25,5 @@ interface CascadeOperation {
 	/**
 	 * @param object $entity
 	 */
-	public function cascade($entity);
+	public function cascade(object $entity): void;
 }

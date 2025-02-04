@@ -25,18 +25,17 @@ use n2n\persistence\orm\store\action\ActionQueue;
 use n2n\persistence\orm\CascadeType;
 
 class PersistOperation implements CascadeOperation {
-	private $actionQueue;
+
 	private $cascader;
 	
-	public function __construct(ActionQueue $actionQueue) {
-		$this->actionQueue = $actionQueue;
+	public function __construct(private ActionQueue $actionQueue, private bool $ignoreRemovedState = false) {
 		$this->cascader = new OperationCascader(CascadeType::PERSIST, $this);
 	}
 	
-	public function cascade($entity) {
+	public function cascade(object $entity): void {
 		if (!$this->cascader->markAsCascaded($entity)) return;
 
-		$persistAction = $this->actionQueue->getOrCreatePersistAction($entity);
+		$persistAction = $this->actionQueue->getOrCreatePersistAction($entity, $this->ignoreRemovedState);
 		if (!$persistAction->isInitialized()) {
 			return;
 		}

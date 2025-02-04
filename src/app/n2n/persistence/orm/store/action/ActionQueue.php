@@ -44,12 +44,13 @@ interface ActionQueue {
 	 * @return PersistAction
 	 */
 	public function getPersistAction($entity);
+
 	/**
 	 * @param object $entity
-	 * @param bool $manageIfTransient
+	 * @param bool $ignoreRemovedState
 	 * @return PersistAction
 	 */
-	public function getOrCreatePersistAction($entity);
+	public function getOrCreatePersistAction(object $entity, bool $ignoreRemovedState = false): PersistAction;
 	/**
 	 * @param object $object
 	 */

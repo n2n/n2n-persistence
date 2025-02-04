@@ -282,8 +282,8 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 	public function persist(object $entity): void {
 		$this->ensureTransactionOpen('Persist');
 		
-		$persitOperation = new PersistOperation($this->actionQueue);
-		$persitOperation->cascade($entity);
+		$persistOperation = new PersistOperation($this->actionQueue, true);
+		$persistOperation->cascade($entity);
 	}
 	
 	public function refresh(object $entity): void {
@@ -317,11 +317,6 @@ class LazyEntityManager implements EntityManager, TransactionalResource {
 	
 	public function flush(): void {
 		$this->ensureTransactionOpen('Flush');
-		
-		$persistOperation = new PersistOperation($this->actionQueue);
-		foreach ($this->persistenceContext->getManagedEntityObjs() as $entity) {
-			$persistOperation->cascade($entity);
-		}
 
 		$this->actionQueue->supply();
 		$this->actionQueue->flush($this->getPdo());

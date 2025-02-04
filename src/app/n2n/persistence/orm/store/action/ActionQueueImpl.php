@@ -26,13 +26,12 @@ use n2n\persistence\orm\LifecycleEvent;
 use n2n\reflection\magic\MagicMethodInvoker;
 use n2n\persistence\orm\LifecycleListener;
 use n2n\util\magic\MagicContext;
-use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\LifecycleUtils;
 use n2n\util\ex\IllegalStateException;
-use n2n\reflection\magic\MagicUtils;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\PersistenceContext;
 use n2n\persistence\Pdo;
+use n2n\persistence\orm\store\operation\PersistOperation;
 
 class ActionQueueImpl implements ActionQueue {
 	protected $em;
@@ -89,9 +88,10 @@ class ActionQueueImpl implements ActionQueue {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\store\action\ActionQueue::getOrCreatePersistAction()
 	 */
-	public function getOrCreatePersistAction($entity) {
+	public function getOrCreatePersistAction(object $entity, bool $ignoreRemovedState = false): PersistAction {
+		$persistAction = $this->persistActionPool->getOrCreateAction($entity, $ignoreRemovedState);
 		$this->removeActionPool->removeAction($entity);
-		return $this->persistActionPool->getOrCreateAction($entity);
+		return $persistAction;
 	}
 
 	public function getPersistAction($entity) {
@@ -183,6 +183,11 @@ class ActionQueueImpl implements ActionQueue {
 		$this->triggerAtStartClosures();
 
 		$this->flushing = true;
+
+		$persistOperation = new PersistOperation($this);
+		foreach ($this->persistenceContext->getManagedEntityObjs() as $entity) {
+			$persistOperation->cascade($entity);
+		}
 
 		do {
 			do {
