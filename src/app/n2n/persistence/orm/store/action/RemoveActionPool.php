@@ -84,7 +84,7 @@ class RemoveActionPool {
 		$this->unsuppliedRemoveActions[$objHash] = $removeAction;
 		$this->actionQueue->add($removeAction, true);
 		
-		$this->actionQueue->getEntityManager()->getPersistenceContext()->removeEntityObj($entity);
+		$this->actionQueue->getPersistenceContext()->removeEntityObj($entity);
 		
 		$that = $this;
 		$removeAction->executeAtEnd(function () use ($that, $removeAction) {

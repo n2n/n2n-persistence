@@ -15,6 +15,8 @@ use n2n\util\magic\impl\SimpleMagicContext;
 use n2n\persistence\orm\store\action\mock\SimpleEntityListener;
 use n2n\persistence\orm\store\ValueHashColFactory;
 use n2n\util\magic\MagicContext;
+use n2n\persistence\orm\store\EntityInfo;
+use n2n\persistence\orm\store\PersistenceOperationException;
 
 class ActionQueueImplTest extends TestCase {
 
@@ -99,5 +101,51 @@ class ActionQueueImplTest extends TestCase {
 		$this->actionQueue->supply();
 
 		$this->assertCount(2, $this->listener->events);
+	}
+
+	function testForceRemovedToManaged(): void {
+		$entityObj1 = new SimpleEntityMock('holeradio-1');
+		$entityObj1->setId(1);
+
+		$hasher = new ValueHashColFactory($this->entityModel, $this->magicContext);
+
+		$this->persistenceContext->manageEntityObj($entityObj1, $this->entityModel);
+		$this->persistenceContext->identifyManagedEntityObj($entityObj1, $entityObj1->getId());
+		$this->persistenceContext->updateValueHashes($entityObj1, $hasher->create($entityObj1));
+
+
+		$this->assertEquals(EntityInfo::STATE_MANAGED,
+				$this->persistenceContext->getEntityInfo($entityObj1)->getState());
+
+		$this->actionQueue->getOrCreateRemoveAction($entityObj1);
+		$this->assertEquals(EntityInfo::STATE_REMOVED,
+				$this->persistenceContext->getEntityInfo($entityObj1)->getState());
+
+		$this->actionQueue->getOrCreatePersistAction($entityObj1, true);
+		$this->assertEquals(EntityInfo::STATE_MANAGED,
+				$this->persistenceContext->getEntityInfo($entityObj1)->getState());
+	}
+
+	function testRemovedToManaged(): void {
+		$entityObj1 = new SimpleEntityMock('holeradio-1');
+		$entityObj1->setId(1);
+
+		$hasher = new ValueHashColFactory($this->entityModel, $this->magicContext);
+
+		$this->persistenceContext->manageEntityObj($entityObj1, $this->entityModel);
+		$this->persistenceContext->identifyManagedEntityObj($entityObj1, $entityObj1->getId());
+		$this->persistenceContext->updateValueHashes($entityObj1, $hasher->create($entityObj1));
+
+
+		$this->assertEquals(EntityInfo::STATE_MANAGED,
+				$this->persistenceContext->getEntityInfo($entityObj1)->getState());
+
+		$this->actionQueue->getOrCreateRemoveAction($entityObj1);
+		$this->assertEquals(EntityInfo::STATE_REMOVED,
+				$this->persistenceContext->getEntityInfo($entityObj1)->getState());
+
+		$this->expectException(PersistenceOperationException::class);
+		$this->actionQueue->getOrCreatePersistAction($entityObj1, true);
+
 	}
 }

@@ -135,11 +135,11 @@ class PersistenceContext {
 			$id = $this->entityModels[$objectHash]->getIdDef()->getEntityProperty()->repToValue(
 					$this->entityIdReps[$objectHash]);	
 		}
-		
+
 		if (isset($this->managedEntityObjs[$objectHash])) {
 			return new EntityInfo(EntityInfo::STATE_MANAGED, $this->entityModels[$objectHash], $id);
 		}
-			
+
 		if (isset($this->removedEntityObjs[$objectHash])) {
 			return new EntityInfo(EntityInfo::STATE_REMOVED, $this->entityModels[$objectHash], $id);
 		}
