@@ -159,17 +159,18 @@ class PersistActionPool {
 
 			case EntityInfo::STATE_REMOVED:
 				if (!$entityInfo->hasId()) {
-					throw new IllegalStateException('Unable to update entity with unknown id: '
+					throw new IllegalStateException('Unable to remove entity with unknown id: '
 							. $entityInfo->toEntityString());
 				}
-				$persistAction = new UpdatePersistAction($this->actionQueue, $entityModel, $entityInfo->getId(),
-						$entity, $this->createActionMeta($entityModel, $entityInfo));
-				$this->registerPersistAction($entity, $persistAction);
-				$this->manage($persistAction);
-				return $persistAction;
 
-// 				throw new PersistenceOperationException('Can not persist removed entity: '
-// 						. $entityInfo->toEntityString());
+				throw new PersistenceOperationException('Can not persist removed entity: '
+						. $entityInfo->toEntityString());
+
+//				$persistAction = new UpdatePersistAction($this->actionQueue, $entityModel, $entityInfo->getId(),
+//						$entity, $this->createActionMeta($entityModel, $entityInfo));
+//				$this->registerPersistAction($entity, $persistAction);
+//				$this->manage($persistAction);
+//				return $persistAction;
 
 			case EntityInfo::STATE_DETACHED:
 				throw new PersistenceOperationException('Can not persist detached entity: '
