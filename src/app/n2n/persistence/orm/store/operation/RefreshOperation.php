@@ -39,7 +39,7 @@ class RefreshOperation implements CascadeOperation {
 		$this->cascader = new OperationCascader(CascadeType::REFRESH, $this);
 	}
 	
-	public function cascade($entity) {
+	public function cascade(object $entity): void {
 		if (!$this->cascader->markAsCascaded($entity)) return;
 	
 		$persistenceContext = $this->em->getPersistenceContext();
