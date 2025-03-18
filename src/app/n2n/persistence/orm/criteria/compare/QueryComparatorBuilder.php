@@ -216,8 +216,8 @@ class QueryComparatorBuilder {
 			$oppositeOperator = self::oppositeOperator($operator);
 			$typeConstraint2 = self::oppositeTypeConstraint($columnComparable2, $oppositeOperator);
 				
-			if (!$typeConstraint1->isPassableBy($typeConstraint2)
-					&& !$typeConstraint1->isPassableTo($typeConstraint2)) {
+			if (!$typeConstraint1->isPassableBy($typeConstraint2, true)
+					&& !$typeConstraint1->isPassableTo($typeConstraint2, true)) {
 				throw new CriteriaConflictException();
 			}
 
