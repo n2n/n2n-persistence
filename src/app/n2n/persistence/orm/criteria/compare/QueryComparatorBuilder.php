@@ -50,7 +50,7 @@ class QueryComparatorBuilder {
 		$this->queryComparator = $queryComparator;
 	}
 	
-	public function applyTest($operator, ComparatorCriteria $criteria, $useAnd) {
+	public function applyTest($operator, ComparatorCriteria $criteria, $useAnd): void {
 		$queryItem = $criteria->createQueryPoint($this->queryState, $this->queryPointResolver)
 				->requestRepresentableQueryItem();
 		IllegalStateException::assertTrue($queryItem instanceof QueryResult);
