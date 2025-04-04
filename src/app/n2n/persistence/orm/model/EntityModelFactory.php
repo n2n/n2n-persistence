@@ -253,7 +253,7 @@ class EntityModelInitializer {
 			if ($this->entityModel->getInheritanceType() == InheritanceType::SINGLE_TABLE
 					&& !$this->entityModel->getClass()->isAbstract()) {
 				throw OrmError::create('No discriminator value defined for entity: '
-						. $this->entityModel->getClass()->getName(), array($discriminatorValueAttr));
+						. $this->entityModel->getClass()->getName(), array($this->entityModel->getClass()));
 			}
 			
 			return;
