@@ -174,8 +174,8 @@ class QueryComparator implements ComparisonBuilder {
 	public static function getOperators(): array {
 		return array(self::OPERATOR_EQUAL, self::OPERATOR_NOT_EQUAL, self::OPERATOR_LARGER_THAN,
 				self::OPERATOR_LARGER_THAN_OR_EQUAL_TO, self::OPERATOR_SMALLER_THAN,
-				self::OPERATOR_SMALLER_THAN_OR_EQUAL_TO, self::OPERATOR_LIKE, self::OPERATOR_IS,
-				self::OPERATOR_IS_NOT, self::OPERATOR_IN, self::OPERATOR_NOT_IN);
+				self::OPERATOR_SMALLER_THAN_OR_EQUAL_TO, self::OPERATOR_LIKE, self::OPERATOR_NOT_LIKE,
+				self::OPERATOR_IS, self::OPERATOR_IS_NOT, self::OPERATOR_IN, self::OPERATOR_NOT_IN);
 	}
 	
 	public static function getTestOperators() {
