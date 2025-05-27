@@ -233,14 +233,14 @@ class ScalarEntityProperty implements ColumnEntityProperty, BasicEntityProperty 
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::writeValue()
 	 */
-	public function writeValue($object, $value) {
+	public function writeValue(object $object, mixed $value): void {
 		$this->accessProxy->setValue($object, $value);
 	}
 
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::readValue()
 	 */
-	public function readValue($object) {
+	public function readValue(object $object): mixed {
 		try {
 			return $this->accessProxy->getValue($object);
 		} catch (PropertyAccessException $e) {

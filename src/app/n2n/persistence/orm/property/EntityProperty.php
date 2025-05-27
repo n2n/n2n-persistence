@@ -35,6 +35,9 @@ use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\util\magic\MagicContext;
+use n2n\reflection\property\PropertyAccessException;
+use n2n\util\type\ValueIncompatibleWithConstraintsException;
+use n2n\persistence\orm\CorruptedDataException;
 
 interface EntityProperty {
 	/**
@@ -67,13 +70,14 @@ interface EntityProperty {
 	 * @param object $object
 	 * @return mixed 
 	 */
-	public function readValue($object);
+	public function readValue(object $object): mixed;
 	
 	/**
 	 * @param object $object
 	 * @param mixed $value
+	 * @throws CorruptedDataException
 	 */
-	public function writeValue($object, $value);
+	public function writeValue(object $object, mixed $value): void;
 	
 	/**
 	 * @param MetaTreePoint $metaTreePoint

@@ -39,6 +39,9 @@ use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\model\EntityModelCollection;
 use n2n\util\magic\MagicContext;
+use n2n\util\type\ValueIncompatibleWithConstraintsException;
+use n2n\persistence\orm\CorruptedDataException;
+use n2n\persistence\orm\OrmException;
 
 class PersistenceContext {
 	private $entityProxyManager;
@@ -395,13 +398,14 @@ class PersistenceContext {
 		}
 		
 		throw new \InvalidArgumentException('Entity has status new');
-	}	
-	
+	}
+
 	/**
 	 * @param object $entity
 	 * @param array $values
+	 * @throws CorruptedDataException
 	 */
-	public function mapValues($entityObj, array $values) {
+	public function mapValues($entityObj, array $values): void {
 		$this->validateEntityObjManaged($entityObj);
 		
 		$entityModel = $this->getEntityModelByEntityObj($entityObj);
@@ -411,8 +415,13 @@ class PersistenceContext {
 			$propertyString = $entityProperty->toPropertyString();
 			
 			if (!array_key_exists($propertyString, $values)) continue;
-			
-			$entityProperty->writeValue($entityObj, $values[$propertyString]);
+
+			try {
+				$entityProperty->writeValue($entityObj, $values[$propertyString]);
+			} catch (CorruptedDataException $e) {
+				throw new CorruptedDataException('Could write value to EntityProperty ' . $entityProperty
+						. '. Reason: ' . $e->getMessage());
+			}
 		}
 	}
 	

@@ -24,6 +24,8 @@ namespace n2n\persistence\orm\store;
 use n2n\persistence\orm\store\action\ActionQueue;
 use n2n\persistence\orm\LifecycleEvent;
 use n2n\util\ex\IllegalStateException;
+use n2n\persistence\orm\CorruptedDataException;
+use n2n\persistence\orm\OrmException;
 
 class LoadingQueue {
 	private $persistenceContext;
@@ -36,9 +38,14 @@ class LoadingQueue {
 		$this->persistenceContext = $persistenceContext;
 		$this->actionQueue = $actionQueue;
 	}
-	
-	public function mapValues($entity, $id, array $values) {
-		$this->persistenceContext->mapValues($entity, $values);
+
+	public function mapValues($entity, $id, array $values): void {
+		try {
+			$this->persistenceContext->mapValues($entity, $values);
+		} catch (CorruptedDataException $e) {
+			throw new OrmException('Could not write data from database to entity '
+					. get_class($entity) . '#' . $id . '. Reason: ' . $e->getMessage(), previous: $e);
+		}
 		
 		if (empty($this->loadingContainerStack)) {
 			throw new IllegalStateException('No LoadingContainer available.');
