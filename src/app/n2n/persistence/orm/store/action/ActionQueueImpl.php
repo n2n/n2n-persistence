@@ -46,7 +46,8 @@ class ActionQueueImpl implements ActionQueue {
 	protected $atPrepareCycleEndClosures = array();
 	private $persistActionPool;
 	private $removeActionPool;
-	private $flushing = false;
+	private int $activeSupplyCallsNum = 0;
+	private int $activeFlushCallsNum = 0;
 	private $bufferedEvents = array();
 	private \WeakMap $entityListenersMap;
 	/**
@@ -175,6 +176,10 @@ class ActionQueueImpl implements ActionQueue {
 		return true;
 	}
 
+	function hasStarted(): bool {
+		return $this->activeSupplyCallsNum > 0 || $this->activeFlushCallsNum > 0;
+	}
+
 	function supply(): void {
 		IllegalStateException::assertTrue(
 				!$this->persistActionPool->isFrozend() && !$this->removeActionPool->isFrozend(),
@@ -182,7 +187,7 @@ class ActionQueueImpl implements ActionQueue {
 
 		$this->triggerAtStartClosures();
 
-		$this->flushing = true;
+		$this->activeSupplyCallsNum++;
 
 		$persistOperation = new PersistOperation($this);
 		foreach ($this->persistenceContext->getManagedEntityObjs() as $entity) {
@@ -201,12 +206,16 @@ class ActionQueueImpl implements ActionQueue {
 
 		$this->persistActionPool->supply();
 		$this->removeActionPool->supply();
+
+		$this->activeSupplyCallsNum--;
 	}
 
 	public function flush(Pdo $pdo): void {
 		IllegalStateException::assertTrue(
 				$this->persistActionPool->isFrozend() && $this->removeActionPool->isFrozend(),
 				'Is not supplied nor frozen.');
+
+		$this->activeFlushCallsNum++;
 
 		uasort($this->actionJobs, fn (Action $aj1, Action $aj2) => $aj1->getPriority() - $aj2->getPriority());
 
@@ -219,7 +228,11 @@ class ActionQueueImpl implements ActionQueue {
 
 		$this->triggerAtEndClosures();
 
-		$this->flushing = false;
+		$this->activeFlushCallsNum--;
+
+		if ($this->activeFlushCallsNum > 0) {
+			return;
+		}
 
 		while (null !== ($event = array_shift($this->bufferedEvents))) {
 			$this->triggerLifecycleEvent($event);
@@ -246,13 +259,13 @@ class ActionQueueImpl implements ActionQueue {
 
 			case LifecycleEvent::POST_LOAD:
 				$this->triggerLifecycleEvent($event);
-				if ($this->flushing) {
+				if ($this->hasStarted()) {
 					$this->persistActionPool->getOrCreateAction($event->getEntityObj(), false);
 				}
 				break;
 
 			default:
-				IllegalStateException::assertTrue($this->flushing);
+				IllegalStateException::assertTrue($this->hasStarted());
 				$this->bufferedEvents[] = $event;
 		}
 
