@@ -28,7 +28,7 @@ class CallbackColumnComparable extends ColumnComparableAdapter {
 
 		$queryPartGroup = new QueryPartGroup();
 		foreach ($value as $fieldValue) {
-			$value = $this->valueToScalar($value);
+			$fieldValue = $this->valueToScalar($fieldValue);
 			$queryPartGroup->addQueryPart(
 					new QueryPlaceMarker($this->queryState->registerPlaceholderValue($fieldValue)));
 		}
