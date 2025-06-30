@@ -41,7 +41,7 @@ abstract class JoinedTreePointAdapter extends EntityTreePoint implements JoinedT
 		$this->joinType = $joinType;
 	}
 	
-	public function getJoinType() {
+	public function getJoinType(): string {
 		return $this->joinType;
 	}
 	
