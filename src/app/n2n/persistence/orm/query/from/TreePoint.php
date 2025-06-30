@@ -30,6 +30,9 @@ interface TreePoint extends QueryPoint {
 	 * @param SelectStatementBuilder $selectBuilder
 	 */
 	public function apply(SelectStatementBuilder $selectBuilder);
+
+	function getJoinType(): ?string;
+
 	/**
 	 * @param string $fetchType
 	 * @return JoinedTreePoint

@@ -89,7 +89,7 @@ abstract class ExtendableTreePoint extends MetaTreePointAdapter {
 		if (!isset($this->propertyJoinTreePoints[$propertyStr])) {
 			$joinType = null;
 			if ($innerJoinRequired
-					|| ($entityProperty instanceof JoinableEntityProperty && !in_array(JoinType::LEFT, $entityProperty->getAvailableJoinTypes()))) {
+					|| ($entityProperty instanceof JoinableEntityProperty && !in_array(JoinType::LEFT, $entityProperty->getAvailableJoinTypes($this)))) {
 				$joinType = JoinType::INNER;
 			} else {
 				$joinType = JoinType::LEFT; 

@@ -24,13 +24,14 @@ namespace n2n\persistence\orm\property;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\query\from\JoinedTreePoint;
+use n2n\persistence\orm\query\from\TreePoint;
 
 interface JoinableEntityProperty extends EntityProperty {
 	
 	/**
 	 * @return string[]
 	 */
-	public function getAvailableJoinTypes(): array;
+	public function getAvailableJoinTypes(TreePoint $treePoint): array;
 	
 	/**
 	 * @param QueryState $queryState

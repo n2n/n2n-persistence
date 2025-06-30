@@ -30,4 +30,7 @@ class BaseEntityTreePoint extends EntityTreePoint {
 		parent::apply($selectBuilder);
 	}
 
+	function getJoinType(): ?string {
+		return null;
+	}
 }

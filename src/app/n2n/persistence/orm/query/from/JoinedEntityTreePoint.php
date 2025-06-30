@@ -43,7 +43,7 @@ class JoinedEntityTreePoint extends EntityTreePoint implements JoinedTreePoint {
 		$this->joinType = $joinType;
 	}
 	
-	public function getJoinType() {
+	public function getJoinType(): string {
 		return $this->joinType;
 	}
 

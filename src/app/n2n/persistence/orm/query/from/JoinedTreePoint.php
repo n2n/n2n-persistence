@@ -27,7 +27,7 @@ interface JoinedTreePoint extends TreePoint {
 	/**
 	 * @return string 
 	 */
-	public function getJoinType();
+	public function getJoinType(): string;
 	/**
 	 * @param string $joinType
 	 * @throws QueryConflictException
