@@ -9,9 +9,27 @@ class EntityProxyManagerTest extends TestCase {
 
 
 	function testTypes(): void {
+		$called = false;
 		$listenerMock = $this->createMock(EntityProxyAccessListener::class);
+		$listenerMock->expects($this->once())->method('onAccess')
+				->with($this->callback(function (object $obj) use (&$called) {
+					$this->assertInstanceOf(EntityProxyMock::class, $obj);
+					$this->assertFalse($called);
+					$called = true;
+					return true;
+				}));
 
-		$this->assertNotNull(EntityProxyManager::getInstance()
-				->createProxy(new \ReflectionClass(EntityProxyMock::class), $listenerMock));
+		$mockProxyMock = EntityProxyManager::getInstance()
+				->createProxy(new \ReflectionClass(EntityProxyMock::class), $listenerMock);
+
+		$this->assertInstanceOf(EntityProxyMock::class, $mockProxyMock);
+		$this->assertFalse($called);
+
+		$this->assertNotNull($mockProxyMock->staticReturnTest());
+		$this->assertFalse($called);
+
+		$this->assertNotNull($mockProxyMock->someAccessMethod());
+
+		$this->assertTrue($called);
 	}
 }

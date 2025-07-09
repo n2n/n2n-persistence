@@ -17,6 +17,7 @@ use n2n\persistence\orm\store\ValueHashColFactory;
 use n2n\util\magic\MagicContext;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\store\PersistenceOperationException;
+use PHPUnit\Framework\MockObject\Exception;
 
 class ActionQueueImplTest extends TestCase {
 
@@ -26,6 +27,9 @@ class ActionQueueImplTest extends TestCase {
 	private SimpleEntityListener $listener;
 	private MagicContext $magicContext;
 
+	/**
+	 * @throws Exception
+	 */
 	function setUp(): void {
 
 		$this->listener = new SimpleEntityListener();
