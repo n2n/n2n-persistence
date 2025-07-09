@@ -13,4 +13,8 @@ class EntityProxyMock {
 	function someAccessMethod(): int {
 		return $this->id;
 	}
+
+	function nonAccessMethod(): void {
+
+	}
 }

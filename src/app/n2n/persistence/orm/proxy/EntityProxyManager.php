@@ -31,10 +31,13 @@ class EntityProxyManager {
 
 	private static ?EntityProxyManager $instance = null;
 
+	private \WeakMap $listenerMap;
+
 //	private $proxyClasses = array();
 //	private $accessListenerPropertyNames = array();
 
 	private function __construct() {
+		$this->listenerMap = new \WeakMap();
 	}
 
 	/**
@@ -53,9 +56,12 @@ class EntityProxyManager {
 	 * @return object
 	 */
 	public function createProxy(ReflectionClass $class, EntityProxyAccessListener $proxyAccessListener): object {
-		return $class->newLazyGhost(function(object $entityObj) use ($proxyAccessListener) {
+		$entityObj = $class->newLazyGhost(function(object $entityObj) use ($proxyAccessListener) {
 			$proxyAccessListener->onAccess($entityObj);
+			$this->listenerMap->offsetUnset($entityObj);
 		});
+		$this->listenerMap->offsetSet($entityObj, $proxyAccessListener);
+		return $entityObj;
 //		} catch (\ReflectionException $e) {
 //			throw new \InvalidArgumentException($e->getMessage(), previous: $e);
 //		}
@@ -86,46 +92,37 @@ class EntityProxyManager {
 //	 * @param object $entity
 //	 * @return EntityProxyAccessListener|null
 //	 */
-//	private function retrieveAccessListener(object $entity, bool $unset): ?EntityProxyAccessListener {
-//		if (!($entity instanceof EntityProxy)) {
-//			return null;
-//		}
-//
-//		$property = $this->getAccessibleListenerProperty(new ReflectionClass($entity));
-//		$accessListener = $property->getValue($entity);
-//
-//		if ($unset) {
-//			$property->setValue($entity,null);
-//		}
-//
-//		if ($accessListener === null || $accessListener instanceof EntityProxyAccessListener) {
-//			return $accessListener;
-//		}
-//
-//		$className = get_class($entity);
-//		throw new IllegalStateException($className . '::' . $this->accessListenerPropertyNames[$className]
-//				. ' corrupted.');
-//	}
+	private function retrieveAccessListener(object $entity, bool $unset): ?EntityProxyAccessListener {
+		if (!$this->listenerMap->offsetExists($entity)) {
+			return null;
+		}
+
+		$listener = $this->listenerMap->offsetGet($entity);
+		if ($unset) {
+			$this->listenerMap->offsetUnset($entity);
+		}
+		return $listener;
+	}
 //
 //	/**
 //	 * @param EntityProxy $proxy
 //	 * @throws \n2n\persistence\orm\EntityNotFoundException
 //	 */
-//	public function initializeProxy(EntityProxy $proxy) {
-//		$this->retrieveAccessListener($proxy, true)?->onAccess($proxy);
-//	}
-//
-//	public function isProxyInitialized(EntityProxy $proxy): bool {
-//		return null === $this->retrieveAccessListener($proxy, false);
-//	}
-//
-//	function extractProxyId(EntityProxy $proxy): mixed {
-//		return $this->retrieveAccessListener($proxy, false)?->getId();
-//	}
-//
-//	public function disposeProxyAccessListenerOf($entity) {
-//		$this->retrieveAccessListener($entity, true)?->dispose();
-//	}
+	public function initializeProxy(object $proxy): void {
+		$this->retrieveAccessListener($proxy, true)?->onAccess($proxy);
+	}
+
+	public function isProxyInitialized(object $proxy): bool {
+		return null === $this->retrieveAccessListener($proxy, false);
+	}
+
+	function extractProxyId(object $proxy): mixed {
+		return $this->retrieveAccessListener($proxy, false)?->getId();
+	}
+
+	public function disposeProxyAccessListenerOf(object $entityObj): void {
+		$this->retrieveAccessListener($entityObj, true)?->dispose();
+	}
 //
 //	private function createProxyClass(ReflectionClass $class) {
 //		if ($class->isAbstract()) {
