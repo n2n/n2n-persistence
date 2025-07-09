@@ -8,7 +8,7 @@ use n2n\persistence\orm\attribute\EntityListeners;
 class SimpleEntityMock {
 
 	private mixed $id;
-	private mixed $name = null;
+	public mixed $name = null;
 
 	function __construct(?string $name = null) {
 		$this->name = $name;
@@ -22,11 +22,11 @@ class SimpleEntityMock {
 		$this->id = $id;
 	}
 
-	function getName(): ?string {
-		return $this->name;
-	}
-
-	function setName(string $name): void {
-		$this->name = $name;
-	}
+//	function getName(): ?string {
+//		return $this->name;
+//	}
+//
+//	function setName(string $name): void {
+//		$this->name = $name;
+//	}
 }

@@ -241,8 +241,9 @@ class PersistenceContext {
 			throw new LazyInitialisationException('Cannot lazy initialize class: '
 					. EntityInfo::buildEntityString($entityModel, $id), 0, $e);
 		}
-		
-		$entityModel->getIdDef()->getEntityProperty()->writeValue($entity, $id);
+
+// causes the lazy ghost to be initialized.
+//		$entityModel->getIdDef()->getEntityProperty()->writeValue($entity, $id);
 		
 		$this->manageEntityObj($entity, $entityModel);
 		$this->identifyManagedEntityObj($entity, $id);

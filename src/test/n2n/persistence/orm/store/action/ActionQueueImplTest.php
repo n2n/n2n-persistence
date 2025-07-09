@@ -57,7 +57,7 @@ class ActionQueueImplTest extends TestCase {
 			$this->listener->onPrePersist = null;
 
 			$this->assertCount(1, $this->listener->events);
-			$entityObj1->setName('holeradio-1-1');
+			$entityObj1->name = 'holeradio-1-1';
 		};
 
 		$this->actionQueue->supply();
@@ -91,7 +91,7 @@ class ActionQueueImplTest extends TestCase {
 //		$this->actionQueue->getOrCreatePersistAction($entityObj2);
 
 
-		$entityObj1->setName('holeradio-1-1');
+		$entityObj1->name = 'holeradio-1-1';
 
 		$this->listener->onPreUpdate = function () use ($entityObj1, $entityObj2, $entityObj3) {
 
@@ -99,7 +99,7 @@ class ActionQueueImplTest extends TestCase {
 			$this->listener->onPreUpdate = null;
 
 			$this->assertCount(1, $this->listener->events);
-			$entityObj2->setName('holeradio-1-1');
+			$entityObj2->name = 'holeradio-1-1';
 		};
 
 		$this->actionQueue->supply();
