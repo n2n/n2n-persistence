@@ -49,7 +49,7 @@ class EntityProxyAccessListener implements ProxyAccessListener {
 		return $this->entityModel;
 	}
 
-	public function onAccess($entity): void {
+	public function onAccess(object $obj): void {
 		if ($this->disposed) return;
 		$this->disposed = true;
 		
@@ -62,7 +62,7 @@ class EntityProxyAccessListener implements ProxyAccessListener {
 							. EntityInfo::buildEntityString($this->entityModel, $this->id));
 		}
 		
-		$this->em->getLoadingQueue()->mapValues($entity, $this->id, $values);
+		$this->em->getLoadingQueue()->mapValues($obj, $this->id, $values);
 		$this->em->getLoadingQueue()->finalizeLoading($this);
 // 		$persistenceContext = $this->em->getPersistenceContext();
 // 		$persistenceContext->mapValues($entity, $values);
