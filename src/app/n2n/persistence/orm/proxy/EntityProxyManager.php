@@ -52,10 +52,10 @@ class EntityProxyManager {
 	}
 	/**
 	 * @param ReflectionClass $class
-	 * @param EntityProxyAccessListener $proxyAccessListener
+	 * @param ProxyAccessListener $proxyAccessListener
 	 * @return object
 	 */
-	public function createProxy(ReflectionClass $class, EntityProxyAccessListener $proxyAccessListener): object {
+	public function createProxy(ReflectionClass $class, ProxyAccessListener $proxyAccessListener): object {
 		$entityObj = $class->newLazyGhost(function(object $entityObj) use ($proxyAccessListener) {
 			$proxyAccessListener->onAccess($entityObj);
 			$this->listenerMap->offsetUnset($entityObj);
@@ -92,7 +92,7 @@ class EntityProxyManager {
 //	 * @param object $entity
 //	 * @return EntityProxyAccessListener|null
 //	 */
-	private function retrieveAccessListener(object $entity, bool $unset): ?EntityProxyAccessListener {
+	private function retrieveAccessListener(object $entity, bool $unset): ?ProxyAccessListener {
 		if (!$this->listenerMap->offsetExists($entity)) {
 			return null;
 		}

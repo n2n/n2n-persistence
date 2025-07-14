@@ -27,7 +27,7 @@ use n2n\persistence\orm\store\SimpleLoader;
 use n2n\persistence\orm\EntityNotFoundException;
 use n2n\persistence\orm\store\EntityInfo;
 
-class EntityProxyAccessListener {
+class EntityProxyAccessListener implements ProxyAccessListener {
 	private $em;
 	private $valueLoader;
 	private $entityModel;
@@ -41,7 +41,7 @@ class EntityProxyAccessListener {
 		$this->id = $id;
 	}
 	
-	public function getId() {
+	public function getId(): mixed {
 		return $this->id;
 	}
 	
@@ -49,7 +49,7 @@ class EntityProxyAccessListener {
 		return $this->entityModel;
 	}
 
-	public function onAccess($entity) {
+	public function onAccess($entity): void {
 		if ($this->disposed) return;
 		$this->disposed = true;
 		
@@ -69,7 +69,7 @@ class EntityProxyAccessListener {
 // 		$persistenceContext->updateValueHashes($entity, $values, array(), $this->em);
 	}
 
-	public function dispose() {
+	public function dispose(): void {
 		$this->disposed = true;
 	}
 }
