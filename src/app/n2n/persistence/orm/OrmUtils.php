@@ -76,14 +76,18 @@ class OrmUtils {
 // 		}
 // 	}
 
+	static function isInitialized(?object $proxy): bool {
+		return $proxy === null || EntityProxyManager::getInstance()->isProxyInitialized($proxy);
+	}
+
 	static function initialize(?object $proxy): void {
-		if ($proxy instanceof EntityProxy) {
+		if ($proxy !== null) {
 			EntityProxyManager::getInstance()->initializeProxy($proxy);
 		}
 	}
 
 	static function extractId(?object $proxy): mixed {
-		if ($proxy instanceof EntityProxy) {
+		if ($proxy !== null) {
 			return EntityProxyManager::getInstance()->extractProxyId($proxy);
 		}
 
