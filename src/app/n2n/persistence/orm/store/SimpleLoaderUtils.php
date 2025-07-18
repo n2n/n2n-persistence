@@ -36,6 +36,8 @@ class SimpleLoaderUtils {
 	public $entityModel;
 	
 	public QueryState $queryState;
+	public LoadingQueue $loadingQueue;
+	public PersistenceContext $persistenceContext;
 	public $tree;
 	public $metaTreePoint;
 	
@@ -52,6 +54,8 @@ class SimpleLoaderUtils {
 		$this->queryState = new QueryState($this->em);
 		$this->tree = new Tree($this->queryState);
 		$this->metaTreePoint = $this->tree->createBaseTreePoint($this->entityModel, 'e');
+		$this->loadingQueue = $this->em->getLoadingQueue();
+		$this->persistenceContext = $this->em->getPersistenceContext();
 	}
 	
 	public function setSelection(Selection $selection) {

@@ -39,7 +39,7 @@ class SimpleLoader {
 		$utils = new SimpleLoaderUtils($this->em, $entityModel);
 		$utils->initialize();
 		$utils->setSelection(new EntityObjSelection($entityModel, $utils->metaTreePoint,
-				$utils->queryState->getPersistenceContext(), $this->em->getLoadingQueue()));
+				$utils->persistenceContext, $utils->loadingQueue));
 		
 		$selectBuilder = $utils->build();
 		$idProperty = $entityModel->getIdDef()->getEntityProperty();
@@ -56,7 +56,7 @@ class SimpleLoader {
 		$utils = new SimpleLoaderUtils($this->em, $entityModel);
 		$utils->initialize();
 		$utils->setSelection(new EntityValuesSelection($entityModel, $utils->metaTreePoint,
-				$utils->queryState->getPersistenceContext(), $this->em->getLoadingQueue()));
+				$utils->persistenceContext, $utils->loadingQueue));
 
 		$selectBuilder = $utils->build();
 		$idProperty = $entityModel->getIdDef()->getEntityProperty();
