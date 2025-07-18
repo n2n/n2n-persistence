@@ -418,7 +418,7 @@ class PersistenceContext {
 				$entityProperty->writeValue($entityObj, $values[$propertyString]);
 			} catch (CorruptedDataException $e) {
 				throw new CorruptedDataException('Could write value to EntityProperty ' . $entityProperty
-						. '. Reason: ' . $e->getMessage());
+						. '. Reason: ' . $e->getMessage(), previous: $e);
 			}
 		}
 	}
