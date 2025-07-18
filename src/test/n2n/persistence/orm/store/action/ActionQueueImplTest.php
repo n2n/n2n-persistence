@@ -18,6 +18,9 @@ use n2n\util\magic\MagicContext;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use PHPUnit\Framework\MockObject\Exception;
+use n2n\persistence\orm\proxy\EntityProxyManager;
+use n2n\persistence\orm\proxy\EntityProxyAccessListener;
+use n2n\util\ex\IllegalStateException;
 
 class ActionQueueImplTest extends TestCase {
 
@@ -151,5 +154,19 @@ class ActionQueueImplTest extends TestCase {
 		$this->expectException(PersistenceOperationException::class);
 		$this->actionQueue->getOrCreatePersistAction($entityObj1);
 
+	}
+
+	function testGetUninitializedPersistAction(): void {
+		$this->expectException(IllegalStateException::class);
+
+		$accessListener = $this->createMock(EntityProxyAccessListener::class);
+		$accessListener->expects($this->never())->method('onAccess');
+		$accessListener->expects($this->never())->method('getId')->willReturn(1);
+
+		$entityObj = EntityProxyManager::getInstance()->createProxy(new \ReflectionClass(SimpleEntityMock::class),
+				$accessListener);
+
+
+		$this->assertFalse($this->actionQueue->getOrCreatePersistAction($entityObj)->isInitialized());
 	}
 }

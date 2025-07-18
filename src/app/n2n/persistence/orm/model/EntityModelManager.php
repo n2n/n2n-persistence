@@ -21,7 +21,6 @@
  */
 namespace n2n\persistence\orm\model;
 
-use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\OrmConfigurationException;
 use n2n\reflection\ReflectionContext;
 use n2n\persistence\orm\OrmError;
@@ -163,9 +162,6 @@ class EntityModelManager implements EntityModelCollection {
 		
 	public function getEntityModelByEntityObj(object $entityObj): EntityModel {
 		$class = new \ReflectionClass($entityObj);
-		if ($entityObj instanceof EntityProxy) {
-			$class = $class->getParentClass();
-		}
 		return $this->getEntityModelByClass($class);
 	}
 	

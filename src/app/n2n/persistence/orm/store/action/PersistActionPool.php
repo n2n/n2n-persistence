@@ -24,7 +24,6 @@ namespace n2n\persistence\orm\store\action;
 use n2n\persistence\orm\store\EntityInfo;
 
 use n2n\util\type\ArgUtils;
-use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\store\PersistenceOperationException;
@@ -33,12 +32,16 @@ use n2n\persistence\orm\store\ValueHashColFactory;
 use n2n\persistence\orm\store\action\supply\PersistSupplyJob;
 use n2n\persistence\orm\store\operation\PersistOperation;
 use n2n\persistence\orm\proxy\EntityProxyManager;
+use n2n\persistence\orm\store\action\supply\SupplyJob;
 
 class PersistActionPool {
 	private ActionQueue $actionQueue;
 	private $persistActions = array();
 	private $unsuppliedPersistActions = array();
-	private $persistSupplyJobs = array();
+	/**
+	 * @var PersistSupplyJob[] $persistSupplyJobs
+	 */
+	private array $persistSupplyJobs = array();
 	private $emptyPersistActions = array();
 	private $frozen;
 
@@ -60,10 +63,11 @@ class PersistActionPool {
 
 		$persistenceContext = $this->actionQueue->getPersistenceContext();
 
-		if ($entity instanceof EntityProxy
-				&& !EntityProxyManager::getInstance()->isProxyInitialized($entity)) {
-			$entityInfo = $persistenceContext->getEntityInfo($entity);
-			return new UninitializedPersistAction($entityInfo->getEntityModel(), $entityInfo->getId());
+		if (!EntityProxyManager::getInstance()->isProxyInitialized($entity)) {
+//			temporary test to see if this works or not.
+			throw new IllegalStateException('Can not create PersistAction from uninitialized entity proxy.');
+//			$entityInfo = $persistenceContext->getEntityInfo($entity);
+//			return new UninitializedPersistAction($entityInfo->getEntityModel(), $entityInfo->getId());
 		}
 
 		return null;
@@ -251,7 +255,7 @@ class PersistActionPool {
 		$this->emptyPersistActions = array();
 	}
 
-	public function supply() {
+	public function supply(): void {
 		IllegalStateException::assertTrue($this->frozen);
 
 		foreach ($this->persistSupplyJobs as $supplyJob) {

@@ -23,12 +23,12 @@ namespace n2n\persistence\orm\store\operation;
 
 use n2n\persistence\orm\store\action\ActionQueue;
 use n2n\util\type\ArgUtils;
-use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\util\type\ValueIncompatibleWithConstraintsException;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\store\PersistenceOperationException;
+use n2n\persistence\orm\OrmUtils;
 
 class MergeOperationImpl implements MergeOperation {
 	private $actionQueue;
@@ -57,8 +57,7 @@ class MergeOperationImpl implements MergeOperation {
 		$em = $this->actionQueue->getEntityManager();
 		$persistenceContext = $em->getPersistenceContext();
 
-		if ($entity instanceof EntityProxy
-				&& !$persistenceContext->getEntityProxyManager()->isProxyInitialized($entity)) {
+		if (!OrmUtils::isInitialized($entity)) {
 			return $this->mergedEntity[$objHash] = $entity;
 		}
 

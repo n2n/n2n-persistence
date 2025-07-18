@@ -30,6 +30,7 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
+use n2n\persistence\orm\query\select\Selection;
 
 class SimpleTreePointMeta extends TreePointMetaAdapter {
 	private $tableAlias;
@@ -52,7 +53,7 @@ class SimpleTreePointMeta extends TreePointMetaAdapter {
 	public function setIdColumnName(string $idColumnname) {		
 	}
 	
-	public function registerColumn(EntityModel $entityModel, $columnName) {		
+	public function registerColumn(EntityModel $entityModel, string $columnName): QueryColumn {
 		if (!isset($this->queryColumns[$columnName])) {
 			$this->queryColumns[$columnName] = new QueryColumn($columnName, $this->tableAlias);
 		}
@@ -60,7 +61,7 @@ class SimpleTreePointMeta extends TreePointMetaAdapter {
 		return $this->queryColumns[$columnName];
 	}
 
-	public function getQueryColumnByName(EntityModel $entityModel, $columnName) {		
+	public function getQueryColumnByName(EntityModel $entityModel, string $columnName): QueryColumn {
 		if (!isset($this->queryColumns[$columnName])) {
 			throw new IllegalStateException();
 		}
@@ -87,12 +88,12 @@ class SimpleTreePointMeta extends TreePointMetaAdapter {
 		return $selectStatementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias, $onComparator);
 	}
 	
-	public function createDiscriminatorSelection() {
+	public function createDiscriminatorSelection(): Selection {
 		return new SimpleDiscriminatorSelection($this->registerColumn($this->entityModel, 
 				$this->getIdColumnName()), $this->entityModel);
 	}
 	
-	public function createDiscriminatorComparisonStrategy(QueryState $queryState) {
+	public function createDiscriminatorComparisonStrategy(QueryState $queryState): ComparisonStrategy {
 		return new ComparisonStrategy(new SimpleDiscriminatorColumnComparable($this->entityModel->getClass(), $queryState));
 	}
 }

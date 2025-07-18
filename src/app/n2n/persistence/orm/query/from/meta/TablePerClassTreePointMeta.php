@@ -63,7 +63,7 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 		$this->discriminatedColumnAliases[$entityModel->getClass()->getName()] = array();
 	}
 
-	public function registerColumn(EntityModel $entityModel, $columnName) {
+	public function registerColumn(EntityModel $entityModel, string $columnName): QueryColumn {
 		$className = $entityModel->getClass()->getName();
 		
 		if (!isset($this->discriminatedColumnAliases[$className][$columnName])) {
@@ -81,7 +81,7 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 		return $this->queryColumns[$this->discriminatedColumnAliases[$className][$columnName]];
 	}
 
-	public function getQueryColumnByName(EntityModel $entityModel, $columnName) {
+	public function getQueryColumnByName(EntityModel $entityModel, string $columnName): QueryColumn {
 		$className = $entityModel->getClass()->getName();
 		
 		if (!isset($this->discriminatedColumnAliases[$className][$columnName])) {
@@ -162,7 +162,7 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 	
 	private $discrColumnAlias = null;
 	
-	public function createDiscriminatorSelection() {
+	public function createDiscriminatorSelection(): \n2n\persistence\orm\query\select\Selection {
 		if (!$this->entityModel->hasSubEntityModels()) {
 			return new SimpleDiscriminatorSelection($this->registerColumn($this->entityModel, 
 					$this->getIdColumnName()), $this->entityModel);
@@ -177,7 +177,7 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 				$this->discriminatedEntityModels);
 	}
 		
-	public function createDiscriminatorComparisonStrategy(QueryState $queryState) {
+	public function createDiscriminatorComparisonStrategy(QueryState $queryState): ComparisonStrategy {
 		if (!$this->entityModel->hasSubEntityModels()) {
 			return new ComparisonStrategy(new SimpleDiscriminatorColumnComparable(
 					$this->entityModel->getClass(), $this->queryState));

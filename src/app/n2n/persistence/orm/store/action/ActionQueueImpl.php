@@ -114,7 +114,7 @@ class ActionQueueImpl implements ActionQueue {
 		return $this->removeActionPool->getAction($entity);
 	}
 
-	public function add(Action $action, bool $prepend = false) {
+	public function add(Action $action, bool $prepend = false): void {
 		if (!$prepend) {
 			$this->actionJobs[spl_object_hash($action)] = $action;
 			return;
@@ -123,7 +123,7 @@ class ActionQueueImpl implements ActionQueue {
 		$this->actionJobs = [spl_object_hash($action) => $action] + $this->actionJobs;
 	}
 
-	public function remove(Action $action) {
+	public function remove(Action $action): void {
 		unset($this->actionJobs[spl_object_hash($action)]);
 	}
 

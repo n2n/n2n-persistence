@@ -25,12 +25,14 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\query\QueryState;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
+use n2n\persistence\orm\query\select\Selection;
 
 interface TreePointMeta {
 	
-	public function registerColumn(EntityModel $entityModel, $columnName);
+	public function registerColumn(EntityModel $entityModel, string $columnName): QueryColumn;
 
-	public function getQueryColumnByName(EntityModel $entityModel, $columnName);
+	public function getQueryColumnByName(EntityModel $entityModel, string $columnName): QueryColumn;
 
 	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder);
 
@@ -43,13 +45,11 @@ interface TreePointMeta {
 	public function setMetaGenerator(?MetaGenerator $metaGenerator = null);
 	
 	public function getMetaColumnAliases();
-	/**
-	 * @return \n2n\persistence\orm\query\select\Selection
-	 */
-	public function createDiscriminatorSelection();
+
+	public function createDiscriminatorSelection(): Selection;
 	/**
 	 * @param QueryState $queryState
 	 * @return \n2n\persistence\orm\criteria\compare\ComparisonStrategy
 	 */
-	public function createDiscriminatorComparisonStrategy(QueryState $queryState);
+	public function createDiscriminatorComparisonStrategy(QueryState $queryState): \n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 }

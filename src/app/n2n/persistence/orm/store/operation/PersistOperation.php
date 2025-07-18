@@ -23,6 +23,7 @@ namespace n2n\persistence\orm\store\operation;
 
 use n2n\persistence\orm\store\action\ActionQueue;
 use n2n\persistence\orm\CascadeType;
+use n2n\persistence\orm\OrmUtils;
 
 class PersistOperation implements CascadeOperation {
 
@@ -32,14 +33,16 @@ class PersistOperation implements CascadeOperation {
 		$this->cascader = new OperationCascader(CascadeType::PERSIST, $this);
 	}
 	
-	public function cascade(object $entity): void {
-		if (!$this->cascader->markAsCascaded($entity)) return;
+	public function cascade(object $entityObj): void {
+		if (!OrmUtils::isInitialized($entityObj) || !$this->cascader->markAsCascaded($entityObj)) {
+			return;
+		}
 
-		$persistAction = $this->actionQueue->getOrCreatePersistAction($entity, $this->ignoreRemovedState);
+		$persistAction = $this->actionQueue->getOrCreatePersistAction($entityObj, $this->ignoreRemovedState);
 		if (!$persistAction->isInitialized()) {
 			return;
 		}
 		
-		$this->cascader->cascadeProperties($persistAction->getEntityModel(), $entity);
+		$this->cascader->cascadeProperties($persistAction->getEntityModel(), $entityObj);
 	}
 }

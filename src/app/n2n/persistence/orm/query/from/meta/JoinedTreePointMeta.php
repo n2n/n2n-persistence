@@ -69,14 +69,8 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 
 		return $tableAlias;
 	}
-	/**
-	 *
-	 * @param EntityModel $entityModel
-	 * @param string $columnName
-	 * @param bool $select
-	 * @return QueryColumn
-	 */
-	public function registerColumn(EntityModel $entityModel, $columnName) {
+
+	public function registerColumn(EntityModel $entityModel, string $columnName): QueryColumn {
 		$tableAlias = $this->registerEntityModel($entityModel);
 		
 		if (!isset($this->queryColumns[$tableAlias])) {
@@ -90,7 +84,7 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 		return $this->queryColumns[$tableAlias][$columnName];
 	}
 
-	public function getQueryColumnByName(EntityModel $entityModel, $columnName) {
+	public function getQueryColumnByName(EntityModel $entityModel, string $columnName): QueryColumn {
 		$tableAlias = $this->registerEntityModel($entityModel);
 		
 		if (!isset($this->queryColumns[$tableAlias][$columnName])) {
@@ -162,7 +156,7 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\from\meta\TreePointMeta::createDiscriminatorSelection()
 	 */
-	public function createDiscriminatorSelection() {
+	public function createDiscriminatorSelection(): \n2n\persistence\orm\query\select\Selection {
 		$idQueryItems = array(new QueryColumn($this->getIdColumnName(), $this->registerEntityModel($this->entityModel)));
 		$entityModels = array($this->entityModel);
 		
@@ -174,7 +168,7 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 		return new JoinedDiscriminatorSelection($idQueryItems, $entityModels);
 	}
 	
-	public function createDiscriminatorComparisonStrategy(QueryState $queryState) {
+	public function createDiscriminatorComparisonStrategy(QueryState $queryState): \n2n\persistence\orm\criteria\compare\ComparisonStrategy {
 		throw new NotYetImplementedException('Wenn das würklich mal öper sötti bruche, chan er sich gern melde.'
 				. ' Ich bin mir aber ziemlich sicher, dass das niä de Fall si wird und de Text au nie öper läse wird.');
 	}

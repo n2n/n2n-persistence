@@ -35,7 +35,7 @@ class SimpleLoaderUtils {
 	private $em;
 	public $entityModel;
 	
-	public $queryState;
+	public QueryState $queryState;
 	public $tree;
 	public $metaTreePoint;
 	

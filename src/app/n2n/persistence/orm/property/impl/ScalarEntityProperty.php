@@ -79,7 +79,8 @@ class ScalarEntityProperty implements ColumnEntityProperty, BasicEntityProperty 
 	}
 	
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
-		return new SimpleSelection($this->createQueryColumn($metaTreePoint->getMeta()));
+//		return new SimpleSelection($this->createQueryColumn($metaTreePoint->getMeta()));
+		return new EagerValueSelection($this->createQueryColumn($metaTreePoint->getMeta()), TypeConstraints::scalar(true));
 	}
 
 	/**

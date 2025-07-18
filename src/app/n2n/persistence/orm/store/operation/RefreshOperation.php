@@ -39,11 +39,11 @@ class RefreshOperation implements CascadeOperation {
 		$this->cascader = new OperationCascader(CascadeType::REFRESH, $this);
 	}
 	
-	public function cascade(object $entity): void {
-		if (!$this->cascader->markAsCascaded($entity)) return;
+	public function cascade(object $entityObj): void {
+		if (!$this->cascader->markAsCascaded($entityObj)) return;
 	
 		$persistenceContext = $this->em->getPersistenceContext();
-		$entityInfo = $persistenceContext->getEntityInfo($entity, $this->em->getEntityModelManager());
+		$entityInfo = $persistenceContext->getEntityInfo($entityObj, $this->em->getEntityModelManager());
 		
 		switch ($entityInfo->getState()) {
 			case EntityInfo::STATE_DETACHED:
@@ -61,7 +61,7 @@ class RefreshOperation implements CascadeOperation {
 					. $entityInfo->toEntityString());
 		}
 		
-		$this->em->getLoadingQueue()->mapValues($entity, $entityInfo->getId(), $values);
+		$this->em->getLoadingQueue()->mapValues($entityObj, $entityInfo->getId(), $values);
 		$this->em->getLoadingQueue()->finalizeLoading($this);
 		
 // 		$persistenceContext->mapValues($entity, $values);
@@ -71,7 +71,7 @@ class RefreshOperation implements CascadeOperation {
 		
 		$entityProperty = null;
 		try {
-			$this->cascader->cascadeProperties($entityInfo->getEntityModel(), $entity, $entityProperty);
+			$this->cascader->cascadeProperties($entityInfo->getEntityModel(), $entityObj, $entityProperty);
 		} catch (EntityNotFoundException $e) {
 			throw new EntityNotFoundException('Could not refresh property '
 					. $entityProperty->toPropertyString(), 0, $e);

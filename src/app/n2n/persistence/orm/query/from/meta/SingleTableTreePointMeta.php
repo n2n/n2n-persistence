@@ -69,7 +69,7 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 				$this->entityModel, $this->entityModel->getDiscriminatorColumnName());
 	}
 
-	private function resolveDiscriminatedEntityModels(EntityModel $entityModel) {
+	private function resolveDiscriminatedEntityModels(EntityModel $entityModel): void {
 		if (!$entityModel->isAbstract()) {
 			$this->discriminatedEntityModels[$entityModel->getDiscriminatorValue()] = $entityModel;
 		}
@@ -79,7 +79,7 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 		}
 	}
 
-	public function registerColumn(EntityModel $entityModel, $columnName) {
+	public function registerColumn(EntityModel $entityModel, string $columnName): QueryColumn {
 		if (!isset($this->queryColumns[$columnName])) {
 			$this->queryColumns[$columnName] = new QueryColumn($columnName, $this->tableAlias);
 		}
@@ -87,7 +87,7 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 		return $this->queryColumns[$columnName];
 	}
 
-	public function getQueryColumnByName(EntityModel $entityModel, $columnName) {
+	public function getQueryColumnByName(EntityModel $entityModel, string $columnName): QueryColumn {
 		if (!isset($this->queryColumns[$columnName])) {
 			throw new IllegalStateException();
 		}
@@ -135,13 +135,13 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\from\meta\TreePointMeta::createDiscriminatorSelection()
 	 */
-	public function createDiscriminatorSelection() {
+	public function createDiscriminatorSelection(): \n2n\persistence\orm\query\select\Selection {
 		return new SingleTableDiscriminatorSelection(
 				$this->registerColumn($this->entityModel, $this->discriminatorColumnName),
 				$this->discriminatedEntityModels);
 	}
 	
-	public function createDiscriminatorComparisonStrategy(QueryState $queryState) {
+	public function createDiscriminatorComparisonStrategy(QueryState $queryState): ComparisonStrategy {
 		return new ComparisonStrategy(new SingleTableDiscriminatorColumnComparable(
 				$this->registerColumn($this->entityModel, $this->discriminatorColumnName), 
 				$this->discriminatedEntityModels, $queryState));

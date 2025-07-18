@@ -21,13 +21,13 @@
  */
 namespace n2n\persistence\orm\store\action;
 
-use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\util\ex\IllegalStateException;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\LifecycleEvent;
 use n2n\persistence\orm\store\action\supply\RemoveSupplyJob;
+use n2n\persistence\orm\OrmUtils;
 
 class RemoveActionPool {
 	private $actionQueue;
@@ -102,9 +102,8 @@ class RemoveActionPool {
 	
 	private function createRemoveAction($entity) {
 		$persistenceContext = $this->actionQueue->getPersistenceContext();
-		if ($entity instanceof EntityProxy) {
-			$persistenceContext->getEntityProxyManager()
-					->initializeProxy($entity);
+		if (!OrmUtils::isInitialized($entity)) {
+			throw new IllegalStateException('Can not create RemoveAction from a uninitialized entity proxy.');
 		}
 
 		$entityInfo = $persistenceContext->getEntityInfo($entity);
@@ -138,10 +137,10 @@ class RemoveActionPool {
 				$actionMeta, $oldValueHashCol);		
 	}
 	
-	public function removeAction($entity) {
-		ArgUtils::assertTrue(is_object($entity));
+	public function removeAction(object $entityObj): void {
+		ArgUtils::assertTrue(is_object($entityObj));
 		
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_hash($entityObj);
 		if (!isset($this->removeActions[$objHash])) return;
 	
 		IllegalStateException::assertTrue(!$this->frozen);

@@ -26,6 +26,7 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\SimpleLoader;
 use n2n\persistence\orm\EntityNotFoundException;
 use n2n\persistence\orm\store\EntityInfo;
+use n2n\util\type\ArgUtils;
 
 class EntityProxyAccessListener implements ProxyAccessListener {
 	private $em;
@@ -34,7 +35,8 @@ class EntityProxyAccessListener implements ProxyAccessListener {
 	private $id;
 	private $disposed = false;
 
-	public function __construct(EntityManager $em, EntityModel $entityModel, $id) {
+	public function __construct(EntityManager $em, EntityModel $entityModel, mixed $id) {
+		ArgUtils::assertTrue($id !== null, 'Id must not be null.');
 		$this->em = $em;
 		$this->valueLoader = new SimpleLoader($em);
 		$this->entityModel = $entityModel;

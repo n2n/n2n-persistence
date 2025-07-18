@@ -26,7 +26,6 @@ use n2n\reflection\ReflectionUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\proxy\EntityProxyManager;
-use n2n\persistence\orm\model\EntityModelManager;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\proxy\LazyInitialisationException;
 use n2n\persistence\orm\proxy\EntityProxyAccessListener;
@@ -35,13 +34,11 @@ use n2n\persistence\orm\proxy\EntityProxyInitializationException;
 use n2n\persistence\orm\proxy\CanNotCreateEntityProxyClassException;
 use n2n\reflection\ObjectCreationFailedException;
 use n2n\persistence\orm\EntityCreationFailedException;
-use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\model\EntityModelCollection;
 use n2n\util\magic\MagicContext;
-use n2n\util\type\ValueIncompatibleWithConstraintsException;
 use n2n\persistence\orm\CorruptedDataException;
-use n2n\persistence\orm\OrmException;
+use n2n\persistence\orm\OrmUtils;
 
 class PersistenceContext {
 	private $entityProxyManager;
@@ -149,7 +146,7 @@ class PersistenceContext {
 		
 		$entityModel = $this->entityModelCollection->getEntityModelByEntityObj($entityObj);
 		$idDef = $entityModel->getIdDef();
-		$id = $idDef->getEntityProperty()->readValue($entityObj);
+		$id = OrmUtils::extractId($entityObj) ?? $idDef->getEntityProperty()->readValue($entityObj);
 	
 		if ($idDef->isGenerated()) {
 			return new EntityInfo(($id === null ? EntityInfo::STATE_NEW : EntityInfo::STATE_DETACHED), 
@@ -252,14 +249,14 @@ class PersistenceContext {
 	}
 	
 	/**
-	 * @param object $entity
+	 * @param object $entityObj
 	 * @param EntityModel $entityModel
 	 */
-	public function manageEntityObj($entity, EntityModel $entityModel) {
-		$objHash = spl_object_hash($entity);
+	public function manageEntityObj(object $entityObj, EntityModel $entityModel): void {
+		$objHash = spl_object_hash($entityObj);
 		unset($this->removedEntityObjs[$objHash]);
 		
-		$this->managedEntityObjs[$objHash] = $entity;
+		$this->managedEntityObjs[$objHash] = $entityObj;
 		$this->entityModels[$objHash] = $entityModel;
 	}
 	

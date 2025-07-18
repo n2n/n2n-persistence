@@ -21,29 +21,31 @@
  */
 namespace n2n\persistence\orm\query\select;
 
-use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\PdoStatement;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\persistence\orm\EntityCreationFailedException;
 use n2n\persistence\orm\CorruptedDataException;
-use n2n\persistence\orm\proxy\EntityProxy;
+use n2n\persistence\orm\store\PersistenceContext;
+use n2n\persistence\orm\store\LoadingQueue;
 
 class EntityObjSelection implements Selection {
-	private $em;
 	private $selectionGroup;
 	
-	public function __construct(EntityModel $entityModel, QueryState $queryState, 
-			MetaTreePoint $metaTreePoint) {
-		$this->em = $queryState->getEntityManager();
-		
+	public function __construct(EntityModel $entityModel, MetaTreePoint $metaTreePoint,
+			private PersistenceContext $persistenceContext, private LoadingQueue $loadingQueue) {
+
 		$this->selectionGroup = new SelectionGroup();
 		$this->selectionGroup->addSelection(null, $metaTreePoint->getMeta()->createDiscriminatorSelection());
 		foreach ($entityModel->getAllEntityProperties() as $entityProperty) {			
 			$this->selectionGroup->addSelection($entityProperty->toPropertyString(), 
 			 		$metaTreePoint->requestCustomPropertySelection($entityProperty));
 		}
+	}
+
+	function getSelectionGroup(): SelectionGroup {
+		return $this->selectionGroup;
 	}
 	
 // 	private function buildKey(EntityProperty $entityProperty) {
@@ -66,7 +68,7 @@ class EntityObjSelection implements Selection {
 	protected function assembleValueBuilders(?EntityModel &$entityModel = null) {
 		$discrSelection = $this->selectionGroup->getSelectionByKey(null);
 		$entityModel = $discrSelection->determineEntityModel();
-		
+
 		if ($entityModel === null) {
 			return null;
 		}
@@ -83,34 +85,32 @@ class EntityObjSelection implements Selection {
 	public function createValueBuilder(): ValueBuilder {
 		$entityModel = null;
 		$valueBuilders = $this->assembleValueBuilders($entityModel);
-		
+
 		if ($valueBuilders === null) {
 			return new EagerValueBuilder(null);
 		} 
-				
-		$persistenceContext = $this->em->getPersistenceContext();
+
 		$id = $valueBuilders[$entityModel->getIdDef()->getEntityProperty()->toPropertyString()]->buildValue();
-		
+
 		if ($id === null) {
 			return new EagerValueBuilder(null);
 		}
-		
-		$entityObj = $persistenceContext->getEntityById($entityModel, $id);
-		
+
+		$entityObj = $this->persistenceContext->getEntityById($entityModel, $id);
+
 		if (null !== $entityObj) {
-			if (!($entityObj instanceof EntityProxy) 
-					|| $persistenceContext->getEntityProxyManager()->isProxyInitialized($entityObj)) {
+			if ($this->persistenceContext->getEntityProxyManager()->isProxyInitialized($entityObj)) {
 				return new EagerValueBuilder($entityObj);
 			}
 		} else {
 			try {
-				$entityObj = $persistenceContext->createManagedEntityObj($entityModel, $id);
+				$entityObj = $this->persistenceContext->createManagedEntityObj($entityModel, $id);
 			} catch(EntityCreationFailedException $e) {
 				throw new CorruptedDataException('Data in database incompatible with entity: ' 
 						. EntityInfo::buildEntityString($entityModel, $id), 0, $e);
 			}
 		}
-		
+
 		return new LazyValueBuilder(function () use ($entityObj, $id, $valueBuilders) {
 // 			if (!$this->persistenceContext->containsValueHashCol($entity)) {
 			$values = array();
@@ -118,7 +118,7 @@ class EntityObjSelection implements Selection {
 				$values[$key] = $valueBuilder->buildValue();
 			}
 			
-			$this->em->getLoadingQueue()->mapValues($entityObj, $id, $values);
+			$this->loadingQueue->mapValues($entityObj, $id, $values);
 // 			$persistenceContext = $this->em->getPersistenceContext();
 // 			$persistenceContext->mapValues($entity, $values);
 // 			$persistenceContext->updateValueHashes($entity, $values, array(), $this->em);
@@ -130,7 +130,10 @@ class EntityObjSelection implements Selection {
 class SelectionGroup {
 	private $columnCounter = 0;
 
-	private $selections = array();
+	/**
+	 * @var Selection[] $selections
+	 */
+	private array $selections = array();
 	private $queryItems = array();
 	private $selectionCaims = array();
 
@@ -162,11 +165,11 @@ class SelectionGroup {
 		}
 	}
 	
-	public function getSelectionByKey($key) {
+	public function getSelectionByKey($key): Selection {
 		if (isset($this->selections[$key])) {
 			return $this->selections[$key];
 		}
-		
+
 		throw new \InvalidArgumentException();
 	}
 }

@@ -23,7 +23,6 @@ namespace n2n\persistence\orm;
 
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\criteria\item\CriteriaProperty;
-use n2n\persistence\orm\proxy\EntityProxy;
 use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\persistence\orm\proxy\EntityProxyManager;
 
@@ -113,7 +112,7 @@ class OrmUtils {
 	 * @return void
 	 * @deprecated use {@link self::initialize()}
 	 */
-	public static function initializeProxy(EntityManager $em, $obj) {
+	public static function initializeProxy(EntityManager $em, $obj): void {
 //		if ($obj instanceof EntityProxy) {
 			$em->getPersistenceContext()->getEntityProxyManager()
 					->initializeProxy($obj);

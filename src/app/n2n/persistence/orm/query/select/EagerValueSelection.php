@@ -21,6 +21,10 @@ class EagerValueSelection implements Selection {
 		$stmt->shareBindColumn($columnAliases[0], $this->value);
 	}
 
+	function setValue(mixed $value): void {
+		$this->value = $value;
+	}
+
 	public function createValueBuilder(): ValueBuilder {
 		$value = $this->rawTypeConstraint?->validate($this->value);
 

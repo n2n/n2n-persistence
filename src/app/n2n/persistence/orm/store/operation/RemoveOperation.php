@@ -23,6 +23,7 @@ namespace n2n\persistence\orm\store\operation;
 
 use n2n\persistence\orm\store\action\ActionQueue;
 use n2n\persistence\orm\CascadeType;
+use n2n\persistence\orm\OrmUtils;
 
 class RemoveOperation implements CascadeOperation {
 	private $actionQueue;
@@ -33,11 +34,13 @@ class RemoveOperation implements CascadeOperation {
 		$this->cascader = new OperationCascader(CascadeType::REMOVE, $this);
 	}
 	
-	public function cascade(object $entity): void {
-		if (!$this->cascader->markAsCascaded($entity)) return;
+	public function cascade(object $entityObj): void {
+		if (!$this->cascader->markAsCascaded($entityObj)) return;
+
+		OrmUtils::initialize($entityObj);
 		
-		if (null !== ($removeAction = $this->actionQueue->getOrCreateRemoveAction($entity))) {
-			$this->cascader->cascadeProperties($removeAction->getEntityModel(), $entity);
+		if (null !== ($removeAction = $this->actionQueue->getOrCreateRemoveAction($entityObj))) {
+			$this->cascader->cascadeProperties($removeAction->getEntityModel(), $entityObj);
 		}
 	}
 }

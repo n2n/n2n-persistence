@@ -39,7 +39,7 @@ class SimpleDiscriminatorSelection implements DiscriminatorSelection {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\from\meta\DiscriminatorSelection::determineEntityModel()
 	 */
-	public function determineEntityModel() { 
+	public function determineEntityModel(): ?EntityModel {
 		if ($this->value === null) return null;
 		
 		return $this->entityModel;
@@ -56,6 +56,11 @@ class SimpleDiscriminatorSelection implements DiscriminatorSelection {
 	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$stmt->shareBindColumn($columnAliases[0], $this->value);
 	}
+
+	function setValue(mixed $value): void {
+		$this->value = $value;
+	}
+
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
 	 */
