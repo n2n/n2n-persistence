@@ -47,7 +47,7 @@ abstract class DateTimeColumnAdapter extends ColumnAdapter implements DateTimeCo
 		return $dateTime;
 	}
 
-	public function buildRawValue(?\DateTime $dateTime = null) {
+	public function buildRawValue(?\DateTimeInterface $dateTime = null): ?string {
 		if (is_null($dateTime)) {
 			return null;
 		}

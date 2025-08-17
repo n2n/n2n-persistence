@@ -23,22 +23,22 @@ namespace n2n\persistence\meta;
 
 interface OrmDialectConfig {
 	/**
-	 * Converts a rawValue of the typical DateTime type into a DateTime object. 
+	 * Converts a rawValue of the typical DateTime type into an object of type DateTimeInterface.
 	 * If null is passed the method returns null.	
 	 * @param string $rawValue
-	 * @return \DateTime
+	 * @return \DateTimeInterface|null
 	 * @throws \InvalidArgumentException if an invalid rawValue was passed.
 	 */
-	public function parseDateTime($rawValue);
+	public function parseDateTime($rawValue): ?\DateTimeInterface;
 	/**
-	 * Converts the passed DateTime into the rawValue for the typical DateTime type. 
+	 * Converts the passed object of type DateTimeInterface into the rawValue for the typical DateTime type.
 	 * If null is passed the method returns null.  
-	 * @param \DateTime $dateTime
-	 * @return string
+	 * @param \DateTimeInterface|null $dateTime
+	 * @return string|null
 	 */
-	public function buildDateTimeRawValue(?\DateTime $dateTime = null);
+	public function buildDateTimeRawValue(?\DateTimeInterface $dateTime = null): ?string;
 	/**
 	 * @return string
 	 */
-	public function getOrmDateTimeColumnTypeName();
+	public function getOrmDateTimeColumnTypeName(): string;
 }
