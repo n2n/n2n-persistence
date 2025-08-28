@@ -30,7 +30,7 @@
 		"n2n/n2n": "~7.4",
 		"n2n/n2n-io": "~7.4",
 		"n2n/n2n-reflection": "~7.4",
-		"n2n/n2n-util" : "~7.4",
+		"n2n/n2n-util": "~7.4.3",
         "n2n/n2n-spec-dbo": "~1.0",
         "ext-mbstring": "*",
         "ext-pdo": "*",
