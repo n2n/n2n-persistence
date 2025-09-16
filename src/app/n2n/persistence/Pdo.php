@@ -302,7 +302,7 @@ class Pdo implements Dbo {
 		$result = @$this->pdo()->commit();
 		$postErr = error_get_last();
 
-		// Problem: Warining: Error while sending QUERY packet. PID=223316 --> $this->pdo()->commit() will return true but
+		// Problem: Warning: Error while sending QUERY packet. PID=223316 --> $this->pdo()->commit() will return true but
 		// triggers warning.
 		// http://php.net/manual/de/pdo.transactions.php
 		if (!$result || $preErr !== $postErr) {
