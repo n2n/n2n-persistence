@@ -271,7 +271,8 @@ class Pdo implements Dbo {
 		}
 	}
 
-	private function performBeginTransaction(?Transaction $transaction = null, bool $readOnly = false): void {
+	private function performBeginTransaction(?Transaction $transaction = null, bool $readOnly = false,
+			?string $isolationLevel = null): void {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_BEGIN, $transaction);
 
 		IllegalStateException::assertTrue(!$this->pdo()->inTransaction(),

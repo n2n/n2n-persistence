@@ -64,12 +64,12 @@ interface Dialect {
 	 * @param \PDO $pdo
 	 * @param bool $readOnly
 	 * @param PdoLogger|null $pdoLogger
-	 * @param string|null $transactionIsolationLevel individual isolation level for this transaction if null the default
+	 * @param string|null $isolationLevel individual isolation level for this transaction if null the default
 	 *   isolation leven will be used.
 	 * @return void
 	 */
 	function beginTransaction(\PDO $pdo, bool $readOnly, ?PdoLogger $pdoLogger = null,
-			?string $transactionIsolationLevel = null): void;
+			?string $isolationLevel = null): void;
 
 	/**
 	 * @param Pdo $dbh
