@@ -237,9 +237,9 @@ class Pdo implements Dbo {
 		return PDOOperations::exec($this->logger, $this->pdo(), $statement);
 	}
 
-	public function beginTransaction(bool $readOnly = false): void {
+	public function beginTransaction(bool $readOnly = false, ?string $isolationLevel = null): void {
 		if ($this->transactionManager === null || !$this->bindMode->isTransactionIncluded()) {
-			$this->performBeginTransaction(null, $readOnly);
+			$this->performBeginTransaction(null, $readOnly, $isolationLevel);
 			return;
 		}
 
@@ -278,7 +278,8 @@ class Pdo implements Dbo {
 		IllegalStateException::assertTrue(!$this->pdo()->inTransaction(),
 				'Illegal call, pdo already in transaction.');
 
-		$this->dialect->beginTransaction($this->pdo(), $readOnly, $this->logger);
+		$this->dialect->beginTransaction($this->pdo(), $readOnly, $this->logger,
+				$isolationLevel ?? $transaction?->getIsolationLevel());
 
 		if (!$this->pdo()->inTransaction()) {
 			throw new IllegalStateException('Dialect call '
