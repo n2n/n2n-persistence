@@ -29,5 +29,8 @@ class BaseSubCriteriaTreePoint extends SubCriteriaTreePoint {
 		$selectBuilder->addFrom($this->buildQueryResult(), $this->tableAlias);
 	}
 
-	
+	function getJoinType(): ?string {
+		return null;
+	}
+
 }
