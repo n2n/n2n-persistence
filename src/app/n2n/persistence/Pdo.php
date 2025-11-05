@@ -36,6 +36,7 @@ use n2n\spec\dbo\meta\data\InsertStatementBuilder;
 use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\spec\dbo\meta\data\DeleteStatementBuilder;
 use n2n\spec\dbo\DboStatement;
+use n2n\spec\tx\TransactionIsolationLevel;
 
 class Pdo implements Dbo {
 	private ?\PDO $pdo = null;
@@ -237,7 +238,7 @@ class Pdo implements Dbo {
 		return PDOOperations::exec($this->logger, $this->pdo(), $statement);
 	}
 
-	public function beginTransaction(bool $readOnly = false, ?string $isolationLevel = null): void {
+	public function beginTransaction(bool $readOnly = false, ?TransactionIsolationLevel $isolationLevel = null): void {
 		if ($this->transactionManager === null || !$this->bindMode->isTransactionIncluded()) {
 			$this->performBeginTransaction(null, $readOnly, $isolationLevel);
 			return;
@@ -272,7 +273,7 @@ class Pdo implements Dbo {
 	}
 
 	private function performBeginTransaction(?Transaction $transaction = null, bool $readOnly = false,
-			?string $isolationLevel = null): void {
+			?TransactionIsolationLevel $isolationLevel = null): void {
 		$this->triggerTransactionEvent(TransactionEvent::TYPE_ON_BEGIN, $transaction);
 
 		IllegalStateException::assertTrue(!$this->pdo()->inTransaction(),
