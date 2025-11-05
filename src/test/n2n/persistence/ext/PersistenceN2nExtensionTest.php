@@ -3,7 +3,6 @@
 namespace n2n\persistence\ext;
 
 use PHPUnit\Framework\TestCase;
-use n2n\core\cache\impl\NullAppCache;
 use n2n\core\config\AppConfig;
 use n2n\core\config\GeneralConfig;
 use n2n\core\config\WebConfig;
@@ -14,7 +13,6 @@ use n2n\core\config\ErrorConfig;
 use n2n\core\config\DbConfig;
 use n2n\l10n\L10nConfig;
 use n2n\l10n\PseudoL10nConfig;
-use n2n\core\cache\impl\EphemeralAppCache;
 use n2n\core\config\PersistenceUnitConfig;
 use n2n\core\config\OrmConfig;
 use n2n\core\config\N2nLocaleConfig;
@@ -34,6 +32,7 @@ use n2n\core\N2nApplication;
 use n2n\core\cache\AppCache;
 use n2n\util\io\fs\FsPath;
 use n2n\core\cache\impl\N2nCaches;
+use n2n\spec\tx\TransactionIsolationLevel;
 
 class PersistenceN2nExtensionTest extends TestCase {
 
@@ -46,7 +45,7 @@ class PersistenceN2nExtensionTest extends TestCase {
 		$this->appConfig = new AppConfig(
 				dbConfig: new DbConfig([
 					new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
-							'SERIALIZABLE', DialectMock::class,
+							TransactionIsolationLevel::TIL_SERIALIZABLE, DialectMock::class,
 							false, null)
 				]),
 				ormConfig: new OrmConfig([PseudoEntityMock::class], []));

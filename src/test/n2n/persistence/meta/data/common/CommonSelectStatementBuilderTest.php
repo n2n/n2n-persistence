@@ -10,13 +10,14 @@ use n2n\spec\dbo\meta\data\impl\QueryTable;
 use n2n\persistence\PdoFactory;
 use n2n\spec\dbo\meta\data\QueryFragmentBuilder;
 use n2n\spec\dbo\meta\data\QueryLockMode;
+use n2n\spec\tx\TransactionIsolationLevel;
 
 class CommonSelectStatementBuilderTest extends TestCase {
 
 	private function createPdo(): Pdo {
 		return PdoFactory::createFromPersistenceUnitConfig(
 				new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
-						PersistenceUnitConfig::TIL_SERIALIZABLE, DialectMock::class));
+						TransactionIsolationLevel::TIL_SERIALIZABLE, DialectMock::class));
 	}
 
 	function testWithLock(): void {
