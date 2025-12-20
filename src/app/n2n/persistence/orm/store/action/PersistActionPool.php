@@ -272,6 +272,7 @@ class PersistActionPool {
 
 		do {
 			$updatePersistActions = array();
+			$recheckPersistActions = [];
 
 			while (null !== ($persistAction = array_pop($this->unsuppliedPersistActions))) {
 				if ($persistAction->isDisabled()) continue;
@@ -290,14 +291,18 @@ class PersistActionPool {
 				}
 			}
 
-			while ($this->announceUpdateLifecylcEvents($updatePersistActions)) {
+
+			while ($this->announceUpdateLifecycleEvents($updatePersistActions, $recheckPersistActions)) {
 				$persistOperation = new PersistOperation($this->actionQueue);
 				foreach ($updatePersistActions as $updatePersistAction) {
 					$persistOperation->cascade($updatePersistAction->getEntityObj());
 				}
 
+				$recheckPersistActions = [];
 				foreach ($this->persistSupplyJobs as $persistSupplyJob) {
-					$this->refreshSupplyJob($persistSupplyJob);
+					if ($this->refreshSupplyJob($persistSupplyJob)) {
+						$recheckPersistActions[] = $persistSupplyJob->getPersistAction();
+					}
 				}
 
 				$updatePersistActions = array();
@@ -342,8 +347,8 @@ class PersistActionPool {
 		return $supplyJob;
 	}
 
-	private function refreshSupplyJob(PersistSupplyJob $supplyJob) {
-		if ($supplyJob->isDisabled()) return;
+	private function refreshSupplyJob(PersistSupplyJob $supplyJob): bool {
+		if ($supplyJob->isDisabled()) return false;
 
 		$persistAction = $supplyJob->getPersistAction();
 
@@ -357,17 +362,22 @@ class PersistActionPool {
 // 		cascade could destroy this
 // 		if ($valueHashes === $supplyJob->getValueHashes()) return;
 
+		$matches = $supplyJob->getValueHashCol()?->matches($valueHashCol) ?? false;
+
 		$supplyJob->setValues($values);
 		$supplyJob->setValueHashCol($valueHashCol);
 
 		$supplyJob->prepare();
+
+		return !$matches;
 	}
 
 	/**
 	 * @param PersistAction[] $persistActions
+	 * @param PersistAction[] $recheckOnlyPersistActions
 	 * @return bool
 	 */
-	private function announceUpdateLifecylcEvents(array $persistActions): bool {
+	private function announceUpdateLifecycleEvents(array $persistActions, array $recheckOnlyPersistActions): bool {
 		$callbacksInvoked = false;
 
 		foreach ($persistActions as $persistAction) {
@@ -387,6 +397,17 @@ class PersistActionPool {
 						$persistAction->getEntityObj(), $persistAction->getEntityModel(), $persistAction->getId(),
 						$persistAction->getMeta()));
 			});
+		}
+
+		foreach ([...$persistActions, ...$recheckOnlyPersistActions] as $persistAction) {
+			if ($persistAction->isDisabled()) continue;
+
+			if ($this->actionQueue->announceLifecycleEvent(new LifecycleEvent(
+					($persistAction->isNew() ? LifecycleEvent::PRE_PERSIST_RECHECK : LifecycleEvent::PRE_UPDATE_RECHECK),
+					$persistAction->getEntityObj(), $persistAction->getEntityModel(), $persistAction->getId(),
+					$persistAction->getMeta()))) {
+				$callbacksInvoked = true;
+			}
 		}
 
 		return $callbacksInvoked;

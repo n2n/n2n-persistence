@@ -253,7 +253,9 @@ class ActionQueueImpl implements ActionQueue {
 	public function announceLifecycleEvent(LifecycleEvent $event): bool {
 		switch ($event->getType()) {
 			case LifecycleEvent::PRE_PERSIST:
+			case LifecycleEvent::PRE_PERSIST_RECHECK:
 			case LifecycleEvent::PRE_REMOVE:
+			case LifecycleEvent::PRE_UPDATE_RECHECK:
 			case LifecycleEvent::PRE_UPDATE:
 				return $this->triggerLifecycleEvent($event);
 

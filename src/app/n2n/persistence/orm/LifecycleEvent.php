@@ -32,10 +32,12 @@ use n2n\util\ex\IllegalStateException;
 
 class LifecycleEvent {
 	const PRE_PERSIST = '_prePersist';
+	const PRE_PERSIST_RECHECK = '_prePersistRecheck';
 	const POST_PERSIST = '_postPersist';
 	const PRE_REMOVE = '_preRemove';
 	const POST_REMOVE = '_postRemove';
 	const PRE_UPDATE = '_preUpdate';
+	const PRE_UPDATE_RECHECK = '_preUpdateRecheck';
 	const POST_UPDATE = '_postUpdate';
 	const POST_LOAD = '_postLoad';
 	
@@ -74,9 +76,11 @@ class LifecycleEvent {
 		return $this->id;
 	}
 	
-	public static function getTypes() {
-		return array(self::PRE_PERSIST, self::POST_PERSIST, self::PRE_REMOVE, self::POST_REMOVE, 
-				self::PRE_UPDATE, self::POST_UPDATE, self::POST_LOAD);
+	public static function getTypes(): array {
+		return array(self::PRE_PERSIST, self::PRE_PERSIST_RECHECK, self::POST_PERSIST,
+				self::PRE_REMOVE, self::POST_REMOVE,
+				self::PRE_UPDATE, self::PRE_UPDATE_RECHECK, self::POST_UPDATE,
+				self::POST_LOAD);
 	}
 
 	private function determineEntityProperty(string $propertyExpression): EntityProperty {
