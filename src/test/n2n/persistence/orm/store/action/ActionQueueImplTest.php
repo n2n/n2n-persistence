@@ -70,14 +70,14 @@ class ActionQueueImplTest extends TestCase {
 
 		$this->assertSame(LifecycleEvent::PRE_PERSIST, $this->listener->events[0]->getType());
 		$this->assertSame($entityObj1, $this->listener->events[0]->getEntityObj());
-		$this->assertSame(LifecycleEvent::PRE_PERSIST_RECHECK, $this->listener->events[1]->getType());
+		$this->assertSame(LifecycleEvent::PRE_PERSIST_AND_RECHECK, $this->listener->events[1]->getType());
 		$this->assertSame($entityObj1, $this->listener->events[1]->getEntityObj());
-		$this->assertSame(LifecycleEvent::PRE_PERSIST_RECHECK, $this->listener->events[2]->getType());
+		$this->assertSame(LifecycleEvent::PRE_PERSIST_AND_RECHECK, $this->listener->events[2]->getType());
 		$this->assertSame($entityObj1, $this->listener->events[2]->getEntityObj());
 
 		$this->assertSame(LifecycleEvent::PRE_PERSIST, $this->listener->events[3]->getType());
 		$this->assertSame($entityObj2, $this->listener->events[3]->getEntityObj());
-		$this->assertSame(LifecycleEvent::PRE_PERSIST_RECHECK, $this->listener->events[4]->getType());
+		$this->assertSame(LifecycleEvent::PRE_PERSIST_AND_RECHECK, $this->listener->events[4]->getType());
 		$this->assertSame($entityObj2, $this->listener->events[4]->getEntityObj());
 	}
 
@@ -124,12 +124,12 @@ class ActionQueueImplTest extends TestCase {
 
 		$this->assertSame(LifecycleEvent::PRE_UPDATE, $this->listener->events[0]->getType());
 		$this->assertSame($entityObj1, $this->listener->events[0]->getEntityObj());
-		$this->assertSame(LifecycleEvent::PRE_UPDATE_RECHECK, $this->listener->events[1]->getType());
+		$this->assertSame(LifecycleEvent::PRE_UPDATE_AND_RECHECK, $this->listener->events[1]->getType());
 		$this->assertSame($entityObj1, $this->listener->events[1]->getEntityObj());
 
 		$this->assertSame(LifecycleEvent::PRE_UPDATE, $this->listener->events[2]->getType());
 		$this->assertSame($entityObj2, $this->listener->events[2]->getEntityObj());
-		$this->assertSame(LifecycleEvent::PRE_UPDATE_RECHECK, $this->listener->events[3]->getType());
+		$this->assertSame(LifecycleEvent::PRE_UPDATE_AND_RECHECK, $this->listener->events[3]->getType());
 		$this->assertSame($entityObj2, $this->listener->events[3]->getEntityObj());
 	}
 
@@ -174,9 +174,9 @@ class ActionQueueImplTest extends TestCase {
 
 		$this->assertSame(LifecycleEvent::PRE_UPDATE, $this->listener->events[0]->getType());
 		$this->assertSame($entityObj1, $this->listener->events[0]->getEntityObj());
-		$this->assertSame(LifecycleEvent::PRE_UPDATE_RECHECK, $this->listener->events[1]->getType());
+		$this->assertSame(LifecycleEvent::PRE_UPDATE_AND_RECHECK, $this->listener->events[1]->getType());
 		$this->assertSame($entityObj1, $this->listener->events[1]->getEntityObj());
-		$this->assertSame(LifecycleEvent::PRE_UPDATE_RECHECK, $this->listener->events[2]->getType());
+		$this->assertSame(LifecycleEvent::PRE_UPDATE_AND_RECHECK, $this->listener->events[2]->getType());
 		$this->assertSame($entityObj1, $this->listener->events[2]->getEntityObj());
 	}
 

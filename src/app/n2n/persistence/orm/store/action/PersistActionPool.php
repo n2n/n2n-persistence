@@ -403,7 +403,7 @@ class PersistActionPool {
 			if ($persistAction->isDisabled()) continue;
 
 			if ($this->actionQueue->announceLifecycleEvent(new LifecycleEvent(
-					($persistAction->isNew() ? LifecycleEvent::PRE_PERSIST_RECHECK : LifecycleEvent::PRE_UPDATE_RECHECK),
+					($persistAction->isNew() ? LifecycleEvent::PRE_PERSIST_AND_RECHECK : LifecycleEvent::PRE_UPDATE_AND_RECHECK),
 					$persistAction->getEntityObj(), $persistAction->getEntityModel(), $persistAction->getId(),
 					$persistAction->getMeta()))) {
 				$callbacksInvoked = true;

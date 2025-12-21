@@ -22,7 +22,7 @@ class SimpleEntityListener {
 		$this->onPrePersist?->__invoke($event);
 	}
 
-	function _prePersistRecheck(LifecycleEvent $event): void {
+	function _prePersistAndRecheck(LifecycleEvent $event): void {
 		$this->events[]	= $event;
 		$this->onPrePersistRecheck?->__invoke($event);
 	}
@@ -32,7 +32,7 @@ class SimpleEntityListener {
 		$this->onPreUpdate?->__invoke($event);
 	}
 
-	function _preUpdateRecheck(LifecycleEvent $event): void {
+	function _preUpdateAndRecheck(LifecycleEvent $event): void {
 		$this->events[]	= $event;
 		$this->onPreUpdateRecheck?->__invoke($event);
 	}
