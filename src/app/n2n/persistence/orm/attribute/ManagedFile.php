@@ -4,6 +4,7 @@ namespace n2n\persistence\orm\attribute;
 use Attribute;
 use n2n\io\managed\FileLocator;
 use n2n\io\managed\FileManager;
+use n2n\io\managed\impl\MonthlyDirFileLocator;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ManagedFile {
@@ -14,7 +15,7 @@ class ManagedFile {
 	 * @param bool $cascadeDelete
 	 */
 	public function __construct(private string $fileManagerlookupId = FileManager::TYPE_PUBLIC,
-			private ?FileLocator $fileLocator = null, private bool $cascadeDelete = true) {
+			private ?FileLocator $fileLocator = new MonthlyDirFileLocator(), private bool $cascadeDelete = true) {
 	}
 
 	/**
