@@ -64,7 +64,10 @@ class EntityObjSelection implements Selection {
 	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$this->selectionGroup->bindColumns($stmt, $columnAliases);
 	}
-	
+
+	/**
+	 * @throws CorruptedDataException
+	 */
 	protected function assembleValueBuilders(?EntityModel &$entityModel = null) {
 		$discrSelection = $this->selectionGroup->getSelectionByKey(null);
 		$entityModel = $discrSelection->determineEntityModel();
@@ -77,7 +80,12 @@ class EntityObjSelection implements Selection {
 		foreach ($entityModel->getEntityProperties() as $entityProperty) {
 			$propertyString = $entityProperty->toPropertyString();
 			$selection = $this->selectionGroup->getSelectionByKey($propertyString);
-			$valueBuilders[$propertyString] = $selection->createValueBuilder();
+			try {
+				$valueBuilders[$propertyString] = $selection->createValueBuilder();
+			} catch (CorruptedDataException $e) {
+				throw new CorruptedDataException('Could build value for ' . $entityProperty . ': ' . $e->getMessage(),
+						previous: $e);
+			}
 		}
 		return $valueBuilders;
 	}
