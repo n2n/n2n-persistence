@@ -15,7 +15,7 @@ class ManagedFile {
 	 * @param bool $cascadeDelete
 	 */
 	public function __construct(private string $fileManagerlookupId = FileManager::TYPE_PUBLIC,
-			private ?FileLocator $fileLocator = new MonthlyDirFileLocator(), private bool $cascadeDelete = true) {
+			private ?FileLocator $fileLocator = null, private bool $cascadeDelete = true) {
 	}
 
 	/**
