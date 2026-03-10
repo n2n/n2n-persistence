@@ -53,7 +53,7 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 		
 		$pdo = $this->emPool->getPdoPool()->getPdo($this->persistenceUnitName);
 		if (!$pdo->inTransaction()) {
-			throw new IllegalStateException('No tranaction open.');
+			throw new IllegalStateException('No transaction open.');
 		}
 		
 		$this->transactionalEm = new LazyEntityManager($this->persistenceUnitName, $this->emPool, true);
@@ -125,3 +125,4 @@ class LazyEntityManagerFactory implements EntityManagerFactory {
 // 		}
 // 	}
 // }
+
