@@ -9,20 +9,32 @@ use n2n\persistence\orm\LifecycleEvent;
 class SimpleEntityListener {
 
 	/**
-	 * @var LifecycleEvent $events;
+	 * @var LifecycleEvent[] $events;
 	 */
 	public array $events = [];
 	public ?\Closure $onPrePersist = null;
+	public ?\Closure $onPrePersistRecheck = null;
 	public ?\Closure $onPreUpdate = null;
+	public ?\Closure $onPreUpdateRecheck = null;
 
 	function _prePersist(LifecycleEvent $event): void {
 		$this->events[]	= $event;
 		$this->onPrePersist?->__invoke($event);
 	}
 
+	function _prePersistAndRecheck(LifecycleEvent $event): void {
+		$this->events[]	= $event;
+		$this->onPrePersistRecheck?->__invoke($event);
+	}
+
 	function _preUpdate(LifecycleEvent $event): void {
 		$this->events[]	= $event;
 		$this->onPreUpdate?->__invoke($event);
+	}
+
+	function _preUpdateAndRecheck(LifecycleEvent $event): void {
+		$this->events[]	= $event;
+		$this->onPreUpdateRecheck?->__invoke($event);
 	}
 
 	function _preRemove(LifecycleEvent $event): void {

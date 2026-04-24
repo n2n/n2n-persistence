@@ -6,14 +6,15 @@ use n2n\core\config\PersistenceUnitConfig;
 use PHPUnit\Framework\TestCase;
 use n2n\persistence\ext\mock\DialectMock;
 use n2n\core\container\TransactionManager;
+use n2n\spec\tx\TransactionIsolationLevel;
 
 class PdoLoggerTest extends TestCase {
 
 
 	private function createPersistenceUnitConfig(bool $persistent,
-			string $readOnlyTransactionIsolationLevel = PersistenceUnitConfig::TIL_REPEATABLE_READ): PersistenceUnitConfig {
+			TransactionIsolationLevel $readOnlyTransactionIsolationLevel = TransactionIsolationLevel::TIL_REPEATABLE_READ): PersistenceUnitConfig {
 		return new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
-				PersistenceUnitConfig::TIL_SERIALIZABLE, DialectMock::class,
+				TransactionIsolationLevel::TIL_SERIALIZABLE, DialectMock::class,
 				persistent: $persistent, readOnlyTransactionIsolationLevel: $readOnlyTransactionIsolationLevel);
 	}
 
@@ -22,7 +23,7 @@ class PdoLoggerTest extends TestCase {
 	}
 
 	private function createPdo(bool $persistent,
-			string $readOnlyTransactionIsolationLevel = PersistenceUnitConfig::TIL_REPEATABLE_READ,
+			TransactionIsolationLevel $readOnlyTransactionIsolationLevel = TransactionIsolationLevel::TIL_REPEATABLE_READ,
 			?TransactionManager $transactionManager = null): Pdo {
 		return PdoFactory::createFromPersistenceUnitConfig(
 				$this->createPersistenceUnitConfig($persistent, $readOnlyTransactionIsolationLevel),

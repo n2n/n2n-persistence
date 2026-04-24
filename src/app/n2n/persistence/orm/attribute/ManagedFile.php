@@ -4,6 +4,7 @@ namespace n2n\persistence\orm\attribute;
 use Attribute;
 use n2n\io\managed\FileLocator;
 use n2n\io\managed\FileManager;
+use n2n\io\managed\impl\MonthlyDirFileLocator;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ManagedFile {

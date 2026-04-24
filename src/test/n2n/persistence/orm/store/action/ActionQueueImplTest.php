@@ -21,6 +21,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use n2n\persistence\orm\proxy\EntityProxyManager;
 use n2n\persistence\orm\proxy\EntityProxyAccessListener;
 use n2n\util\ex\IllegalStateException;
+use n2n\persistence\orm\LifecycleEvent;
 
 class ActionQueueImplTest extends TestCase {
 
@@ -65,7 +66,19 @@ class ActionQueueImplTest extends TestCase {
 
 		$this->actionQueue->supply();
 
-		$this->assertCount(2, $this->listener->events);
+		$this->assertCount(5, $this->listener->events);
+
+		$this->assertSame(LifecycleEvent::PRE_PERSIST, $this->listener->events[0]->getType());
+		$this->assertSame($entityObj1, $this->listener->events[0]->getEntityObj());
+		$this->assertSame(LifecycleEvent::PRE_PERSIST_AND_RECHECK, $this->listener->events[1]->getType());
+		$this->assertSame($entityObj1, $this->listener->events[1]->getEntityObj());
+		$this->assertSame(LifecycleEvent::PRE_PERSIST_AND_RECHECK, $this->listener->events[2]->getType());
+		$this->assertSame($entityObj1, $this->listener->events[2]->getEntityObj());
+
+		$this->assertSame(LifecycleEvent::PRE_PERSIST, $this->listener->events[3]->getType());
+		$this->assertSame($entityObj2, $this->listener->events[3]->getEntityObj());
+		$this->assertSame(LifecycleEvent::PRE_PERSIST_AND_RECHECK, $this->listener->events[4]->getType());
+		$this->assertSame($entityObj2, $this->listener->events[4]->getEntityObj());
 	}
 
 	function testNewUpdateOnPreUpdate() {
@@ -102,12 +115,69 @@ class ActionQueueImplTest extends TestCase {
 			$this->listener->onPreUpdate = null;
 
 			$this->assertCount(1, $this->listener->events);
-			$entityObj2->name = 'holeradio-1-1';
+			$entityObj2->name = 'holeradio-2-1';
 		};
 
 		$this->actionQueue->supply();
 
-		$this->assertCount(2, $this->listener->events);
+		$this->assertCount(4, $this->listener->events);
+
+		$this->assertSame(LifecycleEvent::PRE_UPDATE, $this->listener->events[0]->getType());
+		$this->assertSame($entityObj1, $this->listener->events[0]->getEntityObj());
+		$this->assertSame(LifecycleEvent::PRE_UPDATE_AND_RECHECK, $this->listener->events[1]->getType());
+		$this->assertSame($entityObj1, $this->listener->events[1]->getEntityObj());
+
+		$this->assertSame(LifecycleEvent::PRE_UPDATE, $this->listener->events[2]->getType());
+		$this->assertSame($entityObj2, $this->listener->events[2]->getEntityObj());
+		$this->assertSame(LifecycleEvent::PRE_UPDATE_AND_RECHECK, $this->listener->events[3]->getType());
+		$this->assertSame($entityObj2, $this->listener->events[3]->getEntityObj());
+	}
+
+	function testOnPreUpdateRecheckRecursion() {
+		$entityObj1 = new SimpleEntityMock('holeradio-1');
+		$entityObj1->setId(1);
+		$entityObj2 = new SimpleEntityMock('holeradio-2');
+		$entityObj2->setId(2);
+		$entityObj3 = new SimpleEntityMock('holeradio-3');
+		$entityObj3->setId(3);
+
+		$hasher = new ValueHashColFactory($this->entityModel, $this->magicContext);
+
+		$this->persistenceContext->manageEntityObj($entityObj1, $this->entityModel);
+		$this->persistenceContext->identifyManagedEntityObj($entityObj1, $entityObj1->getId());
+		$this->persistenceContext->updateValueHashes($entityObj1, $hasher->create($entityObj1));
+
+		$this->persistenceContext->manageEntityObj($entityObj2, $this->entityModel);
+		$this->persistenceContext->identifyManagedEntityObj($entityObj2, $entityObj2->getId());
+		$this->persistenceContext->updateValueHashes($entityObj2, $hasher->create($entityObj2));
+
+		$this->persistenceContext->manageEntityObj($entityObj3, $this->entityModel);
+		$this->persistenceContext->identifyManagedEntityObj($entityObj3, $entityObj3->getId());
+		$this->persistenceContext->updateValueHashes($entityObj3, $hasher->create($entityObj3));
+
+//		$this->actionQueue->getOrCreatePersistAction($entityObj1);
+//		$this->actionQueue->getOrCreatePersistAction($entityObj2);
+
+
+		$entityObj1->name = 'holeradio-1-1';
+		$callsNum = 0;
+		$this->listener->onPreUpdateRecheck = function () use ($entityObj1, $entityObj2, $entityObj3, &$callsNum) {
+			$this->assertTrue($this->actionQueue->containsPersistAction($entityObj1));
+
+			$entityObj1->name = 'holeradio-2-1';
+			$callsNum++;
+		};
+
+		$this->actionQueue->supply();
+
+		$this->assertCount(3, $this->listener->events);
+
+		$this->assertSame(LifecycleEvent::PRE_UPDATE, $this->listener->events[0]->getType());
+		$this->assertSame($entityObj1, $this->listener->events[0]->getEntityObj());
+		$this->assertSame(LifecycleEvent::PRE_UPDATE_AND_RECHECK, $this->listener->events[1]->getType());
+		$this->assertSame($entityObj1, $this->listener->events[1]->getEntityObj());
+		$this->assertSame(LifecycleEvent::PRE_UPDATE_AND_RECHECK, $this->listener->events[2]->getType());
+		$this->assertSame($entityObj1, $this->listener->events[2]->getEntityObj());
 	}
 
 	function testForceRemovedToManaged(): void {

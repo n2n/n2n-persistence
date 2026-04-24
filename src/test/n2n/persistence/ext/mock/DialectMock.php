@@ -17,6 +17,7 @@ use n2n\persistence\meta\OrmDialectConfig;
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\persistence\PdoLogger;
 use n2n\persistence\PDOOperations;
+use n2n\spec\tx\TransactionIsolationLevel;
 
 class DialectMock implements Dialect {
 
@@ -88,7 +89,8 @@ class DialectMock implements Dialect {
 
 	public array $beginTransactionCalls = [];
 
-	function beginTransaction(\PDO $pdo, bool $readOnly, ?PdoLogger $pdoLogger = null): void {
+	function beginTransaction(\PDO $pdo, bool $readOnly, ?PdoLogger $pdoLogger = null,
+			?TransactionIsolationLevel $isolationLevel = null): void {
 		$this->beginTransactionCalls[] = ['method' => 'beginTransaction', 'readOnly' => $readOnly];
 
 		PDOOperations::beginTransaction($pdoLogger, $pdo);

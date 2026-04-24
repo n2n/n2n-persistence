@@ -29,6 +29,7 @@ use n2n\persistence\orm\attribute\Transient;
 use n2n\persistence\orm\attribute\MappedSuperclass;
 use n2n\util\ex\err\ConfigurationError;
 use n2n\util\type\TypeUtils;
+use n2n\reflection\property\UninitializedBehaviour;
 
 class EntityPropertyAnalyzer {
 	private $entityPropertyProviders;
@@ -41,7 +42,8 @@ class EntityPropertyAnalyzer {
 	
 	public function analyzeClass(ClassSetup $classSetup) {
 		$class = $classSetup->getClass();
-		$propertiesAnalyzer = new PropertiesAnalyzer($class, true);
+		$propertiesAnalyzer = new PropertiesAnalyzer($class, true,
+				uninitializedBehaviour: UninitializedBehaviour::RETURN_NULL);
 		$attributeSet = $classSetup->getAttributeSet();
 		
 		$attrAttributeOverrides = $attributeSet->getClassAttribute(AttributeOverrides::class);
