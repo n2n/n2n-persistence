@@ -29,27 +29,29 @@ use n2n\persistence\orm\EntityCreationFailedException;
 use n2n\persistence\orm\CorruptedDataException;
 use n2n\persistence\orm\store\PersistenceContext;
 use n2n\persistence\orm\store\LoadingQueue;
+use n2n\persistence\orm\property\EntityProperty;
+use n2n\util\StringUtils;
 
 class EntityObjSelection implements Selection {
 	private $selectionGroup;
-	
+
 	public function __construct(EntityModel $entityModel, MetaTreePoint $metaTreePoint,
 			private PersistenceContext $persistenceContext, private LoadingQueue $loadingQueue) {
 
 		$this->selectionGroup = new SelectionGroup();
 		$this->selectionGroup->addSelection(null, $metaTreePoint->getMeta()->createDiscriminatorSelection());
-		foreach ($entityModel->getAllEntityProperties() as $entityProperty) {			
-			$this->selectionGroup->addSelection($entityProperty->toPropertyString(), 
-			 		$metaTreePoint->requestCustomPropertySelection($entityProperty));
+		foreach ($entityModel->getAllEntityProperties() as $entityProperty) {
+			$this->selectionGroup->addSelection($entityProperty->toPropertyString(),
+					$metaTreePoint->requestCustomPropertySelection($entityProperty));
 		}
 	}
 
 	function getSelectionGroup(): SelectionGroup {
 		return $this->selectionGroup;
 	}
-	
+
 // 	private function buildKey(EntityProperty $entityProperty) {
-// 		return $entityProperty->getEntityModel()->getClass()->getName() 
+// 		return $entityProperty->getEntityModel()->getClass()->getName()
 // 				. '::$' . $entityProperty->getName();
 // 	}
 	/**
@@ -75,7 +77,7 @@ class EntityObjSelection implements Selection {
 		if ($entityModel === null) {
 			return null;
 		}
-		
+
 		$valueBuilders = array();
 		foreach ($entityModel->getEntityProperties() as $entityProperty) {
 			$propertyString = $entityProperty->toPropertyString();
@@ -83,20 +85,37 @@ class EntityObjSelection implements Selection {
 			try {
 				$valueBuilders[$propertyString] = $selection->createValueBuilder();
 			} catch (CorruptedDataException $e) {
-				throw new CorruptedDataException('Could build value for ' . $entityProperty . ': ' . $e->getMessage(),
-						previous: $e);
+				throw $this->decorateCorruptedDataException($entityProperty, $e);
 			}
 		}
 		return $valueBuilders;
 	}
-	
+
+	private function decorateCorruptedDataException(EntityProperty $entityProperty, CorruptedDataException $e): CorruptedDataException {
+		$idEntityProperty = $entityProperty->getEntityModel()->getIdDef()->getEntityProperty();
+		$id = null;
+		try {
+			$id = $this->selectionGroup->getSelectionByKey($idEntityProperty->toPropertyString())->createValueBuilder()
+					->buildValue();
+		} catch (CorruptedDataException $e) {}
+
+		if ($id === null) {
+			return new CorruptedDataException('Could build value for ' . $entityProperty . ': ' . $e->getMessage(),
+					previous: $e);
+		}
+
+		return new CorruptedDataException('Could build value for ' . $entityProperty . ' of entity with id '
+				. StringUtils::strOf($id, true) . ': ' . $e->getMessage(),
+				previous: $e);
+	}
+
 	public function createValueBuilder(): ValueBuilder {
 		$entityModel = null;
 		$valueBuilders = $this->assembleValueBuilders($entityModel);
 
 		if ($valueBuilders === null) {
 			return new EagerValueBuilder(null);
-		} 
+		}
 
 		$id = $valueBuilders[$entityModel->getIdDef()->getEntityProperty()->toPropertyString()]->buildValue();
 
@@ -114,7 +133,7 @@ class EntityObjSelection implements Selection {
 			try {
 				$entityObj = $this->persistenceContext->createManagedEntityObj($entityModel, $id);
 			} catch(EntityCreationFailedException $e) {
-				throw new CorruptedDataException('Data in database incompatible with entity: ' 
+				throw new CorruptedDataException('Data in database incompatible with entity: '
 						. EntityInfo::buildEntityString($entityModel, $id), 0, $e);
 			}
 		}
@@ -125,7 +144,7 @@ class EntityObjSelection implements Selection {
 			foreach ($valueBuilders as $key => $valueBuilder) {
 				$values[$key] = $valueBuilder->buildValue();
 			}
-			
+
 			$this->loadingQueue->mapValues($entityObj, $id, $values);
 // 			$persistenceContext = $this->em->getPersistenceContext();
 // 			$persistenceContext->mapValues($entity, $values);
@@ -164,15 +183,15 @@ class SelectionGroup {
 	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		foreach ($this->selections as $key => $selection) {
 			$selectionColumnAliases = array();
-			
+
 			foreach ($this->selectionCaims[$key] as $queryItemIndex => $columnIndex) {
 				$selectionColumnAliases[$queryItemIndex] = $columnAliases[$columnIndex];
 			}
-				
+
 			$selection->bindColumns($stmt, $selectionColumnAliases);
 		}
 	}
-	
+
 	public function getSelectionByKey($key): Selection {
 		if (isset($this->selections[$key])) {
 			return $this->selections[$key];
