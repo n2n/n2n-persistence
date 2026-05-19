@@ -71,7 +71,7 @@ class CriteriaProperty implements CriteriaItem {
 class PropertyQueryPoint implements QueryPoint {
 	private $propertyNames;
 	private $queryState;
-	private $queryPointResolver;
+	private QueryPointResolver $queryPointResolver;
 	
 	public function __construct(array $propertyNames, QueryState $queryState, 
 			QueryPointResolver $queryPointResolver) {
@@ -99,7 +99,7 @@ class PropertyQueryPoint implements QueryPoint {
 	}
 	
 	public function requestRepresentableQueryItem(): QueryItem {
-		return $this->queryPointResolver->requestPropertyRepresentableQueryItem(
+		return $this->queryPointResolver->(
 				new TreePath($this->propertyNames));
 	}
 					

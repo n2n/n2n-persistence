@@ -51,24 +51,11 @@ class Criteria {
 	const ORDER_DIRECTION_ASC = OrderDirection::ASC;
 	const ORDER_DIRECTION_DESC = OrderDirection::DESC;
 	
-	private $persistenceContext; 
-
-	private $distinct;
-	
-	private $unnamedSelectCriteriaItems = array();
-	private $namedSelectCriteriaItems = array();
+	private $persistenceContext;
 	
 	private $treeModClosures = array();
 	
 	private $whereComparator;
-
-	private $orderDefs = array();
-	private $groupCriteriaItems = array();
-	
-	private $havingComparator;
-	
-	private $limit;
-	private $num;
 
 	private ?LockMode $lockMode = null;
 	/**
@@ -87,45 +74,10 @@ class Criteria {
 		return $this;
 	}
 	
-	private function validateAlias($alias) {
-		if (!is_scalar($alias)) {
-			throw new CriteriaConflictException('Invalid criteria alias type: ' . TypeUtils::getTypeInfo($alias));
-		}
-		
+	protected function validateAlias(string $alias): void {
 		if (0 == mb_strlen($alias)) {
 			throw new CriteriaConflictException('Empty string passed as criteria alias.');
 		}
-	}
-	
-	/**
-	 * @param mixed $item Arg for {@see CrIt::pfLenient()}
-	 * @param string $alias
-	 * @throws CriteriaConflictException
-	 * @return Criteria
-	 */
-	public function select($item, $alias = null) {
-		$criteriaItem = CrIt::pfLenient($item);
-		
-		if ($alias === null) {
-			$this->unnamedSelectCriteriaItems[] = $criteriaItem;
-			return $this;
-		}
-		
-		$this->validateAlias($alias);
-		$alias = (string) $alias;
-		if (isset($this->namedSelectCriteriaItems[$alias])) {
-			throw new CriteriaConflictException('Column alias ambiguous: ' . $alias);
-		}
-		
-		$this->namedSelectCriteriaItems[$alias] = $criteriaItem;
-		
-		return $this;
-	}
-
-	function clearSelect(): static {
-		$this->unnamedSelectCriteriaItems = [];
-		$this->namedSelectCriteriaItems = [];
-		return $this;
 	}
 
 	/**

@@ -22,6 +22,7 @@
 namespace n2n\persistence\orm\query\from;
 
 use n2n\persistence\orm\query\QueryConflictException;
+use n2n\spec\dbo\meta\data\StatementBuilder;
 
 interface JoinedTreePoint extends TreePoint {
 	/**
@@ -38,4 +39,6 @@ interface JoinedTreePoint extends TreePoint {
 	 * @return \n2n\persistence\meta\data\QueryComparator
 	 */
 	public function getOnQueryComparator();
+
+	public function apply(StatementBuilder $statementBuilder);
 }

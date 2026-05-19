@@ -31,6 +31,8 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
+use n2n\spec\dbo\meta\data\QueryResult;
+use n2n\util\ex\NotYetImplementedException;
 
 class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 	private $metaData;
@@ -105,13 +107,18 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 		}
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, ?QueryComparator $onComparator = null) {
+	function applyAsMod(ModStatementBuilder $modStatementBuilder): void {
+		throw new NotYetImplementedException(TablePerClassTreePointMeta::class
+				. ' can not yet be applied to a ' . ModStatementBuilder::class);
+	}
+
+	public function applyAsJoin(SelectStatementBuilder $statementBuilder, $joinType, ?QueryComparator $onComparator = null) {
 		if (!$this->entityModel->hasSubEntityModels()) {
-			return $selectStatementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)),
+			return $statementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)),
 					$this->tableAlias, $onComparator);
 		}
 
-		return $selectStatementBuilder->addJoin($joinType, $this->createSelectStatementSequence(), $this->tableAlias);
+		return $statementBuilder->addJoin($joinType, $this->createSelectStatementSequence(), $this->tableAlias);
 	}
 
 	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder) {
@@ -122,7 +129,7 @@ class TablePerClassTreePointMeta extends TreePointMetaAdapter {
 		return $selectStatementBuilder->addFrom($this->createSelectStatementSequence(), $this->tableAlias);
 	}
 
-	private function createSelectStatementSequence() {
+	private function createSelectStatementSequence(): QueryResult {
 		$sequence = null;
 		foreach ($this->discriminatedEntityModels as $discriminatorValue => $entityModel) {
 			$selectStatement = $this->createSelectStatement($discriminatorValue, $entityModel);

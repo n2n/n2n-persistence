@@ -31,12 +31,13 @@ use n2n\util\ex\IllegalStateException;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\spec\dbo\meta\data\StatementBuilder;
 
 class SimpleTreePointMeta extends TreePointMetaAdapter {
 	private $tableAlias;
 
-	private $discriminatorQueryColumn = null;
-	private $discriminatorAlias = null;
+//	private $discriminatorQueryColumn = null;
+//	private $discriminatorAlias = null;
 
 	private $queryColumns = array();
 
@@ -69,23 +70,27 @@ class SimpleTreePointMeta extends TreePointMetaAdapter {
 		return $this->queryColumns[$columnName];
 	}
 
-	private function applySelection(SelectStatementBuilder $selectBuilder) {
-		if (!isset($this->discriminatorQueryColumn)) return;
-			
-		$selectBuilder->addSelectColumn($this->discriminatorQueryColumn, 
-				$this->discriminatorAlias);
+//	private function applySelection(SelectStatementBuilder $selectBuilder) {
+//		if (!isset($this->discriminatorQueryColumn)) return;
+//
+//		$selectBuilder->addSelectColumn($this->discriminatorQueryColumn,
+//				$this->discriminatorAlias);
+//	}
+
+	function applyAsMod(ModStatementBuilder $modStatementBuilder): void {
+		$modStatementBuilder->setTable($this->generateTableName($this->entityModel));
 	}
 
-	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder) {
-		$this->applySelection($selectStatementBuilder);
+	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder): void {
+//		$this->applySelection($selectStatementBuilder);
 
 		$selectStatementBuilder->addFrom(new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias);
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, ?QueryComparator $onComparator = null) {
-		$this->applySelection($selectStatementBuilder);
+	public function applyAsJoin(StatementBuilder $statementBuilder, $joinType, ?QueryComparator $onComparator = null): void {
+//		$this->applySelection($statementBuilder);
 
-		return $selectStatementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias, $onComparator);
+		/*return*/ $statementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias, $onComparator);
 	}
 	
 	public function createDiscriminatorSelection(): Selection {

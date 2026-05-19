@@ -25,6 +25,7 @@ use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\spec\dbo\meta\data\QueryPart;
+use n2n\persistence\orm\query\update\Settable;
 
 interface QueryPoint extends QueryPointResolver {
 	/**
@@ -42,4 +43,6 @@ interface QueryPoint extends QueryPointResolver {
 	 * @throws \n2n\persistence\orm\query\QueryConflictException
 	 */
 	public function requestRepresentableQueryItem(): QueryPart;
+
+	function requestSettable(): Settable;
 }

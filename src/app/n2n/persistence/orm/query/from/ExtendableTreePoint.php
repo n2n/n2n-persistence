@@ -35,13 +35,17 @@ use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\property\CustomComparableEntityProperty;
 use n2n\persistence\orm\property\JoinableEntityProperty;
 use n2n\persistence\orm\property\EntityProperty;
+use n2n\persistence\orm\query\update\Settable;
 
 abstract class ExtendableTreePoint extends MetaTreePointAdapter {
 	const CLASS_COMPARISON_PROPERTY = 'class';
 	
 	protected $queryState;
 	protected $entityPropertyCollection;
-	protected $propertyJoinTreePoints = array();
+	/**
+	 * @var JoinedTreePoint[]
+	 */
+	protected array $propertyJoinTreePoints = array();
 	protected $propertyComparationStrategies = array();
 	protected $propertySelections = array();
 	
@@ -104,7 +108,11 @@ abstract class ExtendableTreePoint extends MetaTreePointAdapter {
 		
 		return $this->propertyJoinTreePoints[$propertyStr];
 	}
-	
+
+	function requestSettable(): Settable {
+
+	}
+
 	public function requestPropertyComparisonStrategy(TreePath $treePath) {
 		$propertyName = $treePath->next();
 		

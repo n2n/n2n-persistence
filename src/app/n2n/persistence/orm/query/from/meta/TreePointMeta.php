@@ -27,6 +27,7 @@ use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\query\QueryState;
 use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\spec\dbo\meta\data\StatementBuilder;
 
 interface TreePointMeta {
 	
@@ -34,9 +35,9 @@ interface TreePointMeta {
 
 	public function getQueryColumnByName(EntityModel $entityModel, string $columnName): QueryColumn;
 
-	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder);
+	public function applyAsFrom(StatementBuilder $selectStatementBuilder);
 
-	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, ?QueryComparator $onComparator = null);
+	public function applyAsJoin(StatementBuilder $statementBuilder, $joinType, ?QueryComparator $onComparator = null): void;
 
 	public function getEntityModel(): EntityModel;
 

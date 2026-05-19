@@ -30,6 +30,7 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\util\ex\IllegalStateException;
 use n2n\util\ex\NotYetImplementedException;
+use n2n\spec\dbo\meta\data\StatementBuilder;
 
 class JoinedTreePointMeta extends TreePointMetaAdapter {
 	private $superEntityModels = array(); 
@@ -111,13 +112,13 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 		}
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, ?QueryComparator $onComparator = null) {
+	public function applyAsJoin(StatementBuilder $statementBuilder, $joinType, ?QueryComparator $onComparator = null): void {
 // 		$this->applySelection($selectBuilder);
 		
 		if (count($this->tableAliases) == 1) {
 			foreach ($this->tableAliases as $className => $tableAlias) {
 				$tableName = $this->generateTableName($this->registeredEntityModels[$className]);
-				return $selectStatementBuilder->addJoin($joinType, new QueryTable($tableName), $tableAlias, $onComparator);
+				/*return*/ $statementBuilder->addJoin($joinType, new QueryTable($tableName), $tableAlias, $onComparator);
 			}
 		}
 		
@@ -136,7 +137,7 @@ class JoinedTreePointMeta extends TreePointMetaAdapter {
 			$this->applyJoin($joinBuilder, $className, $baseTableAlias, $tableName, $tableAlias);
 		}
 
-		return $selectStatementBuilder->addJoin($joinType, $joinBuilder->toFromQueryResult(), null, $onComparator);
+		/*return*/ $statementBuilder->addJoin($joinType, $joinBuilder->toFromQueryResult(), null, $onComparator);
 	}
 	
 	

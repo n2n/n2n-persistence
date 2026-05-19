@@ -52,6 +52,8 @@ interface EntityManager {
 
 	public function createCriteria(): Criteria;
 
+	function createUpdateCriteria(): UpdateCriteria;
+
 	/**
 	 * @template T
 	 * @param class-string<T>|ReflectionClass $class

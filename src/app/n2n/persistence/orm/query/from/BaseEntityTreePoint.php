@@ -25,7 +25,7 @@ use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 
 class BaseEntityTreePoint extends EntityTreePoint {
 	
-	public function apply(SelectStatementBuilder $selectBuilder) {
+	public function apply(SelectStatementBuilder $selectBuilder): void {
 		$this->treePointMeta->applyAsFrom($selectBuilder);
 		parent::apply($selectBuilder);
 	}

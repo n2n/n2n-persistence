@@ -34,7 +34,10 @@ use n2n\util\type\TypeUtils;
 
 class Tree implements QueryPointResolver {
 	private $queryState;
-	private $treePoints = array();
+	/**
+	 * @var TreePoint[]
+	 */
+	private array $treePoints = array();
 	private $namedTreePoints = array();
 	
 // 	private $inheritedNamedTreePoints = array();
@@ -87,6 +90,11 @@ class Tree implements QueryPointResolver {
 		$this->validateAlias($alias);
 		$this->namedTreePoints[$alias] = $treePoint;
 		$this->treePoints[] = $treePoint;
+	}
+
+
+	public function createModeTreePoint(EntityModel $entityModel) {
+		$this->modTreePoint = $this->createBaseTreePoint($entityModel);
 	}
 	
 	/**
@@ -159,7 +167,7 @@ class Tree implements QueryPointResolver {
 		return $this->treePoints[] = $this->namedTreePoints[$alias] = $treePoint;
 	}
 	
-	public function apply(SelectStatementBuilder $selectBuilder) {
+	public function apply(SelectStatementBuilder $selectBuilder): void {
 		foreach ($this->treePoints as $treePoint) {
 			$treePoint->apply($selectBuilder);
 		}

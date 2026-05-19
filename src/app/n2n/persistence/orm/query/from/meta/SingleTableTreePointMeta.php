@@ -30,12 +30,14 @@ use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\spec\dbo\meta\data\impl\QueryConstant;
 use n2n\util\ex\IllegalStateException;
+use n2n\spec\dbo\meta\data\StatementBuilder;
+use n2n\util\ex\NotYetImplementedException;
 
 class SingleTableTreePointMeta extends TreePointMetaAdapter {
 	private $tableAlias;
 
 	private $discriminatorColumnName;
-	private $discriminatorAlias;
+//	private $discriminatorAlias;
 	private $discriminatedEntityModels = [];
 	private array $queryColumns = [];
 	
@@ -55,13 +57,13 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 	public function setIdColumnName(string $idColumnname) {
 	}
 	
-	public function getMetaColumnAliases() {
-		if (isset($this->discriminatorAlias)) {
-			return array($this->discriminatorColumnName => $this->discriminatorAlias);
-		} 
-		
-		return array();
-	}
+//	public function getMetaColumnAliases() {
+//		if (isset($this->discriminatorAlias)) {
+//			return array($this->discriminatorColumnName => $this->discriminatorAlias);
+//		}
+//
+//		return array();
+//	}
 	
 	public function setMetaGenerator(?MetaGenerator $metaGenerator = null) {
 		parent::setMetaGenerator($metaGenerator);
@@ -95,17 +97,27 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 		return $this->queryColumns[$columnName];
 	}
 
-	private function applySelection(SelectStatementBuilder $selectBuilder) {
-		if (is_null($this->discriminatorAlias)) return;
-		
-		$selectBuilder->addSelectColumn(new QueryColumn($this->discriminatorColumnName, $this->tableAlias),
- 				$this->discriminatorAlias);
-// 		$selectBuilder->addSelectColumn($this->getQueryColumnByName($this->discriminatorColumnName),
+//	private function applySelection(SelectStatementBuilder $selectBuilder) {
+//		if (is_null($this->discriminatorAlias)) return;
+//
+//		$selectBuilder->addSelectColumn(new QueryColumn($this->discriminatorColumnName, $this->tableAlias),
 // 				$this->discriminatorAlias);
+//// 		$selectBuilder->addSelectColumn($this->getQueryColumnByName($this->discriminatorColumnName),
+//// 				$this->discriminatorAlias);
+//	}
+
+
+
+	function applyAsMod(ModStatementBuilder $modStatementBuilder): void {
+		$modStatementBuilder->setTable($this->generateTableName($this->entityModel));
+
+		if ($this->entityModel->hasSuperEntityModel()) {
+			$this->assembleDiscrComparator($modStatementBuilder->getWhereComparator()->andGroup(), false);
+		}
 	}
 
-	public function applyAsFrom(SelectStatementBuilder $selectStatementBuilder): void {
-		$this->applySelection($selectStatementBuilder);
+	public function applyAsFrom(StatementBuilder $selectStatementBuilder): void {
+//		$this->applySelection($selectStatementBuilder);
 		$selectStatementBuilder->addFrom(new QueryTable($this->generateTableName($this->entityModel)), $this->tableAlias);
 
 		if ($this->entityModel->hasSuperEntityModel()) {
@@ -113,9 +125,9 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 		}
 	}
 
-	public function applyAsJoin(SelectStatementBuilder $selectStatementBuilder, $joinType, ?QueryComparator $onComparator = null) {
-		$this->applySelection($selectStatementBuilder);
-		$onQueryComparator = $selectStatementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)),
+	public function applyAsJoin(StatementBuilder $statementBuilder, $joinType, ?QueryComparator $onComparator = null): void {
+//		$this->applySelection($statementBuilder);
+		$onQueryComparator = $statementBuilder->addJoin($joinType, new QueryTable($this->generateTableName($this->entityModel)),
 				$this->tableAlias, $onComparator);
 
 		if ($this->entityModel->hasSuperEntityModel()) {
@@ -125,10 +137,11 @@ class SingleTableTreePointMeta extends TreePointMetaAdapter {
 		return $onQueryComparator;
 	}
 
-	private function assembleDiscrComparator(QueryComparator $comparator) {
+	private function assembleDiscrComparator(QueryComparator $comparator, bool $tableAliasUsed = true): void {
 		foreach ($this->discriminatedEntityModels as $discriminatorValue => $entityModel) {
-			$comparator->orMatch(new QueryColumn($this->discriminatorColumnName, $this->tableAlias), '=',
-					new QueryConstant($discriminatorValue));
+			$comparator->orMatch(
+					new QueryColumn($this->discriminatorColumnName, ($tableAliasUsed ? $this->tableAlias : null)),
+					'=', new QueryConstant($discriminatorValue));
 		}
 	}
 	
