@@ -334,7 +334,8 @@ class EntityModelInitializer {
 					$classAttribute->getInstance()->getClasses());
 		} catch (\ReflectionException $e) {
 			throw new ConfigurationError('Could not load EntityListeners for '
-					. $classAttribute->getClass()->getName(), $classAttribute->getFile(), $classAttribute->getLine());
+							. $classAttribute->getClass()->getName(), $classAttribute->getFile(), $classAttribute->getLine(),
+					previous: $e);
 		}
 	}
 	/**
