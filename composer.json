@@ -31,7 +31,7 @@
 		"n2n/n2n-io": "~7.5.0",
 		"n2n/n2n-reflection": "~7.5.0",
 		"n2n/n2n-util": "~7.5.0",
-        "n2n/n2n-spec-dbo": "~2.0",
+        "n2n/n2n-spec-dbo": "~1.0",
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "php": ">=8.4"
