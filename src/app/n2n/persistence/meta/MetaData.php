@@ -23,6 +23,7 @@ namespace n2n\persistence\meta;
 
 use n2n\persistence\Pdo;
 use n2n\spec\dbo\meta\structure\Database;
+use n2n\spec\dbo\meta\structure\MetaManager;
 
 class MetaData {
 	private $dbh;
@@ -36,14 +37,18 @@ class MetaData {
 	}
 	/**
 	 * @return \n2n\spec\dbo\meta\structure\MetaManager
+	 * @deprecated caches data which could be a problem in a script which is supposed to run for a long time. use {@link self::createMetaManager()}.
 	 */
-	
 	public function getMetaManager() {
 		if (null === $this->metaManager) {
 			$this->metaManager = $this->getDialect()->createMetaManager($this->dbh);
 		}
 		
 		return $this->metaManager;
+	}
+
+	function createMetaManager(): MetaManager {
+		return $this->getDialect()->createMetaManager($this->dbh);
 	}
 	
 	/**
