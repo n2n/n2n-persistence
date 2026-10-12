@@ -52,8 +52,9 @@ class MetaData {
 	}
 	
 	/**
-	 * @return \n2n\spec\dbo\meta\structure\Database
-	 * @deprecated caches data which could be a problem in a script which is supposed to run for a long time. use {@link self::createDatabase()}.
+	 * @return Database
+	 * @deprecated caches data which could be a problem in a script which is supposed to run for a long time.
+	 * use {@link self::createMetaManager()} than {@link MetaManager::createDatabase()}.
 	 */
 	public function getDatabase(): Database {
 		if (null === $this->database) {
@@ -61,10 +62,6 @@ class MetaData {
 		}
 		
 		return $this->database;
-	}
-
-	function createDatabase(): Database {
-		return $this->getMetaManager()->createDatabase();
 	}
 	
 	/**
