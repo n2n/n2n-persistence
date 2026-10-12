@@ -22,6 +22,7 @@
 namespace n2n\persistence\meta;
 
 use n2n\persistence\Pdo;
+use n2n\spec\dbo\meta\structure\Database;
 
 class MetaData {
 	private $dbh;
@@ -47,13 +48,18 @@ class MetaData {
 	
 	/**
 	 * @return \n2n\spec\dbo\meta\structure\Database
+	 * @deprecated caches data which could be a problem in a script which is supposed to run for a long time. use {@link self::createDatabase()}.
 	 */
-	public function getDatabase() {
+	public function getDatabase(): Database {
 		if (null === $this->database) {
 			$this->database = $this->getMetaManager()->createDatabase();
 		}
 		
 		return $this->database;
+	}
+
+	function createDatabase(): Database {
+		return $this->getMetaManager()->createDatabase();
 	}
 	
 	/**
