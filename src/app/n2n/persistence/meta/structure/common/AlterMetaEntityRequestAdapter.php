@@ -21,9 +21,14 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-abstract class AlterMetaEntityRequestAdapter extends ChangeRequestAdapter implements AlterMetaEntityRequest {
+abstract class AlterMetaEntityRequestAdapter extends ChangeRequestAdapter {
+
+	public function getType(): ChangeRequestType {
+		return ChangeRequestType::ALTER;
+	}
+
 	public function neutralizesChangeRequest(ChangeRequest $newChangeRequest) {
-		return $newChangeRequest instanceof AlterMetaEntityRequest && 
+		return $newChangeRequest->getType() === ChangeRequestType::ALTER && 
 				$newChangeRequest->getMetaEntity()->equals($this->getMetaEntity()); 
 	}
 

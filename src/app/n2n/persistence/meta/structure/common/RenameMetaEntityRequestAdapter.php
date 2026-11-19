@@ -23,7 +23,7 @@ namespace n2n\persistence\meta\structure\common;
 
 use n2n\spec\dbo\meta\structure\MetaEntity;
 
-abstract class RenameMetaEntityRequestAdapter extends ChangeRequestAdapter implements RenameMetaEntityRequest {
+abstract class RenameMetaEntityRequestAdapter extends ChangeRequestAdapter {
 	
 	protected $oldName;
 	protected $newName;
@@ -32,6 +32,10 @@ abstract class RenameMetaEntityRequestAdapter extends ChangeRequestAdapter imple
 		parent::__construct($metaEntity);
 		$this->oldName = $oldName;
 		$this->newName = $newName;
+	}
+
+	public function getType(): ChangeRequestType {
+		return ChangeRequestType::RENAME;
 	}
 	
 	public function neutralizesChangeRequest(ChangeRequest $newChangeRequest) {

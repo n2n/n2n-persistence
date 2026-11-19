@@ -52,6 +52,7 @@ use n2n\util\ex\IllegalStateException;
 use n2n\util\type\TypeUtils;
 use n2n\util\magic\MagicContext;
 use n2n\util\type\TypeConstraints;
+use n2n\persistence\orm\store\datadefinition\DdTableUpdateProcess;
 
 class ScalarEntityProperty implements ColumnEntityProperty, BasicEntityProperty {
 	private EntityModel $entityModel;
@@ -295,5 +296,9 @@ class ScalarEntityProperty implements ColumnEntityProperty, BasicEntityProperty 
 
 	public function __toString(): string {
 		return (new \ReflectionClass($this))->getShortName() . ' [' . $this->accessProxy . ']';
+	}
+
+	function updateDataDefinition(DdTableUpdateProcess $process): void {
+		$process->putColumn($process->columnFactory->createStringColumn($this->columnName, 255));
 	}
 }

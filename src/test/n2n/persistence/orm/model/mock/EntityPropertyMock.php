@@ -27,6 +27,7 @@ use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\util\magic\MagicContext;
+use n2n\persistence\orm\store\datadefinition\DdTableUpdateProcess;
 
 class EntityPropertyMock implements BasicEntityProperty {
 	private $entityModel;
@@ -210,5 +211,9 @@ class EntityPropertyMock implements BasicEntityProperty {
 	}
 
 	public function cascade(mixed $value, int $cascadeType, CascadeOperation $cascadeOperation): void {
+	}
+
+	public function updateDataDefinition(DdTableUpdateProcess $process): void {
+		throw new UnsupportedOperationException();
 	}
 }

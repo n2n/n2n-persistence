@@ -38,6 +38,7 @@ use n2n\util\magic\MagicContext;
 use n2n\reflection\property\PropertyAccessException;
 use n2n\util\type\ValueIncompatibleWithConstraintsException;
 use n2n\persistence\orm\CorruptedDataException;
+use n2n\persistence\orm\store\datadefinition\DdTableUpdateProcess;
 
 interface EntityProperty {
 	/**
@@ -118,6 +119,8 @@ interface EntityProperty {
 	 * @return mixed
 	 */
 	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash;
+
+	function updateDataDefinition(DdTableUpdateProcess $process): void;
 	
 	/**
 	 * @param mixed $mappedValue

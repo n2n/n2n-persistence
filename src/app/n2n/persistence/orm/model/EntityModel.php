@@ -36,6 +36,7 @@ use n2n\persistence\orm\property\IdDef;
 use n2n\persistence\orm\InheritanceType;
 use n2n\util\type\ArgUtils;
 use n2n\util\type\TypeUtils;
+use n2n\persistence\orm\store\datadefinition\DdTableUpdateProcess;
 
 class EntityModel implements EntityPropertyCollection {	
 	private $class;
@@ -466,7 +467,9 @@ class EntityModel implements EntityPropertyCollection {
 		return $this->actionDependencies;
 	}
 
-	function updateDataDefinition(): void {
-
+	function updateDataDefinition(DdTableUpdateProcess $dbTableUpdateProcess): void {
+    	foreach ($this->getEntityProperties() as $entityProperty) {
+			$entityProperty->updateDataDefinition($dbTableUpdateProcess);
+		}
 	}
 }

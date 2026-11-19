@@ -44,4 +44,6 @@ interface ChangeRequest {
 	 * @return MetaEntity
 	 */
 	public function getMetaEntity(): MetaEntity;
+
+	public function getType(): ChangeRequestType;
 }

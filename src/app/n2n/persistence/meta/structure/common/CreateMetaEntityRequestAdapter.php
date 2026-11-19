@@ -21,12 +21,19 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-abstract class CreateMetaEntityRequestAdapter extends ChangeRequestAdapter implements CreateMetaEntityRequest {
+abstract class CreateMetaEntityRequestAdapter extends ChangeRequestAdapter {
+
+	public function getType(): ChangeRequestType {
+		return ChangeRequestType::CREATE;
+	}
+
 	public function neutralizesChangeRequest(ChangeRequest $newChangeRequest) {
-		return $newChangeRequest instanceof AlterMetaEntityRequest && $newChangeRequest->getMetaEntity()->equals($this->getMetaEntity()); 
+		return $newChangeRequest->getType() === ChangeRequestType::ALTER
+				&& $newChangeRequest->getMetaEntity()->equals($this->getMetaEntity()); 
 	}
 
 	public function isNeutralizedBy(ChangeRequest $newChangeRequest) {
-		return $newChangeRequest instanceof DropMetaEntityRequest && $this->getMetaEntity()->equals($newChangeRequest->getMetaEntity());
+		return $newChangeRequest->getType() === ChangeRequestType::DROP
+				&& $this->getMetaEntity()->equals($newChangeRequest->getMetaEntity());
 	}
 }

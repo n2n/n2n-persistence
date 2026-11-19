@@ -21,7 +21,12 @@
  */
 namespace n2n\persistence\meta\structure\common;
 
-abstract class DropMetaEntityRequestAdapter extends ChangeRequestAdapter implements DropMetaEntityRequest {
+abstract class DropMetaEntityRequestAdapter extends ChangeRequestAdapter {
+
+	public function getType(): ChangeRequestType {
+		return ChangeRequestType::DROP;
+	}
+
 	public function neutralizesChangeRequest(ChangeRequest $newChangeRequest) {
 		return false; 
 	}

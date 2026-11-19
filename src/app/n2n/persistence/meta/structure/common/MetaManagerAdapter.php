@@ -36,7 +36,7 @@ abstract class MetaManagerAdapter implements MetaManager, DatabaseChangeListener
 		$this->changeRequestQueue = new ChangeRequestQueue();
 	}
 
-	public function flush() {
+	public function flush(): void {
 		$this->changeRequestQueue->persist($this->dbh);
 	}
 	
@@ -55,33 +55,33 @@ abstract class MetaManagerAdapter implements MetaManager, DatabaseChangeListener
 	/**
 	 * @param MetaEntity $metaEntity
 	 */
-	public function onMetaEntityCreate(MetaEntity $metaEntity) {
+	public function onMetaEntityCreate(MetaEntity $metaEntity): void {
 		$this->addChangeRequest($this->createCreateMetaEntityRequest($metaEntity));
 	}
 	
 	/**
 	 * @param MetaEntity $metaEntity
 	 */
-	public function onMetaEntityAlter(MetaEntity $metaEntity) {
+	public function onMetaEntityAlter(MetaEntity $metaEntity): void {
 		$this->addChangeRequest($this->createAlterMetaEntityRequest($metaEntity));
 	}
 	
 	/**
 	 * @param MetaEntity $metaEntity
 	 */
-	public function onMetaEntityDrop(MetaEntity $metaEntity) {
+	public function onMetaEntityDrop(MetaEntity $metaEntity): void {
 		$this->addChangeRequest($this->createDropMetaEntityRequest($metaEntity));
 	}
 	
 	/**
 	 * @param MetaEntity $metaEntity
 	 */
-	public function onMetaEntityNameChange(string $orignalName, MetaEntity $metaEntity) {
+	public function onMetaEntityNameChange(string $orignalName, MetaEntity $metaEntity): void {
 		$this->addChangeRequest($this->createRenameMetaEntityRequest(
 				$metaEntity, $orignalName, $metaEntity->getName()));
 	}
 	
-	private function addChangeRequest(ChangeRequest $changeRequest) {
+	private function addChangeRequest(ChangeRequest $changeRequest): void {
 		$ignore = false;
 		foreach ($this->changeRequestQueue->getAll() as $aChangeRequest) {
 			if ($aChangeRequest->isNeutralizedBy($changeRequest)) {
@@ -89,7 +89,7 @@ abstract class MetaManagerAdapter implements MetaManager, DatabaseChangeListener
 				return;
 			}
 			
-			$ignore = $ignore || $changeRequest->neutralizesChangeRequest($changeRequest);
+			$ignore = $ignore || $aChangeRequest->neutralizesChangeRequest($changeRequest);
 		}
 		
 		if ($ignore) return;
@@ -97,9 +97,9 @@ abstract class MetaManagerAdapter implements MetaManager, DatabaseChangeListener
 		$this->changeRequestQueue->add($changeRequest);
 	}
 	
-	protected abstract function createCreateMetaEntityRequest(MetaEntity $metaEntity);
-	protected abstract function createAlterMetaEntityRequest(MetaEntity $metaEntity);
-	protected abstract function createDropMetaEntityRequest(MetaEntity $metaEntity);
-	protected abstract function createRenameMetaEntityRequest(MetaEntity $metaEntity, string $oldName, string $newName);
+	protected abstract function createCreateMetaEntityRequest(MetaEntity $metaEntity): ChangeRequest;
+	protected abstract function createAlterMetaEntityRequest(MetaEntity $metaEntity): ChangeRequest;
+	protected abstract function createDropMetaEntityRequest(MetaEntity $metaEntity): ChangeRequest;
+	protected abstract function createRenameMetaEntityRequest(MetaEntity $metaEntity, string $oldName, string $newName): ChangeRequest;
 	protected abstract function buildDatabase(): DatabaseAdapter;
 }
