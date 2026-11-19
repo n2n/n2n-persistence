@@ -465,4 +465,8 @@ class EntityModel implements EntityPropertyCollection {
 		$this->ensureActionDependenciesInit();
 		return $this->actionDependencies;
 	}
+
+	function updateDataDefinition(): void {
+
+	}
 }
