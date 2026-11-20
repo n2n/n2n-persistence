@@ -164,7 +164,7 @@ class SelectionGroup {
 	private $queryItems = array();
 	private $selectionCaims = array();
 
-	public function addSelection($key, Selection $selection) {
+	public function addSelection(string $key, Selection $selection): void {
 		$this->selections[$key] = $selection;
 
 		$caims = array();
