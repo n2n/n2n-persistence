@@ -51,7 +51,7 @@ class LoadingQueue {
 			throw new IllegalStateException('No LoadingContainer available.');
 		}
 
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_id($entity);
 		
 		$this->valueHashJobs[$objHash] = array('entityObj' => $entity, 'values' => $values);		
 		
@@ -60,11 +60,11 @@ class LoadingQueue {
 	}
 		
 	public function registerLoading($loadingContainer) {
-		$this->loadingContainerStack[spl_object_hash($loadingContainer)] = $loadingContainer;
+		$this->loadingContainerStack[spl_object_id($loadingContainer)] = $loadingContainer;
 	}
 	
 	public function finalizeLoading($loadingContainer) {
-		$objHash = spl_object_hash($loadingContainer);
+		$objHash = spl_object_id($loadingContainer);
 		
 		if (!isset($this->loadingContainerStack[$objHash])) {
 			throw new IllegalStateException('Unknown LoadingContainer');

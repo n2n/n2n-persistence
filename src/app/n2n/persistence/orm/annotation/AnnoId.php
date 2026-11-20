@@ -38,7 +38,7 @@ class AnnoId implements PropertyAnnotation, LegacyAnnotation {
 	private $sequenceName = null;
 	
 	public function __construct($generated = true, $sequenceName = null) {
-		$this->generated = (boolean) $generated;
+		$this->generated = (bool) $generated;
 		$this->sequenceName = $sequenceName;
 	}
 	

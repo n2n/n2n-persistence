@@ -53,11 +53,11 @@ class ChangeRequestQueue {
 	 * @param ChangeRequest $changeRequest
 	 */
 	public function add(ChangeRequest $changeRequest) {
-		$this->changeRequests[spl_object_hash($changeRequest)] = $changeRequest;
+		$this->changeRequests[spl_object_id($changeRequest)] = $changeRequest;
 	}
 	
 	public function remove(ChangeRequest $changeRequest) {
-		unset($this->changeRequests[spl_object_hash($changeRequest)]);
+		unset($this->changeRequests[spl_object_id($changeRequest)]);
 	}
 	
 	/**

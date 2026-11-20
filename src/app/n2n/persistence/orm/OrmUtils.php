@@ -155,7 +155,7 @@ class OrmUtils {
 // 			return $id === $id2;
 // 		}
 		
-// 		return spl_object_hash($obj) == spl_object_hash($obj2);
+// 		return spl_object_id($obj) == spl_object_id($obj2);
 // 	}
 
 	public static function determineValue(EntityPropertyCollection $entityPropertyCollection, $value, CriteriaProperty $criteriaProperty) {

@@ -49,7 +49,7 @@ class MergeOperationImpl implements MergeOperation {
 	public function mergeEntity($entity) {
 		ArgUtils::assertTrue(is_object($entity));
 
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_id($entity);
 		if (isset($this->mergedEntity[$objHash])) {
 			return $this->mergedEntity[$objHash];
 		}

@@ -120,11 +120,11 @@ class PdoStatement implements DboStatement {
 	}
 	
 	public function registerListener(PdoStatementListener $listener) {
-		$this->listeners[spl_object_hash($listener)] = $listener;
+		$this->listeners[spl_object_id($listener)] = $listener;
 	}
 	
 	public function unregisterListener(PdoStatementListener $listener) {
-		unset($this->listeners[spl_object_hash($listener)]);
+		unset($this->listeners[spl_object_id($listener)]);
 	}
 
 

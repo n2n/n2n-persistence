@@ -88,11 +88,11 @@ abstract class MetaEntityAdapter implements MetaEntity {
 	} 
 	
 	public function registerChangeListener(MetaEntityChangeListener $changeListener) {
-		$this->changeListeners[spl_object_hash($changeListener)] = $changeListener;
+		$this->changeListeners[spl_object_id($changeListener)] = $changeListener;
 	}
 	
 	public function unregisterChangeListener(MetaEntityChangeListener $changeListener) {
-		unset($this->changeListeners[spl_object_hash($changeListener)]);
+		unset($this->changeListeners[spl_object_id($changeListener)]);
 	}
 	
 	protected function triggerChangeListeners() {

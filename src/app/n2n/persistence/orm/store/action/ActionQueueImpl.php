@@ -116,15 +116,15 @@ class ActionQueueImpl implements ActionQueue {
 
 	public function add(Action $action, bool $prepend = false): void {
 		if (!$prepend) {
-			$this->actionJobs[spl_object_hash($action)] = $action;
+			$this->actionJobs[spl_object_id($action)] = $action;
 			return;
 		}
 
-		$this->actionJobs = [spl_object_hash($action) => $action] + $this->actionJobs;
+		$this->actionJobs = [spl_object_id($action) => $action] + $this->actionJobs;
 	}
 
 	public function remove(Action $action): void {
-		unset($this->actionJobs[spl_object_hash($action)]);
+		unset($this->actionJobs[spl_object_id($action)]);
 	}
 
 // 	public function announceLifecycleEvent(LifecycleEvent $event) {
@@ -219,7 +219,10 @@ class ActionQueueImpl implements ActionQueue {
 
 		uasort($this->actionJobs, fn (Action $aj1, Action $aj2) => $aj1->getPriority() - $aj2->getPriority());
 
-		while (null != ($job = array_shift($this->actionJobs))) {
+		// array_shift() would renumber the int keys (spl_object_id())
+		while (null !== ($key = array_key_first($this->actionJobs))) {
+			$job = $this->actionJobs[$key];
+			unset($this->actionJobs[$key]);
 			$job->execute($pdo);
 		}
 
@@ -315,7 +318,6 @@ class ActionQueueImpl implements ActionQueue {
 		$methodInvoker->setClassParamObject(LifecycleEvent::class, $event);
 
 		foreach ($methods as $method) {
-			$method->setAccessible(true);
 			$methodInvoker->invoke($entityObj, $method);
 			$methodInvoked = true;
 		}
@@ -323,7 +325,6 @@ class ActionQueueImpl implements ActionQueue {
 		foreach ($entityListenerClasses as $entityListenerClass) {
 			$callbackMethod = LifecycleUtils::findEventMethod($entityListenerClass, $eventType);
 			if ($callbackMethod !== null) {
-				$callbackMethod->setAccessible(true);
 				$methodInvoker->invoke($this->lookupEntityListener($entityObj, $entityListenerClass), $callbackMethod);
 				$methodInvoked = true;
 			}
@@ -356,10 +357,10 @@ class ActionQueueImpl implements ActionQueue {
 	}
 
 	public function registerLifecycleListener(LifecycleListener $listener) {
-		$this->lifecylceListeners[spl_object_hash($listener)] = $listener;
+		$this->lifecylceListeners[spl_object_id($listener)] = $listener;
 	}
 
 	public function unregisterLifecycleListener(LifecycleListener $listener) {
-		unset($this->lifecylceListeners[spl_object_hash($listener)]);
+		unset($this->lifecylceListeners[spl_object_id($listener)]);
 	}
 }

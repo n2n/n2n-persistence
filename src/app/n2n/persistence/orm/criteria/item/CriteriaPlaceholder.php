@@ -36,7 +36,7 @@ class CriteriaPlaceholder implements CriteriaItem {
 	private $name;
 	
 	public function __construct($name) {
-		return $this->name = $name;
+		$this->name = $name;
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\criteria\item\CriteriaItem::createQueryPoint()

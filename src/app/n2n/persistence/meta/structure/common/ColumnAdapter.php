@@ -151,11 +151,11 @@ abstract class ColumnAdapter implements Column, CommonColumn {
 	}
 	
 	public function registerChangeListener(ColumnChangeListener $changeListener) {
-		$this->changeListeners[spl_object_hash($changeListener)] = $changeListener;
+		$this->changeListeners[spl_object_id($changeListener)] = $changeListener;
 	}
 	
 	public function unregisterChangeListener(ColumnChangeListener $changeListener) {
-		unset($this->changeListeners[spl_object_hash($changeListener)]);
+		unset($this->changeListeners[spl_object_id($changeListener)]);
 	}
 	
 	protected function triggerChangeListeners() {

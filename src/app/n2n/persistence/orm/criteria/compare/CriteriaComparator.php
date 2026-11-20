@@ -68,8 +68,8 @@ class CriteriaComparator {
 			$expectConstForArg1 = false, $expectConstForArg2 = true) {
 		$this->criteria = $criteria;
 		$this->parentComparator = $parentComparator;
-		$this->expectConstForArg1 = (boolean) $expectConstForArg1;
-		$this->expectConstForArg2 = (boolean) $expectConstForArg2;
+		$this->expectConstForArg1 = (bool) $expectConstForArg1;
+		$this->expectConstForArg2 = (bool) $expectConstForArg2;
 	}
 	/**
 	 * @param mixed $arg1
@@ -85,7 +85,7 @@ class CriteriaComparator {
 				'criteriaItem1' => $this->parseCriteriaItem($arg1, $this->expectConstForArg1), 
 				'operator' => $operator, 
 				'criteriaItem2' => $this->parseCriteriaItem($arg2, $this->expectConstForArg2),
-				'useAnd' => (boolean) $useAnd);
+				'useAnd' => (bool) $useAnd);
 		return $this;
 	}
 	
@@ -126,7 +126,7 @@ class CriteriaComparator {
 		$this->comparisonDefs[] = array(
 				'operator' => $operator,
 				'testCriteria' => $comparatorCriteria,
-				'useAnd' => (boolean) $useAnd);
+				'useAnd' => (bool) $useAnd);
 		
 		return $this;
 	}
@@ -155,7 +155,7 @@ class CriteriaComparator {
 				$this->expectConstForArg2);
 		$this->comparisonDefs[] = array(
 				'groupCriteriaComparator' => $groupCriteriaComparator,
-				'useAnd' => (boolean) $useAnd);
+				'useAnd' => (bool) $useAnd);
 		return $groupCriteriaComparator;
 	}
 	/**

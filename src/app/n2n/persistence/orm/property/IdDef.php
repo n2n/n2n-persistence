@@ -28,7 +28,7 @@ class IdDef {
 	
 	public function __construct(BasicEntityProperty $entityProperty, $generated, $sequenceName) {
 		$this->entityProperty = $entityProperty;
-		$this->generated = (boolean) $generated;
+		$this->generated = (bool) $generated;
 		$this->sequenceName = $sequenceName;
 	}
 	

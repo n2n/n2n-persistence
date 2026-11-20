@@ -31,7 +31,7 @@ class CommonTextColumn extends ColumnAdapter implements TextColumn {
 
 	public function __construct($name, $size, $charset = null) {
 		parent::__construct($name);
-		$this->size = doubleval($size);
+		$this->size = floatval($size);
 		$this->charset = $charset;
 	}
 

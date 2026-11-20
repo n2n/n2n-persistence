@@ -63,7 +63,7 @@ class CommonFloatingPointColumn extends ColumnAdapter implements FloatingPointCo
 		$this->minExponent = 1 - $this->getMaxExp($size);
 		$this->maxExponent = $this->getMaxExp($size);
 		// Formula is m * b ^ e ; b = 2; see http://de.wikipedia.org/wiki/IEEE_754
-		$this->maxValue = doubleval($this->getMaxMantissa($size) * pow(2, $this->maxExponent));
+		$this->maxValue = floatval($this->getMaxMantissa($size) * pow(2, $this->maxExponent));
 		$this->minValue = $this->maxValue * (-1);
 	}
 

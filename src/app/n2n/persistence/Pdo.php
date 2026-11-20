@@ -361,13 +361,13 @@ class Pdo implements Dbo {
 	 * @param PdoListener $listener
 	 */
 	public function registerListener(PdoListener $listener) {
-		$this->listeners[spl_object_hash($listener)] = $listener;
+		$this->listeners[spl_object_id($listener)] = $listener;
 	}
 	/**
 	 * @param PdoListener $listener
 	 */
 	public function unregisterListener(PdoListener $listener) {
-		unset($this->listeners[spl_object_hash($listener)]);
+		unset($this->listeners[spl_object_id($listener)]);
 	}
 
 	function createMetaManager(): MetaManager {

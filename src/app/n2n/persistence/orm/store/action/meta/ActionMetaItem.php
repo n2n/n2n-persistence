@@ -71,7 +71,7 @@ class ActionMetaItem {
 	}
 	
 	public function isEmpty() {
-		return !(boolean) sizeof($this->rawValues);
+		return !(bool) sizeof($this->rawValues);
 	}
 	
 	public function setRawValue($columnName, $rawValue, ?int $pdoDataType, ?EntityProperty $entityProperty) {

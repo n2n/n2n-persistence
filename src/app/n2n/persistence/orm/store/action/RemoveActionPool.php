@@ -53,12 +53,12 @@ class RemoveActionPool {
 
 	public function containsAction($entity) {
 		ArgUtils::assertTrue(is_object($entity));
-		return isset($this->removeActions[spl_object_hash($entity)]);
+		return isset($this->removeActions[spl_object_id($entity)]);
 	}
 	
 	public function getAction($entity) {
 		ArgUtils::assertTrue(is_object($entity));
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_id($entity);
 		if (isset($this->removeActions[$objHash])) {
 			return $this->removeActions[$objHash];
 		}
@@ -68,7 +68,7 @@ class RemoveActionPool {
 	
 
 	public function getOrCreateAction($entity) {
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_id($entity);
 		if (isset($this->removeActions[$objHash])) {
 			return $this->removeActions[$objHash];
 		}
@@ -140,7 +140,7 @@ class RemoveActionPool {
 	public function removeAction(object $entityObj): void {
 		ArgUtils::assertTrue(is_object($entityObj));
 		
-		$objHash = spl_object_hash($entityObj);
+		$objHash = spl_object_id($entityObj);
 		if (!isset($this->removeActions[$objHash])) return;
 	
 		IllegalStateException::assertTrue(!$this->frozen);

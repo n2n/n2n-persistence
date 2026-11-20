@@ -41,7 +41,7 @@ class OperationCascader {
 
 	public function markAsCascaded($entity) {
 		ArgUtils::valType($entity, 'object');
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_id($entity);
 
 		if (isset($this->cascadedEntities[$objHash])) {
 			return false;

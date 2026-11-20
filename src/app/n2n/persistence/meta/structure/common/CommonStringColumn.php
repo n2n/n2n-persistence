@@ -31,7 +31,7 @@ class CommonStringColumn extends ColumnAdapter implements StringColumn {
 
 	public function __construct($name, $length, $charset = null) {
 		parent::__construct($name);
-		$this->length = doubleval($length);
+		$this->length = floatval($length);
 		$this->charset = $charset;
 	}
 

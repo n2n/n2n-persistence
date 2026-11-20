@@ -91,13 +91,13 @@ class PdoPoolUsage {
 	function registerUsage(PersistenceAddOnContext $persistenceAddOnContext): void {
 		IllegalStateException::assertTrue(!$this->usages->offsetExists($persistenceAddOnContext));
 
-		$this->usages->attach($persistenceAddOnContext);
+		$this->usages->offsetSet($persistenceAddOnContext);
 	}
 
 	function unregisterUsage(PersistenceAddOnContext $persistenceAddOnContext): void {
 		IllegalStateException::assertTrue($this->usages->offsetExists($persistenceAddOnContext));
 
-		$this->usages->detach($persistenceAddOnContext);
+		$this->usages->offsetUnset($persistenceAddOnContext);
 	}
 
 	function countUsages(): int {

@@ -77,7 +77,7 @@ class PersistenceContext {
 	public function getIdByEntityObj($entityObj) {
 		ArgUtils::assertTrue(is_object($entityObj));
 		
-		$objHash = spl_object_hash($entityObj);
+		$objHash = spl_object_id($entityObj);
 		if (isset($this->entityIdReps[$objHash])) {
 			return $this->entityIdReps[$objHash];
 		}
@@ -113,7 +113,7 @@ class PersistenceContext {
 		
 		if (!isset($this->entityIdentifiers[$className][$idRep])) return null;
 		
-		$objHash = spl_object_hash($this->entityIdentifiers[$className][$idRep]);
+		$objHash = spl_object_id($this->entityIdentifiers[$className][$idRep]);
 		if (isset($this->removedEntityObjs[$objHash])) {
 			return $this->removedEntityObjs[$objHash];
 		}
@@ -128,7 +128,7 @@ class PersistenceContext {
 	public function getEntityInfo($entityObj): EntityInfo {
 		ArgUtils::assertTrue(is_object($entityObj));
 		
-		$objectHash = spl_object_hash($entityObj);
+		$objectHash = spl_object_id($entityObj);
 		$entityModel = null;
 		$id = null;
 		if (isset($this->entityIdReps[$objectHash])) {
@@ -253,7 +253,7 @@ class PersistenceContext {
 	 * @param EntityModel $entityModel
 	 */
 	public function manageEntityObj(object $entityObj, EntityModel $entityModel): void {
-		$objHash = spl_object_hash($entityObj);
+		$objHash = spl_object_id($entityObj);
 		unset($this->removedEntityObjs[$objHash]);
 		
 		$this->managedEntityObjs[$objHash] = $entityObj;
@@ -266,7 +266,7 @@ class PersistenceContext {
 	 */
 	public function containsManagedEntityObj($entityObj) {
 		ArgUtils::assertTrue(is_object($entityObj));
-		return isset($this->managedEntityObjs[spl_object_hash($entityObj)]);
+		return isset($this->managedEntityObjs[spl_object_id($entityObj)]);
 	}
 	
 	/**
@@ -275,7 +275,7 @@ class PersistenceContext {
 	public function removeEntityObj($entity) {
 		$this->validateEntityObjManaged($entity);
 		
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_id($entity);
 		unset($this->managedEntityObjs[$objHash]);
 		$this->removedEntityObjs[$objHash] = $entity;
 	}
@@ -286,7 +286,7 @@ class PersistenceContext {
 	 */
 	public function containsRemovedEntityObj($entityObj) {
 		ArgUtils::assertTrue(is_object($entityObj));
-		return isset($this->removedEntityObjs[spl_object_hash($entityObj)]);
+		return isset($this->removedEntityObjs[spl_object_id($entityObj)]);
 	}
 	
 	/**
@@ -303,7 +303,7 @@ class PersistenceContext {
 	 * @param object $entity
 	 */
 	public function detachEntityObj($entity) {
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_id($entity);
 		
 		if (isset($this->entityModels[$objHash])) {
 			$entityModel = $this->entityModels[$objHash];
@@ -354,7 +354,7 @@ class PersistenceContext {
 		ArgUtils::assertTrue(is_object($entityObj));
 		ArgUtils::assertTrue($id !== null);
 		
-		$objHash = spl_object_hash($entityObj);
+		$objHash = spl_object_id($entityObj);
 		if (!isset($this->managedEntityObjs[$objHash])) {
 			throw new IllegalStateException('Unable to identify non managed entity.');
 		}
@@ -390,7 +390,7 @@ class PersistenceContext {
 	 * @return EntityModel
 	 */
 	public function getEntityModelByEntityObj($entityObj) {
-		$objHash = spl_object_hash($entityObj);
+		$objHash = spl_object_id($entityObj);
 		if (isset($this->entityModels[$objHash])) {
 			return $this->entityModels[$objHash];
 		}
@@ -430,7 +430,7 @@ class PersistenceContext {
 	public function containsValueHashes($entityObj) {
 		$this->validateEntityObjManaged($entityObj);
 		
-		return isset($this->entityValueHashCols[spl_object_hash($entityObj)]);
+		return isset($this->entityValueHashCols[spl_object_id($entityObj)]);
 	}
 	
 	/**
@@ -447,7 +447,7 @@ class PersistenceContext {
 // 		$hashFactory->setValues($values);
 // 		$hashFactory->setValueHashes($valueHashes);
 		
-		$this->entityValueHashCols[spl_object_hash($entityObj)] = $valueHashCol;
+		$this->entityValueHashCols[spl_object_id($entityObj)] = $valueHashCol;
 	}
 	
 	/**
@@ -456,7 +456,7 @@ class PersistenceContext {
 	 * @return ValueHashCol
 	 */
 	public function getValueHashColByEntityObj(object $entityObj): ValueHashCol {
-		$objectHash = spl_object_hash($entityObj);
+		$objectHash = spl_object_id($entityObj);
 		
 		if (isset($this->entityValueHashCols[$objectHash])) {
 			return $this->entityValueHashCols[$objectHash];

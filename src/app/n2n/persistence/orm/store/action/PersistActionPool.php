@@ -51,12 +51,12 @@ class PersistActionPool {
 
 	public function containsAction($entity) {
 		ArgUtils::assertTrue(is_object($entity));
-		return isset($this->persistActions[spl_object_hash($entity)]);
+		return isset($this->persistActions[spl_object_id($entity)]);
 	}
 
 	private function findAction($entity) {
 		ArgUtils::assertTrue(is_object($entity));
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_id($entity);
 		if (isset($this->persistActions[$objHash])) {
 			return $this->persistActions[$objHash];
 		}
@@ -92,7 +92,7 @@ class PersistActionPool {
 
 	public function removeAction($entity) {
 		ArgUtils::assertTrue(is_object($entity));
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_id($entity);
 		if (!isset($this->persistActions[$objHash])) return;
 
 		IllegalStateException::assertTrue(!$this->frozen);
@@ -133,7 +133,7 @@ class PersistActionPool {
 	}
 
 	private function registerPersistAction($entity, PersistAction $persistAction): void {
-		$objHash = spl_object_hash($entity);
+		$objHash = spl_object_id($entity);
 		$this->persistActions[$objHash] = $persistAction;
 		$this->unsuppliedPersistActions[$objHash] = $persistAction;
 		$this->actionQueue->add($persistAction);

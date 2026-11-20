@@ -188,11 +188,11 @@ class PdoPool {
 	}
 	
 //	public function registerListener(PdoPoolListener $dbhPoolListener) {
-//		$this->dbhPoolListeners[spl_object_hash($dbhPoolListener)] = $dbhPoolListener;
+//		$this->dbhPoolListeners[spl_object_id($dbhPoolListener)] = $dbhPoolListener;
 //	}
 //
 //	public function unregisterListener(PdoPoolListener $dbhPoolListener) {
-//		unset($this->dbhPoolListeners[spl_object_hash($dbhPoolListener)]);
+//		unset($this->dbhPoolListeners[spl_object_id($dbhPoolListener)]);
 //	}
 
 }
