@@ -192,9 +192,9 @@ class SelectionGroup {
 		}
 	}
 
-	public function getSelectionByKey($key): Selection {
-		if (isset($this->selections[$key])) {
-			return $this->selections[$key];
+	public function getSelectionByKey(?string $key): Selection {
+		if (isset($this->selections[(string) $key])) {
+			return $this->selections[(string) $key];
 		}
 
 		throw new \InvalidArgumentException();
