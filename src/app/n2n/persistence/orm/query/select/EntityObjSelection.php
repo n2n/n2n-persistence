@@ -164,8 +164,8 @@ class SelectionGroup {
 	private $queryItems = array();
 	private $selectionCaims = array();
 
-	public function addSelection(string $key, Selection $selection): void {
-		$this->selections[$key] = $selection;
+	public function addSelection(?string $key, Selection $selection): void {
+		$this->selections[(string) $key] = $selection;
 
 		$caims = array();
 		foreach ($selection->getSelectQueryItems() as $queryItemIndex => $queryItem) {
@@ -173,7 +173,7 @@ class SelectionGroup {
 			$this->queryItems[$columnIndex] = $queryItem;
 			$caims[$queryItemIndex] = $columnIndex;
 		}
-		$this->selectionCaims[$key] = $caims;
+		$this->selectionCaims[(string) $key] = $caims;
 	}
 
 	public function getSelectQueryItems(): array {
