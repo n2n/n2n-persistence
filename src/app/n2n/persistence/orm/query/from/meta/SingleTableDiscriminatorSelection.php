@@ -44,8 +44,8 @@ class SingleTableDiscriminatorSelection implements DiscriminatorSelection {
 	public function determineEntityModel() {
 		//		if ($this->value === null) return null;
 
-		if (isset($this->discriminatedEntityModels[$this->value])) {
-			return $this->discriminatedEntityModels[$this->value];
+		if (isset($this->discriminatedEntityModels[(string) $this->value])) {
+			return $this->discriminatedEntityModels[(string) $this->value];
 		}
 
 		throw new CorruptedDataException('Unknown discriminator value \'' . TypeUtils::buildScalar($this->value)
